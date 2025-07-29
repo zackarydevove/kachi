@@ -1,8 +1,18 @@
-import { Router } from 'express';
-import { createUser } from '../controllers/user.controller';
+import AuthMiddleware from '@middlewares/auth.middleware';
+import UserController from '@controllers/user.controller';
+import BaseRouter, { RouteConfig } from './router';
 
-const router = Router();
+class UserRoutes extends BaseRouter {
+  protected routes(): RouteConfig[] {
+    return [
+      {
+        method: 'get',
+        path: '/info',
+        middlewares: [AuthMiddleware.authenticateUser],
+        handler: UserController.getUser,
+      },
+    ];
+  }
+}
 
-router.post('/', createUser);
-
-export default router;
+export default new UserRoutes().router;

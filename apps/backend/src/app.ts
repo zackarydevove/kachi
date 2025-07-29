@@ -1,15 +1,45 @@
-import express from 'express';
-import userRoutes from './routes/user.route';
-import { errorHandler } from './middlewares/error.middleware';
+import express, { Express } from 'express';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import authRoutes from '@routes/auth.route';
+import appConfig from '@config/app.config';
+import userRoutes from '@routes/user.route';
 
-const app = express();
+export default class App {
+  private app: Express;
 
-app.use(express.json());
+  constructor() {
+    this.app = express();
 
-// Routes
-app.use('/api/items', userRoutes);
+    this.initMiddlewares();
+    this.initRoutes();
+  }
 
-// Global error handler (should be after routes)
-app.use(errorHandler);
+  private initMiddlewares() {
+    this.app.use(express.json());
+    this.app.use(cookieParser());
+    this.app.use(
+      cors({
+        origin: [
+          'http://localhost:3000',
+          // 'https://mywebsite.com',
+        ],
+        methods: ['GET', 'POST', 'DELETE'],
+        credentials: true, // to get the httpOnly cookies
+      }),
+    );
+  }
 
-export default app;
+  private initRoutes() {
+    this.app.use('/api/auth', authRoutes);
+    this.app.use('/api/user', userRoutes);
+  }
+
+  public start() {
+    const { backendPort, host } = appConfig;
+
+    this.app.listen(backendPort, host, () => {
+      console.log(`server is running on http://${host}:${backendPort}`);
+    });
+  }
+}

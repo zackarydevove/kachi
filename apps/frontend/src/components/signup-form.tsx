@@ -1,5 +1,4 @@
 "use client";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,19 +10,20 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthApi, AuthRequest } from "@/services/api/auth.api";
 import { Loader2Icon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { AuthUtil } from "@/utils/auth.util";
 
-export function LoginForm({
+export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<{ message: string; path: string } | null>(
     null
@@ -32,26 +32,19 @@ export function LoginForm({
   const authApi = new AuthApi();
   const authUtil = new AuthUtil();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    const payload: AuthRequest = { email, password };
+    const payload: AuthRequest = { email, password, confirmPassword };
     if (!authUtil.checkError(payload, setError)) return;
 
     try {
       setLoading(true);
-      await authApi.login(payload);
-      router.push("/home");
-    } catch (err: any) {
-      setError({
-        message:
-          err.response?.status === 401
-            ? "Invalid email or password"
-            : "Something went wrong. Please try again later.",
-        path: "password",
-      });
-      setLoading(false);
+      await authApi.signup(payload);
+      router.push("/login");
+    } catch (err) {
+      console.error("Authentication error: ", err);
     } finally {
       setLoading(false);
     }
@@ -61,13 +54,13 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
+          <CardTitle className="text-xl">Welcome</CardTitle>
           <CardDescription>
             Login with your Apple or Google account
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleSignup}>
             <div className="grid gap-6">
               <div className="flex flex-col gap-4">
                 <Button variant="outline" className="w-full">
@@ -115,12 +108,6 @@ export function LoginForm({
                 <div className="grid gap-3">
                   <div className="flex items-center">
                     <Label htmlFor="password">Password</Label>
-                    <a
-                      href="#"
-                      className="ml-auto text-sm underline-offset-4 hover:underline"
-                    >
-                      Forgot your password?
-                    </a>
                   </div>
                   <div>
                     <Input
@@ -129,7 +116,6 @@ export function LoginForm({
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
-
                     {error && error.path === "password" ? (
                       <p className="text-sm text-red-500 mt-1">
                         {error.message}
@@ -137,14 +123,37 @@ export function LoginForm({
                     ) : null}
                   </div>
                 </div>
+                <div className="grid gap-3">
+                  <div className="flex items-center">
+                    <Label htmlFor="password">Confirm Password</Label>
+                  </div>
+                  <div>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                    />
+                    {error && error.path === "confirmPassword" ? (
+                      <p className="text-sm text-red-500 mt-1">
+                        {error.message}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+
                 <Button type="submit" className="w-full">
-                  {loading ? <Loader2Icon className="animate-spin" /> : "Login"}
+                  {loading ? (
+                    <Loader2Icon className="animate-spin" />
+                  ) : (
+                    "Signup"
+                  )}
                 </Button>
               </div>
               <div className="text-center text-sm">
-                Don&apos;t have an account?{" "}
-                <a href="/signup" className="underline underline-offset-4">
-                  Sign up
+                Already have an account?{" "}
+                <a href="/login" className="underline underline-offset-4">
+                  Log in
                 </a>
               </div>
             </div>
