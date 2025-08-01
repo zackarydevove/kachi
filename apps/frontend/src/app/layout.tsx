@@ -1,3 +1,4 @@
+import { AuthInitializer } from "@/components/auth-initializer";
 import "./globals.css";
 
 export default function RootLayout({
@@ -7,6 +8,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <AuthInitializer />
       <body>{children}</body>
     </html>
   );

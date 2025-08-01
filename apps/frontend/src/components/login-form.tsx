@@ -16,6 +16,7 @@ import { useState } from "react";
 import { AuthApi, AuthRequest } from "@/services/api/auth.api";
 import { Loader2Icon } from "lucide-react";
 import { AuthUtil } from "@/utils/auth.util";
+import { useUserStore } from "@/store/user.store";
 
 export function LoginForm({
   className,
@@ -28,6 +29,7 @@ export function LoginForm({
   const [error, setError] = useState<{ message: string; path: string } | null>(
     null
   );
+  const setUser = useUserStore((state) => state.setUser);
 
   const authApi = new AuthApi();
   const authUtil = new AuthUtil();
@@ -41,7 +43,9 @@ export function LoginForm({
 
     try {
       setLoading(true);
-      await authApi.login(payload);
+      const res = await authApi.login(payload);
+      console.log("res: ", res);
+      setUser(res.user);
       router.push("/home");
     } catch (err: any) {
       setError({

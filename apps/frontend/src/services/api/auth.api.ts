@@ -10,10 +10,8 @@ const AuthRequestSchema = z.object({
 
 // Define response schema
 const AuthResponseSchema = z.object({
-  token: z.string(),
   user: z.object({
     id: z.number(),
-    name: z.string(),
     email: z.string().email(),
   }),
 });

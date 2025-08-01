@@ -68,7 +68,7 @@ export abstract class ApiBase<TRequest, TResponse> {
     data?: TRequest
   ): Promise<TResponse> {
     try {
-      // TODO: Validate request data if applicable // C'est pour check qu'on envoit bien ce qu'on veut et pas autre chose, bonne pratique
+      // TODO: Validate request data // C'est pour check qu'on envoit bien ce qu'on veut et pas autre chose, bonne pratique
       // if (data) {
       //   this.requestSchema().parse(data);
       // }
@@ -79,7 +79,8 @@ export abstract class ApiBase<TRequest, TResponse> {
       // TODO: Validate response // pour check qu'on recoit bien ce qu'on veut, bonne pratique
       // const parsed = this.responseSchema().parse(response.data);
       // return parsed;
-      return response as TResponse; // temporary return to delete
+      console.log("response: ", response);
+      return response.data.data as TResponse; // temporary return to delete
     } catch (error: any) {
       const isLogoutRequest = url == `${this.endpoint}/logout`;
       const isUnauthorized = error?.response?.status === 401;

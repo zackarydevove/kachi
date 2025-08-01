@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/sidebar";
 import { AuthApi } from "@/services/api/auth.api";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/store/user.store";
 
 export function NavUser({
   user,
@@ -41,10 +42,12 @@ export function NavUser({
   const { isMobile } = useSidebar();
 
   const authApi = new AuthApi();
+  const logoutAuthStore = useUserStore((state) => state.logout);
 
   const logout = async () => {
     try {
       await authApi.logout();
+      logoutAuthStore();
       router.push("/login");
     } catch (err) {
       console.error("Logout failed:", err);
@@ -98,7 +101,7 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push("/settings")}>
                 <BadgeCheck />
                 Account
               </DropdownMenuItem>

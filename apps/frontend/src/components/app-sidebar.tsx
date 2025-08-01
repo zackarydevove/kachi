@@ -21,6 +21,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { useUserStore } from "@/store/user.store";
 
 // This is sample data.
 const data = {
@@ -49,20 +50,27 @@ const data = {
   navMain: [
     {
       title: "Home",
+      url: "/home",
+      icon: House,
+      isActive: true,
+      // items: [],
+    },
+    {
+      title: "Portfolio",
       url: "#",
       icon: House,
       isActive: true,
       items: [
         {
-          title: "History",
+          title: "Crypto",
           url: "#",
         },
         {
-          title: "Starred",
+          title: "Real Estate",
           url: "#",
         },
         {
-          title: "Settings",
+          title: "Stocks",
           url: "#",
         },
       ],
@@ -137,6 +145,12 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const user = {
+    email: useUserStore((state) => state.user)?.email,
+    name: "bob",
+    avatar: "b",
+  };
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -147,7 +161,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* <NavProjects projects={data.projects} /> */}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
