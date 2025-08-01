@@ -18,7 +18,8 @@ class AuthMiddleware {
     next: NextFunction,
   ) {
     const token = req.cookies.accessToken;
-    console.log('token of user when logout: ', token);
+    console.log('req.cookies in access token middleware: ', req.cookies);
+
     if (!token) return Send.unauthorized(res, null);
 
     try {
@@ -37,6 +38,7 @@ class AuthMiddleware {
     next: NextFunction,
   ) {
     const refreshToken = req.cookies.refreshToken;
+    console.log('req.cookies in refresh token middleware: ', req.cookies);
     if (!refreshToken)
       return Send.unauthorized(res, { message: 'No refresh token provided' });
 

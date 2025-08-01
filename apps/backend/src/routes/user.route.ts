@@ -7,7 +7,7 @@ class UserRoutes extends BaseRouter {
     return [
       {
         method: 'get',
-        path: '/info',
+        path: '/me',
         middlewares: [AuthMiddleware.authenticateUser],
         handler: UserController.getUser,
       },

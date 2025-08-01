@@ -8,6 +8,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AssetType {
+  crypto
+  real_estate
+  stock
+  cash
+  exotic
+}
+
 model User {
   id           Int      @id @default(autoincrement())
   email        String   @unique
@@ -15,4 +23,50 @@ model User {
   refreshToken String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  deletedAt    DateTime
+
 }
+
+model Asset {
+  id           Int      @id @default(autoincrement())
+  // account_id         // later
+  name        String
+  type        AssetType // (crypto, real_estate, stock, cash, divers) (enum)
+  unitPrice   Int       // cannot be <0
+  quantity    Int       // cannot be < 0
+  // currency    String // for now only USD
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime
+
+  liabilities  AssetLiability[] // 👈 back-reference
+}
+
+model Liability {
+  id           Int      @id @default(autoincrement())
+  // account_id         // later
+  name        String
+  amount      Int       // cannot be <0
+  // currency    String // for now only USD
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime
+
+  assets       AssetLiability[] // 👈 back-reference
+}
+
+model AssetLiability {
+  id          Int       @id @default(autoincrement())
+  assetId     Int
+  liabilityId Int
+
+  asset       Asset     @relation(fields: [assetId], references: [id])
+  liability   Liability @relation(fields: [liabilityId], references: [id])
+}
+
+// model NetWorthSnapshot {
+//   id          Int       @id @default(autoincrement())
+//   accountId   Int
+//   value       Int
+//   date        DateTime
+// }

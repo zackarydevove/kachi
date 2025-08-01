@@ -52,8 +52,10 @@ export default class AuthController {
       });
 
       return Send.success(res, {
-        id: user.id,
-        email: user.email,
+        user: {
+          id: user.id,
+          email: user.email,
+        },
       });
     } catch (error) {
       console.error('Login Failed:', error);
@@ -130,9 +132,14 @@ export default class AuthController {
         where: { id: userId },
       });
 
+      console.log('user: ', user);
+      console.log('refreshToken: ', refreshToken);
+
       if (!user || !user.refreshToken) {
         return Send.unauthorized(res, 'Refresh token not found');
       }
+
+      console.log('user.refreshToken', user.refreshToken);
 
       // Check if the refresh token in the database matches the one from the client
       if (user.refreshToken !== refreshToken) {
