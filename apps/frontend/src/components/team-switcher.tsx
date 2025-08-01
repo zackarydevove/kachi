@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ChevronsUpDown, Ellipsis, Pencil, Plus } from "lucide-react";
+import { ChevronsUpDown, Plus } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -17,19 +17,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
+import EditSubAccountDialog from "./sub-accounts/edit-dialog";
 
 export function TeamSwitcher({
   teams,
@@ -42,7 +30,6 @@ export function TeamSwitcher({
 }) {
   const { isMobile } = useSidebar();
   const [activeTeam, setActiveTeam] = React.useState(teams[0]);
-  const test = () => console.log("hello");
 
   if (!activeTeam) {
     return null;
@@ -88,69 +75,11 @@ export function TeamSwitcher({
                   </div>
                   {team.name}
                 </div>
-                <div onClick={(e) => e.stopPropagation()} className="z-50">
-                  <Dialog>
-                    <form>
-                      <DialogTrigger asChild>
-                        {/* <div className="hover:bg-accent border rounded-full hover:cursor-pointer p-1 transition-colors"> */}
-                        <Button
-                          variant="outline"
-                          size={"icon"}
-                          className="size-6"
-                        >
-                          <Pencil size={1} />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle>Edit profile</DialogTitle>
-                          <DialogDescription>
-                            Make changes to your profile here. Click save when
-                            you&apos;re done.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4">
-                          <div className="grid gap-3">
-                            <Label htmlFor="name-1">Name</Label>
-                            <Input
-                              id="name-1"
-                              name="name"
-                              defaultValue="Pedro Duarte"
-                            />
-                          </div>
-                          <div className="grid gap-3">
-                            <Label htmlFor="username-1">Username</Label>
-                            <Input
-                              id="username-1"
-                              name="username"
-                              defaultValue="@peduarte"
-                            />
-                          </div>
-                        </div>
-                        <DialogFooter className="flex">
-                          <div className="flex-1">
-                            <Button variant="destructive">Delete</Button>
-                          </div>
-                          <div className="flex gap-2">
-                            <DialogClose asChild>
-                              <Button variant="outline">Cancel</Button>
-                            </DialogClose>
-                            <Button type="submit">Save changes</Button>
-                          </div>
-                        </DialogFooter>
-                      </DialogContent>
-                    </form>
-                  </Dialog>
-                </div>
+                <EditSubAccountDialog type="edit" />
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
-                <Plus className="size-4" />
-              </div>
-              <div className="text-muted-foreground font-medium">Add team</div>
-            </DropdownMenuItem>
+            <EditSubAccountDialog type="create" />
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
