@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { ChevronsUpDown, Plus } from "lucide-react"
+import * as React from "react";
+import { ChevronsUpDown, Ellipsis, Pencil, Plus } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -9,30 +9,43 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
 
 export function TeamSwitcher({
   teams,
 }: {
   teams: {
-    name: string
-    logo: React.ElementType
-    plan: string
-  }[]
+    name: string;
+    logo: React.ElementType;
+    plan: string;
+  }[];
 }) {
-  const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = React.useState(teams[0])
+  const { isMobile } = useSidebar();
+  const [activeTeam, setActiveTeam] = React.useState(teams[0]);
+  const test = () => console.log("hello");
 
   if (!activeTeam) {
-    return null
+    return null;
   }
 
   return (
@@ -63,17 +76,72 @@ export function TeamSwitcher({
             <DropdownMenuLabel className="text-muted-foreground text-xs">
               Teams
             </DropdownMenuLabel>
-            {teams.map((team, index) => (
+            {teams.map((team) => (
               <DropdownMenuItem
                 key={team.name}
                 onClick={() => setActiveTeam(team)}
-                className="gap-2 p-2"
+                className="flex p-2"
               >
-                <div className="flex size-6 items-center justify-center rounded-md border">
-                  <team.logo className="size-3.5 shrink-0" />
+                <div className="flex gap-2 flex-1">
+                  <div className="flex size-6 items-center justify-center rounded-md border">
+                    <team.logo className="size-3.5 shrink-0" />
+                  </div>
+                  {team.name}
                 </div>
-                {team.name}
-                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
+                <div onClick={(e) => e.stopPropagation()} className="z-50">
+                  <Dialog>
+                    <form>
+                      <DialogTrigger asChild>
+                        {/* <div className="hover:bg-accent border rounded-full hover:cursor-pointer p-1 transition-colors"> */}
+                        <Button
+                          variant="outline"
+                          size={"icon"}
+                          className="size-6"
+                        >
+                          <Pencil size={1} />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                          <DialogTitle>Edit profile</DialogTitle>
+                          <DialogDescription>
+                            Make changes to your profile here. Click save when
+                            you&apos;re done.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4">
+                          <div className="grid gap-3">
+                            <Label htmlFor="name-1">Name</Label>
+                            <Input
+                              id="name-1"
+                              name="name"
+                              defaultValue="Pedro Duarte"
+                            />
+                          </div>
+                          <div className="grid gap-3">
+                            <Label htmlFor="username-1">Username</Label>
+                            <Input
+                              id="username-1"
+                              name="username"
+                              defaultValue="@peduarte"
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter className="flex">
+                          <div className="flex-1">
+                            <Button variant="destructive">Delete</Button>
+                          </div>
+                          <div className="flex gap-2">
+                            <DialogClose asChild>
+                              <Button variant="outline">Cancel</Button>
+                            </DialogClose>
+                            <Button type="submit">Save changes</Button>
+                          </div>
+                        </DialogFooter>
+                      </DialogContent>
+                    </form>
+                  </Dialog>
+                </div>
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
@@ -87,5 +155,5 @@ export function TeamSwitcher({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }
