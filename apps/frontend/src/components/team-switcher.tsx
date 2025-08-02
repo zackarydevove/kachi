@@ -17,7 +17,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import EditSubAccountDialog from "./sub-accounts/edit-dialog";
+import EditSubAccountDialog from "./sub-accounts/edit-sub-account-dialog";
 
 export function TeamSwitcher({
   teams,

@@ -1,15 +1,16 @@
+import Enable2FADialog from "@/components/settings/security/enable-2fa-dialog";
+import SetPasswordDialog from "@/components/settings/security/set-password-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-export default function Security() {
+export default function Page() {
   return (
     <div className="flex flex-col gap-7 pl-2 pt-6 pr-10 flex-1">
       <span className="text-2xl">Security</span>
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <span>Password</span>
-          {/* Dialog button here to open modal */}
-          <Button variant="outline">Set your password</Button>
+          <SetPasswordDialog />
         </div>
         <div className="flex flex-col gap-2">
           <div className="flex gap-2 items-center">
@@ -21,8 +22,7 @@ export default function Security() {
               Not Enabled
             </Badge>
           </div>
-          {/* Dialog button here to open modal */}
-          <Button variant="outline">Enable 2FA (recommended)</Button>
+          <Enable2FADialog />
         </div>
       </div>
     </div>
