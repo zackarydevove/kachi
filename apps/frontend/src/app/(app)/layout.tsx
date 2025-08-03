@@ -1,15 +1,18 @@
-import { AppSidebar } from "@/components/app-sidebar";
-import BreadcrumbSegment from "@/components/navbar/breadcrumb-segment";
-import SettingNav from "@/components/settings/setting-nav";
-import { Breadcrumb } from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { Separator } from "@/components/ui/separator";
+import { Breadcrumb } from "@/components/ui/breadcrumb";
+import BreadcrumbSegment from "@/components/navbar/breadcrumb-segment";
 
-export default function Page({ children }: { children: React.ReactNode }) {
+export default function MainAppLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -26,16 +29,7 @@ export default function Page({ children }: { children: React.ReactNode }) {
             </Breadcrumb>
           </div>
         </header>
-        <div className="px-12 py-6">
-          <div>
-            <h2 className="text-3xl">Manage my account</h2>
-          </div>
-          <hr className="mt-6" />
-          <div className="flex">
-            <SettingNav />
-            <div className="flex-1">{children}</div>
-          </div>
-        </div>
+        {children}
       </SidebarInset>
     </SidebarProvider>
   );

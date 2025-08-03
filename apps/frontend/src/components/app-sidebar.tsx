@@ -2,14 +2,11 @@
 
 import * as React from "react";
 import {
-  ArrowLeftRight,
   AudioWaveform,
-  Bitcoin,
   ChartColumnIncreasing,
   Command,
   GalleryVerticalEnd,
   House,
-  PiggyBank,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -49,35 +46,19 @@ const data = {
     },
   ],
   navMain: [
-    {
-      title: "Home",
-      url: "/home",
-      icon: House,
-      isActive: true,
-      // items: [],
-    },
+    // {
+    //   title: "Home",
+    //   url: "/home",
+    //   icon: House,
+    //   isActive: true,
+    // },
     {
       title: "Portfolio",
-      url: "#",
+      url: "/portfolio",
       icon: ChartColumnIncreasing,
-      isActive: true,
-      items: [
-        {
-          title: "Crypto",
-          url: "#",
-        },
-        {
-          title: "Real Estate",
-          url: "#",
-        },
-        {
-          title: "Stocks",
-          url: "#",
-        },
-      ],
+      isActive: false,
     },
   ],
-  // projects: [],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

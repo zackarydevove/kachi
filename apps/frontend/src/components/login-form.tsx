@@ -46,7 +46,7 @@ export function LoginForm({
       const res = await authApi.login(payload);
       console.log("res: ", res);
       setUser(res.user);
-      router.push("/home");
+      router.push("/portfolio");
     } catch (err: any) {
       setError({
         message:

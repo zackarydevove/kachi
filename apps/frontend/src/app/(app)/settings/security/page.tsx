@@ -1,7 +1,6 @@
 import Enable2FADialog from "@/components/settings/security/enable-2fa-dialog";
 import SetPasswordDialog from "@/components/settings/security/set-password-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 
 export default function Page() {
   return (
