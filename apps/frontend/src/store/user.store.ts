@@ -1,7 +1,11 @@
 import { create } from "zustand";
 
 interface UserState {
-  user: { id: number; email: string } | null;
+  user: {
+    id: number;
+    email: string;
+    account: { id: number; name: string };
+  } | null;
   setUser: (user: UserState["user"]) => void;
   logout: () => void;
 }

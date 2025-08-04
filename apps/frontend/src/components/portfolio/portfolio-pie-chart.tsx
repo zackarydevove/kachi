@@ -3,16 +3,14 @@ import { useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
 const mockData = [
-  { name: "Crypto", value: 400 },
-  { name: "Stock", value: 300 },
-  { name: "Real Estate", value: 300 },
-  { name: "Exotic", value: 200 },
+  { label: "Crypto", color: "#059669", value: 400 },
+  { label: "Stock", color: "#CA8A04", value: 300 },
+  { label: "Real Estate", color: "#FFBB28", value: 300 },
+  { label: "Exotic", color: "#FF8042", value: 200 },
 ];
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
-
 export default function PortfolioPieChart() {
-  const [activeIndex, setActiveIndex] = useState(null);
+  const [activeIndex, setActiveIndex] = useState(-1);
 
   const totalValue = mockData.reduce((acc, cur) => acc + cur.value, 0);
 
@@ -23,12 +21,12 @@ export default function PortfolioPieChart() {
         {/* Center content */}
         <div className="absolute inset-0 flex flex-col justify-center items-center pointer-events-none">
           <p className="text-2xl font-bold">
-            ${activeIndex === null ? totalValue : mockData[activeIndex].value}
+            ${activeIndex === -1 ? totalValue : mockData[activeIndex].value}
           </p>
           <p className="text-xs text-muted-foreground">
-            {activeIndex === null
+            {activeIndex === -1
               ? "Total Net Worth"
-              : `${mockData[activeIndex].name} • ${(
+              : `${mockData[activeIndex].label} • ${(
                   (mockData[activeIndex].value / totalValue) *
                   100
                 ).toFixed(1)}%`}
@@ -45,14 +43,14 @@ export default function PortfolioPieChart() {
               outerRadius="100%"
               dataKey="value"
               onMouseEnter={(_, index) => setActiveIndex(index)}
-              onMouseLeave={() => setActiveIndex(null)}
+              onMouseLeave={() => setActiveIndex(-1)}
             >
-              {mockData.map((entry, index) => (
+              {mockData.map((asset, index) => (
                 <Cell
-                  key={`cell-${entry.name}`}
-                  fill={COLORS[index % COLORS.length]}
+                  key={`cell-${asset.label}`}
+                  fill={asset.color}
                   fillOpacity={
-                    activeIndex === null ? 1 : activeIndex === index ? 1 : 0.4 // Other cells faded out
+                    activeIndex === -1 ? 1 : activeIndex === index ? 1 : 0.4 // Other cells faded out
                   }
                 />
               ))}

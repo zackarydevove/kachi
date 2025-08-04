@@ -44,13 +44,26 @@ export abstract class ApiBase<TRequest, TResponse> {
           originalRequest._retry = true;
           try {
             // Try to refresh the access token
-            await axios.post(`${baseURL}/auth/refresh-token`, {});
+            await axios.post(
+              `${baseURL}/auth/refresh-token`,
+              {},
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                withCredentials: true,
+              }
+            );
             // Retry original request
             return this.axiosInstance(originalRequest);
           } catch (refreshError) {
             // If refresh fails, redirect to login
             console.error("Refresh token expired or invalid", refreshError);
-            window.location.href = "/login";
+            // if current location is already /login or /signup do not redirect user
+            const currentPath = window.location.pathname;
+            if (currentPath !== "/login" && currentPath !== "/signup") {
+              window.location.href = "/login";
+            }
             return Promise.reject(refreshError);
           }
         }

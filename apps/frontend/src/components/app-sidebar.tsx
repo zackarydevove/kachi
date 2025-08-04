@@ -62,9 +62,10 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const userStore = useUserStore((state) => state.user);
   const user = {
-    email: useUserStore((state) => state.user)?.email,
-    name: "bob",
+    email: userStore?.email,
+    name: userStore?.account.name,
     avatar: "b",
   };
 

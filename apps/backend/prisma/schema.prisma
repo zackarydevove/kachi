@@ -23,50 +23,66 @@ model User {
   refreshToken String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  deletedAt    DateTime
+  deletedAt    DateTime?
 
+  accounts      Account[]
+}
+
+// TODO: Add a column "main account" if its main, then you cannot delete it if user is not deleted
+model Account {
+  id           Int      @id @default(autoincrement())
+  name         String
+  userId        Int
+
+  user      User @relation(fields: [userId], references: [id])
+
+  assets    Asset[]
 }
 
 model Asset {
   id           Int      @id @default(autoincrement())
-  // account_id         // later
+  accountId    Int
   name        String
   type        AssetType // (crypto, real_estate, stock, cash, divers) (enum)
   unitPrice   Int       // cannot be <0
   quantity    Int       // cannot be < 0
+  value       Int
   // currency    String // for now only USD
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  deletedAt    DateTime
+  deletedAt    DateTime?
 
-  liabilities  AssetLiability[] // 👈 back-reference
+  account Account @relation(fields: [accountId], references: [id])
+  
+  // liabilities  AssetLiability[] // 👈 back-reference
 }
 
-model Liability {
-  id           Int      @id @default(autoincrement())
-  // account_id         // later
-  name        String
-  amount      Int       // cannot be <0
-  // currency    String // for now only USD
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  deletedAt    DateTime
+// model Liability {
+//   id           Int      @id @default(autoincrement())
+//   // accountId         // later
+//   name        String
+//   amount      Int       // cannot be <0
+//   // currency    String // for now only USD
+//   createdAt    DateTime @default(now())
+//   updatedAt    DateTime @updatedAt
+//   deletedAt    DateTime?
 
-  assets       AssetLiability[] // 👈 back-reference
-}
+//   assets       AssetLiability[] // 👈 back-reference
+// }
 
-model AssetLiability {
-  id          Int       @id @default(autoincrement())
-  assetId     Int
-  liabilityId Int
-
-  asset       Asset     @relation(fields: [assetId], references: [id])
-  liability   Liability @relation(fields: [liabilityId], references: [id])
-}
-
-// model NetWorthSnapshot {
+// model AssetLiability {
 //   id          Int       @id @default(autoincrement())
-//   accountId   Int
+//   assetId     Int
+//   liabilityId Int
+
+//   asset       Asset     @relation(fields: [assetId], references: [id])
+//   liability   Liability @relation(fields: [liabilityId], references: [id])
+// }
+
+// model AssetSnapshot {
+//   id          Int       @id @default(autoincrement())
+//   // accountId   Int
+//   label       AssetType
 //   value       Int
 //   date        DateTime
 // }

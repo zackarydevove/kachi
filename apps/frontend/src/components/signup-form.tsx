@@ -22,6 +22,7 @@ export function SignupForm({
 }: React.ComponentProps<"div">) {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -36,7 +37,7 @@ export function SignupForm({
     e.preventDefault();
     setError(null);
 
-    const payload: AuthRequest = { email, password, confirmPassword };
+    const payload: AuthRequest = { email, name, password, confirmPassword };
     if (!authUtil.checkError(payload, setError)) return;
 
     try {
@@ -99,6 +100,23 @@ export function SignupForm({
                       required
                     />
                     {error && error.path === "email" ? (
+                      <p className="text-sm text-destructive mt-1">
+                        {error.message}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+                <div className="grid gap-3">
+                  <Label htmlFor="text">Name</Label>
+                  <div>
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="Elon Musk"
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                    />
+                    {error && error.path === "name" ? (
                       <p className="text-sm text-destructive mt-1">
                         {error.message}
                       </p>

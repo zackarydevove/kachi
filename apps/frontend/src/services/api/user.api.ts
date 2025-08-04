@@ -1,14 +1,12 @@
 import z from "zod";
 import { ApiBase } from "./api.base";
-import { userSchema } from "../schema/user.schema";
+import { userAndAccountSchema } from "../schema/user.schema";
 
 const UserRequestSchema = z.object({
   email: z.string().email(),
 });
 
-const UserResponseSchema = z.object({
-  user: userSchema,
-});
+const UserResponseSchema = { user: userAndAccountSchema };
 
 // TypeScript types
 export type UserRequest = z.infer<typeof UserRequestSchema>;

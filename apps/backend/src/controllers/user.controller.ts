@@ -13,8 +13,6 @@ export default class UserController {
         select: {
           id: true,
           email: true,
-          createdAt: true,
-          updatedAt: true,
         },
       });
 
@@ -22,7 +20,22 @@ export default class UserController {
         return Send.notFound(res, {}, 'User not found');
       }
 
-      return Send.success(res, { user });
+      const account = await prisma.account.findFirst({
+        where: { userId: user.id },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+
+      const data = {
+        user: {
+          ...user,
+          account,
+        },
+      };
+
+      return Send.success(res, data);
     } catch (error) {
       console.error('Error fetching user info:', error);
       return Send.error(res, {}, 'Internal server error');

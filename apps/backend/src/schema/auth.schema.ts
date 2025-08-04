@@ -20,6 +20,12 @@ const login = z.object({
 const signup = z
   .object({
     email: z.string().email('Invalid email format'),
+    name: z
+      .string()
+      .regex(
+        /^[a-zA-Z0-9 ]+$/,
+        'Only letters, numbers, and spaces are allowed.',
+      ),
     password: passwordSchema,
     confirmPassword: z.string().min(1, 'Password confirmation is required'),
   })

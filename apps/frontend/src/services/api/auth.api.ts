@@ -4,8 +4,9 @@ import { ApiBase } from "./api.base";
 // Define request schema
 const AuthRequestSchema = z.object({
   email: z.string().email(),
+  name: z.string().optional(), // TODO: This is not optional, do differnet request for login and signup
   password: z.string().min(6),
-  confirmPassword: z.string().min(6).optional(),
+  confirmPassword: z.string().min(6).optional(), // TODO: same here
 });
 
 // Define response schema
@@ -13,6 +14,10 @@ const AuthResponseSchema = z.object({
   user: z.object({
     id: z.number(),
     email: z.string().email(),
+    account: {
+      id: z.number(),
+      name: z.string(),
+    },
   }),
 });
 
@@ -20,6 +25,8 @@ const AuthResponseSchema = z.object({
 export type AuthRequest = z.infer<typeof AuthRequestSchema>;
 export type AuthResponse = z.infer<typeof AuthResponseSchema>;
 
+// TODO: Fix the abstract class to put the schema wanted, for example the schema of login and request are not the same
+// but here we expect the same request
 export class AuthApi extends ApiBase<AuthRequest, AuthResponse> {
   constructor() {
     super("/auth");

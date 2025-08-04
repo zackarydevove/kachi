@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken';
 import authConfig from '@config/auth.config';
 import { DecodedToken } from '@middlewares/auth.middleware';
 
+// TODO: Create response schema for each
 export default class AuthController {
   public static async login(req: Request, res: Response) {
     const { email, password } = req.body as z.infer<typeof authSchema.login>;
@@ -23,6 +24,13 @@ export default class AuthController {
       if (!isPasswordValid)
         return Send.unauthorized(res, null, 'Invalid email or password.'); // Don't send only password otherwise it gives information for hackers
 
+      // TODO: I don't think we should do this in the login but only when we arrive on the page after login
+      const account = await prisma.account.findFirst({
+        where: { userId: user.id },
+      });
+      if (!account)
+        return Send.notFound(res, null, 'Invalid email or password.'); // Don't send only password otherwise it gives information for hackers
+
       const accessToken = jwt.sign({ userId: user.id }, authConfig.secret, {
         expiresIn: authConfig.secret_expires_in as any,
       });
@@ -37,6 +45,9 @@ export default class AuthController {
         where: { email },
         data: { refreshToken },
       });
+
+      res.clearCookie('accessToken');
+      res.clearCookie('refreshToken');
 
       res.cookie('accessToken', accessToken, {
         httpOnly: true,
@@ -55,6 +66,10 @@ export default class AuthController {
         user: {
           id: user.id,
           email: user.email,
+          account: {
+            id: account.id,
+            name: account.name,
+          },
         },
       });
     } catch (error) {
@@ -63,8 +78,9 @@ export default class AuthController {
     }
   }
 
+  // TODO: Use transaction to avoid creating user if account fail
   public static async register(req: Request, res: Response) {
-    const { email, password, confirmPassword } = req.body as z.infer<
+    const { email, name, password, confirmPassword } = req.body as z.infer<
       typeof authSchema.signup
     >;
 
@@ -81,21 +97,32 @@ export default class AuthController {
       }
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const newUser = await prisma.user.create({
-        data: {
-          email,
-          password: hashedPassword,
-        },
-      });
+      const data = await prisma.$transaction(async (tx) => {
+        const newUser = await tx.user.create({
+          data: {
+            email,
+            password: hashedPassword,
+          },
+        });
 
-      return Send.success(
-        res,
-        {
+        const newAccount = await tx.account.create({
+          data: {
+            name,
+            userId: newUser.id,
+          },
+        });
+
+        return {
           id: newUser.id,
           email: newUser.email,
-        },
-        'User successfully registered.',
-      );
+          account: {
+            id: newAccount.id,
+            name: newAccount.name,
+          },
+        };
+      });
+
+      return Send.success(res, data, 'User successfully registered.');
     } catch (error) {
       console.error('Registration failed:', error);
       return Send.error(res, null, 'Registration failed.');
@@ -157,6 +184,9 @@ export default class AuthController {
         authConfig.refresh_secret,
         { expiresIn: authConfig.refresh_secret_expires_in as any },
       );
+
+      res.clearCookie('accessToken');
+      res.clearCookie('refreshToken');
 
       // Send the new access token in the response
       res.cookie('accessToken', newAccessToken, {
