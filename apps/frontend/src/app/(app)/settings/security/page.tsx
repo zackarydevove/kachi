@@ -14,10 +14,7 @@ export default function Page() {
         <div className="flex flex-col gap-2">
           <div className="flex gap-2 items-center">
             <span>Two-Factor Authentication (2FA)</span>
-            <Badge
-              variant="secondary"
-              className="bg-yellow-100 text-yellow-800"
-            >
+            <Badge variant="secondary" className="bg-warning text-warning-text">
               Not Enabled
             </Badge>
           </div>

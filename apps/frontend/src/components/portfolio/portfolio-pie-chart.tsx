@@ -17,7 +17,7 @@ export default function PortfolioPieChart() {
   const totalValue = mockData.reduce((acc, cur) => acc + cur.value, 0);
 
   return (
-    <div className="bg-[#fafafa] rounded-md p-6 w-1/3 flex flex-col gap-6 relative">
+    <div className="bg-component rounded-md p-6 w-1/3 flex flex-col gap-6 relative">
       <p>Pie Chart</p>
       <div className="flex justify-center items-center w-full h-[300px] relative">
         {/* Center content */}

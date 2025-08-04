@@ -99,7 +99,7 @@ export function SignupForm({
                       required
                     />
                     {error && error.path === "email" ? (
-                      <p className="text-sm text-red-500 mt-1">
+                      <p className="text-sm text-destructive mt-1">
                         {error.message}
                       </p>
                     ) : null}
@@ -117,7 +117,7 @@ export function SignupForm({
                       required
                     />
                     {error && error.path === "password" ? (
-                      <p className="text-sm text-red-500 mt-1">
+                      <p className="text-sm text-destructive mt-1">
                         {error.message}
                       </p>
                     ) : null}
@@ -135,7 +135,7 @@ export function SignupForm({
                       required
                     />
                     {error && error.path === "confirmPassword" ? (
-                      <p className="text-sm text-red-500 mt-1">
+                      <p className="text-sm text-destructive mt-1">
                         {error.message}
                       </p>
                     ) : null}

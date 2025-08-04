@@ -13,7 +13,7 @@ export default function Page() {
           <PortfolioPieChart />
         </div>
         {/* down */}
-        <div className="bg-[#fafafa] rounded-md p-6 flex flex-col gap-5">
+        <div className="bg-component rounded-md p-6 flex flex-col gap-5">
           <div className="flex justify-between items-center">
             <p>Assets</p>
             <AddAssetDialog />

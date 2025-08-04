@@ -24,7 +24,7 @@ export default function SettingNav() {
               <li key={href}>
                 {isActive ? (
                   <div
-                    className="block text-sm rounded-sm px-4 py-3 w-full cursor-default bg-slate-100 transition-colors duration-200"
+                    className="block text-sm rounded-sm px-4 py-3 w-full cursor-default bg-card-hover transition-colors duration-200"
                     aria-current="page"
                   >
                     <span>{label}</span>
@@ -32,7 +32,7 @@ export default function SettingNav() {
                 ) : (
                   <Link
                     href={href}
-                    className="block text-sm rounded-sm px-4 py-3 w-full hover:cursor-pointer hover:bg-slate-100 transition-colors duration-200"
+                    className="block text-sm rounded-sm px-4 py-3 w-full hover:cursor-pointer hover:bg-card-hover transition-colors duration-200"
                   >
                     <span>{label}</span>
                   </Link>

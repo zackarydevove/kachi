@@ -104,7 +104,7 @@ export default function AssetsTable() {
           {/* Parent Row */}
           <tr
             className={cn(
-              "grid grid-cols-4 items-center px-6 py-3 bg-gray-100 rounded-t-md",
+              "grid grid-cols-4 items-center px-6 py-3 bg-secondary rounded-t-md",
               openGroups[group.name] ? "rounded-t-md" : "rounded-md"
             )}
           >
@@ -139,28 +139,32 @@ export default function AssetsTable() {
 
           {/* Sub-Items (conditionally rendered) */}
           {openGroups[group.name] &&
-            group.items?.map((item, i, last) => (
-              <tr
-                key={`${group.name}-item-${i}`}
-                className={cn(
-                  "grid grid-cols-4 items-center px-6 py-3 bg-gray-100",
-                  i === 0 && "border-t border-gray-200",
-                  last && "rounded-b-md"
-                )}
-              >
-                <td className="flex items-center gap-2">
-                  <span className="bg-black w-8 h-8 rounded-full" />
-                  <span className="text-sm">{item.name}</span>
-                </td>
-                <td className="text-right text-sm">{item.split}%</td>
-                <td className="text-right text-sm">
-                  ${item.value.toLocaleString()}
-                </td>
-                <td className="text-right text-sm text-green-500">
-                  {item.pnl}
-                </td>
-              </tr>
-            ))}
+            group.items?.map((item, i) => {
+              const first = i === 0;
+              const last = i === group.items.length - 1;
+              return (
+                <tr
+                  key={`${group.name}-item-${i}`}
+                  className={cn(
+                    "grid grid-cols-4 items-center px-6 py-3 bg-secondary",
+                    first && "border-t border-border",
+                    last && "rounded-b-md"
+                  )}
+                >
+                  <td className="flex items-center gap-2">
+                    <span className="bg-black w-8 h-8 rounded-full" />
+                    <span className="text-sm">{item.name}</span>
+                  </td>
+                  <td className="text-right text-sm">{item.split}%</td>
+                  <td className="text-right text-sm">
+                    ${item.value.toLocaleString()}
+                  </td>
+                  <td className="text-right text-sm text-green-500">
+                    {item.pnl}
+                  </td>
+                </tr>
+              );
+            })}
         </tbody>
       ))}
     </table>

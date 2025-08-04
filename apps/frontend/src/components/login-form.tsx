@@ -110,7 +110,7 @@ export function LoginForm({
                       required
                     />
                     {error && error.path === "email" ? (
-                      <p className="text-sm text-red-500 mt-1">
+                      <p className="text-sm text-destructive mt-1">
                         {error.message}
                       </p>
                     ) : null}
@@ -135,7 +135,7 @@ export function LoginForm({
                     />
 
                     {error && error.path === "password" ? (
-                      <p className="text-sm text-red-500 mt-1">
+                      <p className="text-sm text-destructive mt-1">
                         {error.message}
                       </p>
                     ) : null}
