@@ -1,12 +1,94 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import { z } from "zod";
 
-export abstract class ApiBase<TRequest, TResponse> {
+// Base response wrapper interface
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}
+
+// Standard CRUD interfaces (optional)
+export interface CreateRequest<T = unknown> {
+  data: T;
+}
+
+export interface UpdateRequest<T = unknown> {
+  data: T;
+}
+
+export interface CreateResponse<T = unknown> {
+  data: T;
+}
+
+export interface GetResponse<T = unknown> {
+  data: T;
+}
+
+export interface GetAllResponse<T = unknown> {
+  data: T[];
+}
+
+export interface UpdateResponse<T = unknown> {
+  data: T;
+}
+
+export interface DeleteResponse {
+  success: boolean;
+}
+interface Schemas<
+  TCreateRequest,
+  TCreateResponse,
+  TGetResponse,
+  TGetAllResponse,
+  TUpdateRequest,
+  TUpdateResponse,
+  TDeleteResponse
+> {
+  createRequest?: z.ZodType<TCreateRequest>;
+  createResponse?: z.ZodType<TCreateResponse>;
+  getResponse?: z.ZodType<TGetResponse>;
+  getAllResponse?: z.ZodType<TGetAllResponse>;
+  updateRequest?: z.ZodType<TUpdateRequest>;
+  updateResponse?: z.ZodType<TUpdateResponse>;
+  deleteResponse?: z.ZodType<TDeleteResponse>;
+}
+
+export abstract class ApiBase<
+  TCreateRequest = never,
+  TCreateResponse = never,
+  TGetResponse = never,
+  TGetAllResponse = never,
+  TUpdateRequest = never,
+  TUpdateResponse = never,
+  TDeleteResponse = never
+> {
   protected axiosInstance: AxiosInstance;
   protected endpoint: string;
+  protected schemas: Schemas<
+    TCreateRequest,
+    TCreateResponse,
+    TGetResponse,
+    TGetAllResponse,
+    TUpdateRequest,
+    TUpdateResponse,
+    TDeleteResponse
+  >;
 
-  constructor(endpoint: string) {
+  constructor(
+    endpoint: string,
+    schemas: Schemas<
+      TCreateRequest,
+      TCreateResponse,
+      TGetResponse,
+      TGetAllResponse,
+      TUpdateRequest,
+      TUpdateResponse,
+      TDeleteResponse
+    > = {}
+  ) {
     this.endpoint = endpoint;
+    this.schemas = schemas;
 
     const baseURL = `${
       process.env.NEXT_PUBLIC_API_URL ||
@@ -35,7 +117,6 @@ export abstract class ApiBase<TRequest, TResponse> {
         const originalRequest = error.config;
         const bypassRefresh = authBypassRoutes.has(originalRequest.url);
 
-        // If it's a 401 and we haven't retried yet
         if (
           error.response?.status === 401 &&
           !originalRequest._retry &&
@@ -43,7 +124,6 @@ export abstract class ApiBase<TRequest, TResponse> {
         ) {
           originalRequest._retry = true;
           try {
-            // Try to refresh the access token
             await axios.post(
               `${baseURL}/auth/refresh-token`,
               {},
@@ -54,12 +134,9 @@ export abstract class ApiBase<TRequest, TResponse> {
                 withCredentials: true,
               }
             );
-            // Retry original request
             return this.axiosInstance(originalRequest);
           } catch (refreshError) {
-            // If refresh fails, redirect to login
             console.error("Refresh token expired or invalid", refreshError);
-            // if current location is already /login or /signup do not redirect user
             const currentPath = window.location.pathname;
             if (currentPath !== "/login" && currentPath !== "/signup") {
               window.location.href = "/login";
@@ -72,72 +149,95 @@ export abstract class ApiBase<TRequest, TResponse> {
     );
   }
 
-  protected abstract requestSchema(): z.ZodType<TRequest>;
-  protected abstract responseSchema(): z.ZodType<TResponse>;
-
-  protected async fetchApi(
+  /**
+   * Generic API call method with automatic response validation
+a   */
+  protected async fetchApi<TRequest, TResponse>(
     method: "get" | "post" | "put" | "delete",
     url: string,
-    data?: TRequest
+    data?: TRequest,
+    responseSchema?: z.ZodType<TResponse>
   ): Promise<TResponse> {
     try {
-      // TODO: Validate request data // C'est pour check qu'on envoit bien ce qu'on veut et pas autre chose, bonne pratique
-      // if (data) {
-      //   this.requestSchema().parse(data);
-      // }
-
       const config: AxiosRequestConfig = { method, url, data };
       const response: AxiosResponse = await this.axiosInstance.request(config);
 
-      // TODO: Validate response // pour check qu'on recoit bien ce qu'on veut, bonne pratique
-      // const parsed = this.responseSchema().parse(response.data);
-      // return parsed;
-      console.log("response: ", response);
-      return response.data.data as TResponse; // temporary return to delete
-    } catch (error: any) {
-      const isLogoutRequest = url == `${this.endpoint}/logout`;
-      const isUnauthorized = error?.response?.status === 401;
+      // Validate response if schema is provided
+      if (responseSchema) {
+        const parsed = responseSchema.parse(
+          response.data.data || response.data
+        );
+        return parsed;
+      }
 
-      // Gracefully fail logout if already logged out
+      return response.data.data || response.data;
+    } catch (error: unknown) {
+      const isLogoutRequest = url == `${this.endpoint}/logout`;
+      const isUnauthorized =
+        (error as { response?: { status: number } })?.response?.status === 401;
+
       if (isLogoutRequest && isUnauthorized) return {} as TResponse;
 
-      console.error(`API call failed for ${url}:`, error); // TODO: Not sure we want that to be shown to user
+      console.error(`API call failed for ${url}:`, error);
       throw error;
     }
   }
 
   /**
-   * Standard CRUD helpers
+   * Standard CRUD operations (only available if interfaces are provided)
    */
 
-  async getAll(): Promise<TResponse[]> {
-    const res = await this.axiosInstance.get<TResponse[]>(this.endpoint);
-    return res.data.map((item) => this.responseSchema().parse(item));
-  }
-
-  async getById(id: number | string): Promise<TResponse> {
-    const res = await this.axiosInstance.get<TResponse>(
-      `${this.endpoint}/${id}`
+  async create(data: TCreateRequest): Promise<TCreateResponse> {
+    return this.fetchApi<TCreateRequest, TCreateResponse>(
+      "get",
+      this.endpoint,
+      data,
+      this.schemas.createResponse
     );
-    return this.responseSchema().parse(res.data);
   }
 
-  async create(data: TRequest): Promise<TResponse> {
-    this.requestSchema().parse(data);
-    const res = await this.axiosInstance.post<TResponse>(this.endpoint, data);
-    return this.responseSchema().parse(res.data);
+  async getAll(): Promise<TGetAllResponse> {
+    return this.fetchApi<null, TGetAllResponse>(
+      "get",
+      this.endpoint,
+      null,
+      this.schemas.getAllResponse
+    );
   }
 
-  async update(id: number | string, data: TRequest): Promise<TResponse> {
-    this.requestSchema().parse(data);
-    const res = await this.axiosInstance.put<TResponse>(
+  async getById(id: number): Promise<TGetResponse> {
+    return this.fetchApi<null, TGetResponse>(
+      "get",
       `${this.endpoint}/${id}`,
-      data
+      null,
+      this.schemas.getResponse
     );
-    return this.responseSchema().parse(res.data);
   }
 
-  async delete(id: number | string): Promise<void> {
-    await this.axiosInstance.delete(`${this.endpoint}/${id}`);
+  async get(): Promise<TGetResponse> {
+    return this.fetchApi<null, TGetResponse>(
+      "get",
+      `${this.endpoint}`,
+      null,
+      this.schemas.getResponse
+    );
+  }
+
+  async update(id: number, data: TUpdateRequest): Promise<TUpdateResponse> {
+    return this.fetchApi<TUpdateRequest, TUpdateResponse>(
+      "put",
+      `${this.endpoint}/${id}`,
+      data,
+      this.schemas?.updateResponse
+    );
+  }
+
+  async delete(id: number): Promise<TDeleteResponse> {
+    return this.fetchApi<null, TDeleteResponse>(
+      "delete",
+      `${this.endpoint}/${id}`,
+      null,
+      this.schemas?.deleteResponse
+    );
   }
 }

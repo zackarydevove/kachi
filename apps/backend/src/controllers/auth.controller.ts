@@ -159,14 +159,9 @@ export default class AuthController {
         where: { id: userId },
       });
 
-      console.log('user: ', user);
-      console.log('refreshToken: ', refreshToken);
-
       if (!user || !user.refreshToken) {
         return Send.unauthorized(res, 'Refresh token not found');
       }
-
-      console.log('user.refreshToken', user.refreshToken);
 
       // Check if the refresh token in the database matches the one from the client
       if (user.refreshToken !== refreshToken) {
@@ -184,6 +179,11 @@ export default class AuthController {
         authConfig.refresh_secret,
         { expiresIn: authConfig.refresh_secret_expires_in as any },
       );
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { refreshToken: newRefreshToken },
+      });
 
       res.clearCookie('accessToken');
       res.clearCookie('refreshToken');

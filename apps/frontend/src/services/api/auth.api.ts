@@ -1,55 +1,34 @@
-import { z } from "zod";
 import { ApiBase } from "./api.base";
+import {
+  AuthResponse,
+  LoginRequest,
+  LoginResponse,
+  SignupRequest,
+  SignupResponse,
+} from "../schema/auth.schema";
+import { userResponseSchema } from "../schema/user.schema";
 
-// Define request schema
-const AuthRequestSchema = z.object({
-  email: z.string().email(),
-  name: z.string().optional(), // TODO: This is not optional, do differnet request for login and signup
-  password: z.string().min(6),
-  confirmPassword: z.string().min(6).optional(), // TODO: same here
-});
-
-// Define response schema
-const AuthResponseSchema = z.object({
-  user: z.object({
-    id: z.number(),
-    email: z.string().email(),
-    account: {
-      id: z.number(),
-      name: z.string(),
-    },
-  }),
-});
-
-// TypeScript types
-export type AuthRequest = z.infer<typeof AuthRequestSchema>;
-export type AuthResponse = z.infer<typeof AuthResponseSchema>;
-
-// TODO: Fix the abstract class to put the schema wanted, for example the schema of login and request are not the same
-// but here we expect the same request
-export class AuthApi extends ApiBase<AuthRequest, AuthResponse> {
+export class AuthApi extends ApiBase {
   constructor() {
     super("/auth");
   }
 
-  protected requestSchema() {
-    return AuthRequestSchema;
+  async login(data: LoginRequest): Promise<LoginResponse> {
+    return this.fetchApi<LoginRequest, LoginResponse>(
+      "post",
+      `${this.endpoint}/login`,
+      data,
+      userResponseSchema
+    );
   }
 
-  protected responseSchema() {
-    return AuthResponseSchema;
-  }
-
-  async login(data: AuthRequest): Promise<AuthResponse> {
-    return this.fetchApi("post", `${this.endpoint}/login`, data);
-  }
-
-  async signup(data: AuthRequest): Promise<AuthResponse> {
-    return this.fetchApi("post", `${this.endpoint}/signup`, data);
-  }
-
-  async validate(): Promise<AuthResponse> {
-    return this.fetchApi("get", `${this.endpoint}/validate`);
+  async signup(data: SignupRequest): Promise<SignupResponse> {
+    return this.fetchApi<SignupRequest, SignupResponse>(
+      "post",
+      `${this.endpoint}/signup`,
+      data,
+      userResponseSchema
+    );
   }
 
   async logout(): Promise<AuthResponse> {

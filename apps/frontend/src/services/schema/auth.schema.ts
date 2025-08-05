@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { userResponseSchema } from "./user.schema";
 
 const passwordSchema = z
   .string()
@@ -8,7 +9,7 @@ const passwordSchema = z
   .regex(/[0-9]/, "Password must include at least one number")
   .regex(/[@$!%*?&]/, "Password must include at least one special character");
 
-const login = z.object({
+const loginSchema = z.object({
   email: z
     .string()
     .trim()
@@ -17,7 +18,7 @@ const login = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
-const signup = z
+const signupSchema = z
   .object({
     email: z.string().email("Invalid email format"),
     name: z
@@ -35,8 +36,19 @@ const signup = z
   });
 
 const authSchema = {
-  login,
-  signup,
+  login: loginSchema,
+  signup: signupSchema,
 };
 
 export default authSchema;
+
+// We already know that all response wwill contain success, data, error, so just set the schema of data
+
+// Request schemas
+export type LoginRequest = z.infer<typeof loginSchema>;
+export type SignupRequest = z.infer<typeof signupSchema>;
+
+// Response schemas
+export type LoginResponse = z.infer<typeof userResponseSchema>;
+export type SignupResponse = z.infer<typeof userResponseSchema>;
+export type AuthResponse = null;

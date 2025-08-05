@@ -15,3 +15,8 @@ export const userAndAccountSchema = z.object({
   email: z.string().email(),
   account: accountSchema,
 });
+
+export const userResponseSchema = z.object({ user: userAndAccountSchema });
+
+// Response schemas
+export type GetUserResponse = z.infer<typeof userResponseSchema>;
