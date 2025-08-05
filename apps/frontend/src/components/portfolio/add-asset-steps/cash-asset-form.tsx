@@ -1,5 +1,5 @@
 import React from "react";
-import { AssetFormData } from "./types";
+import { AssetFormData } from "@/types";
 import {
   Select,
   SelectContent,
@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
 interface CashAssetFormProps {
-  formData: AssetFormData;
+  formData: AssetFormData["cash"];
   onFormDataChange: (field: string, value: string) => void;
 }
 
@@ -54,8 +54,8 @@ export default function CashAssetForm({
       <div className="flex flex-col gap-2">
         <span>Select a cash</span>
         <Select
-          value={formData.cashAccountType || ""}
-          onValueChange={(value) => onFormDataChange("cashAccountType", value)}
+          value={formData.cashType || ""}
+          onValueChange={(value) => onFormDataChange("type", value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select a stock" />

@@ -1,68 +1,45 @@
-import React from "react";
+"use client";
+
+import { AssetType, assetTypeLabels } from "@/types";
+import { Button } from "../../ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "../../ui/select";
-import { AssetType } from "./types";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../../ui/card";
+import { cn } from "@/lib/utils";
 
 interface Step1Props {
-  selectedAssetType: AssetType | "";
-  onAssetTypeSelect: (value: AssetType) => void;
+  selectedAssetType: AssetType | null;
+  onAssetTypeSelect: (assetType: AssetType) => void;
 }
-
-const assetTypes = [
-  {
-    value: "crypto",
-    label: "Cryptocurrency",
-  },
-  {
-    value: "real_estate",
-    label: "Real Estate",
-  },
-  {
-    value: "stock",
-    label: "Stocks",
-  },
-  { value: "cash", label: "Cash", description: "Cash holdings and deposits" },
-  {
-    value: "exotic",
-    label: "Exotic Assets",
-  },
-];
 
 export default function Step1AssetTypeSelection({
   selectedAssetType,
   onAssetTypeSelect,
 }: Step1Props) {
+  const assetTypes: AssetType[] = Object.keys(assetTypeLabels) as AssetType[];
+  console.log("selectedAssetType: ", selectedAssetType);
   return (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Select
-          value={selectedAssetType}
-          onValueChange={(value) => onAssetTypeSelect(value as AssetType)}
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {assetTypes.map((assetType) => (
+        <Card
+          key={assetType}
+          className={cn(
+            "cursor-pointer hover:bg-card-hover transition-shadow",
+            selectedAssetType === assetType && "bg-card-hover"
+          )}
+          onClick={() => onAssetTypeSelect(assetType)}
         >
-          <SelectTrigger>
-            <SelectValue placeholder="Choose an asset type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Asset Types</SelectLabel>
-              {assetTypes.map((type) => (
-                <SelectItem key={type.value} value={type.value}>
-                  <div className="flex flex-col">
-                    <span className="font-medium">{type.label}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">
+              {assetTypeLabels[assetType]}
+            </CardTitle>
+          </CardHeader>
+        </Card>
+      ))}
     </div>
   );
 }

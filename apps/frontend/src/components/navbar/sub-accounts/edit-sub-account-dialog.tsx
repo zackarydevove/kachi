@@ -1,5 +1,5 @@
-import { Button } from "../ui/button";
-import { Input } from "../ui/input";
+import { Button } from "../../ui/button";
+import { Input } from "../../ui/input";
 import {
   Dialog,
   DialogClose,
@@ -9,8 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../ui/dialog";
-import { Label } from "../ui/label";
+} from "../../ui/dialog";
+import { Label } from "../../ui/label";
 import { Pencil, Plus } from "lucide-react";
 
 export default function EditSubAccountDialog(props: {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -19,66 +19,60 @@ import {
   AssetFormData,
   initialFormData,
   assetTypeLabels,
-} from "./add-asset-steps/types";
+  Asset,
+} from "@/types";
+import { useAssetStore } from "@/store/asset.store";
 
-// TODO: The states shouldn't be on the /portfolio page but only inside the dialog only IF its opened
 export default function AddAssetDialog() {
+  const addAsset = useAssetStore((state) => state.addAsset);
+
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedAssetType, setSelectedAssetType] = useState<AssetType | "">(
-    ""
+  const [selectedAssetType, setSelectedAssetType] = useState<AssetType | null>(
+    null
   );
-  const [formData, setFormData] = useState<AssetFormData>(initialFormData);
+  const [formData, setFormData] = useState<AssetFormData[AssetType]>(
+    {} as AssetFormData[AssetType]
+  );
 
-  const handleAssetTypeSelect = (value: AssetType) => {
-    setSelectedAssetType(value);
+  const resetForm = () => {
+    setCurrentStep(1);
+    setSelectedAssetType(null);
+    setFormData({} as AssetFormData[AssetType]);
   };
 
-  const handleFormDataChange = (field: string, value: string) => {
-    if (!selectedAssetType) return;
+  const handleAssetTypeSelect = (assetType: AssetType) => {
+    setSelectedAssetType(assetType);
+  };
 
-    setFormData((prev) => ({
-      ...prev,
-      [selectedAssetType]: {
-        ...prev[selectedAssetType],
-        [field]: value,
-      },
-    }));
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open) resetForm();
   };
 
   const handleContinue = () => {
     if (currentStep === 1 && selectedAssetType) {
+      setFormData(initialFormData[selectedAssetType]);
       setCurrentStep(2);
     }
   };
 
-  const handleBack = () => {
-    if (currentStep === 2) {
-      setCurrentStep(1);
-      resetForm();
-    }
+  const handleFormDataChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleAdd = async () => {
-    // TODO: Implement API call to add asset
-    console.log("Adding asset:", { type: selectedAssetType, ...formData });
-    setIsOpen(false);
-    resetForm();
-  };
-
-  const resetForm = () => {
-    setCurrentStep(1);
-    setSelectedAssetType("");
-    setFormData(initialFormData);
+  const handleAddAsset = () => {
+    if (selectedAssetType && formData) addAsset(selectedAssetType, formData);
+    handleClose();
   };
 
   const handleClose = () => {
-    setIsOpen(false);
     resetForm();
+    setIsOpen(false);
   };
 
   const canContinue = () => {
-    return currentStep === 1 ? selectedAssetType !== "" : false;
+    return currentStep === 1 ? selectedAssetType : false;
   };
 
   const canAdd = () => {
@@ -94,7 +88,7 @@ export default function AddAssetDialog() {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button onClick={() => setIsOpen(true)}>Add Asset</Button>
       </DialogTrigger>
@@ -106,7 +100,9 @@ export default function AddAssetDialog() {
           <DialogDescription>
             {currentStep === 1
               ? "Choose the type of asset you want to add to your portfolio."
-              : `Add details for your ${assetTypeLabels[selectedAssetType]} asset.`}
+              : `Add details for your ${
+                  assetTypeLabels[selectedAssetType as AssetType]
+                } asset.`}
           </DialogDescription>
         </DialogHeader>
 
@@ -118,7 +114,7 @@ export default function AddAssetDialog() {
         ) : (
           <div className="pb-2">
             <Step2AssetDetails
-              selectedAssetType={selectedAssetType as AssetType}
+              selectedAssetType={selectedAssetType!}
               formData={formData}
               onFormDataChange={handleFormDataChange}
             />
@@ -128,7 +124,7 @@ export default function AddAssetDialog() {
         <DialogFooter className="flex justify-between">
           <div className="flex gap-2">
             {currentStep === 2 && (
-              <Button variant="outline" onClick={handleBack}>
+              <Button variant="outline" onClick={resetForm}>
                 Back
               </Button>
             )}
@@ -145,7 +141,7 @@ export default function AddAssetDialog() {
                 Continue
               </Button>
             ) : (
-              <Button onClick={handleAdd} disabled={!canAdd()}>
+              <Button onClick={handleAddAsset} disabled={!canAdd()}>
                 Add Asset
               </Button>
             )}

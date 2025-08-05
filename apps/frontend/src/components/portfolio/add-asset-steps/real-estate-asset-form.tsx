@@ -1,7 +1,6 @@
 import React from "react";
 import { Label } from "../../ui/label";
-import { Textarea } from "../../ui/textarea";
-import { AssetFormData } from "./types";
+import { AssetFormData } from "@/types";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -14,7 +13,7 @@ import {
 } from "@/components/ui/select";
 
 interface RealEstateAssetFormProps {
-  formData: AssetFormData;
+  formData: AssetFormData["realEstate"];
   onFormDataChange: (field: string, value: string) => void;
 }
 
@@ -44,6 +43,7 @@ export default function RealEstateAssetForm({
   formData,
   onFormDataChange,
 }: RealEstateAssetFormProps) {
+  console.log(" in real estate component formData : ", formData);
   return (
     <div className="space-y-2">
       {/* Name */}
@@ -53,7 +53,7 @@ export default function RealEstateAssetForm({
           id="name"
           type="text"
           placeholder="Main House"
-          value={formData.realEstate.name}
+          value={formData.name}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             onFormDataChange("name", e.target.value)
           }
@@ -68,7 +68,7 @@ export default function RealEstateAssetForm({
           id="address"
           type="text"
           placeholder="123 St. Robert, Los Angeles"
-          value={formData.realEstate.address}
+          value={formData.address}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             onFormDataChange("address", e.target.value)
           }
@@ -81,7 +81,7 @@ export default function RealEstateAssetForm({
         <div className="flex flex-col gap-2">
           <Label htmlFor="address">Type</Label>
           <Select
-            value={formData.realEstate.type}
+            value={formData.realEstateType}
             onValueChange={(value) => onFormDataChange("type", value)}
           >
             <SelectTrigger>
@@ -104,7 +104,7 @@ export default function RealEstateAssetForm({
         <div className="flex flex-col gap-2">
           <Label htmlFor="address">Category</Label>
           <Select
-            value={formData.realEstate.category}
+            value={formData.category}
             onValueChange={(value) => onFormDataChange("category", value)}
           >
             <SelectTrigger>
@@ -132,7 +132,7 @@ export default function RealEstateAssetForm({
           id="cost"
           type="number"
           placeholder="0"
-          value={formData.realEstate.cost}
+          value={formData.cost}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             onFormDataChange("cost", e.target.value)
           }

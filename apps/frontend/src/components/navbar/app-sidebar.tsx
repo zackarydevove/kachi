@@ -6,12 +6,11 @@ import {
   ChartColumnIncreasing,
   Command,
   GalleryVerticalEnd,
-  House,
 } from "lucide-react";
 
-import { NavMain } from "@/components/nav-main";
-import { NavUser } from "@/components/nav-user";
-import { TeamSwitcher } from "@/components/team-switcher";
+import { NavMain } from "@/components/navbar/nav-main";
+import { NavUser } from "@/components/navbar/nav-user";
+import { TeamSwitcher } from "@/components/navbar/team-switcher";
 import {
   Sidebar,
   SidebarContent,

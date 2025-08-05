@@ -1,4 +1,4 @@
-import { AssetFormData } from "./types";
+import { AssetFormData } from "@/types";
 import {
   Select,
   SelectContent,
@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface StockAssetFormProps {
-  formData: AssetFormData;
+  formData: AssetFormData["stock"];
   onFormDataChange: (field: string, value: string) => void;
 }
 
@@ -42,7 +42,7 @@ export default function StockAssetForm({
       <div className="flex flex-col gap-2">
         <span>Select a stock</span>
         <Select
-          value={formData.stock.name || ""}
+          value={formData.name || ""}
           onValueChange={(value) => onFormDataChange("name", value)}
         >
           <SelectTrigger>
@@ -72,7 +72,7 @@ export default function StockAssetForm({
             id="unitPrice"
             type="number"
             placeholder="0.00"
-            value={formData.stock.unitPrice}
+            value={formData.unitPrice}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               onFormDataChange("unitPrice", e.target.value)
             }
@@ -85,7 +85,7 @@ export default function StockAssetForm({
             id="quantity"
             type="number"
             placeholder="0"
-            value={formData.stock.quantity}
+            value={formData.quantity}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               onFormDataChange("quantity", e.target.value)
             }

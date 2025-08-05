@@ -1,11 +1,10 @@
 import React from "react";
 import { Label } from "../../ui/label";
-import { Textarea } from "../../ui/textarea";
-import { AssetFormData } from "./types";
+import { AssetFormData } from "@/types";
 import { Input } from "@/components/ui/input";
 
 interface ExoticAssetFormProps {
-  formData: AssetFormData;
+  formData: AssetFormData["exotic"];
   onFormDataChange: (field: string, value: string) => void;
 }
 
@@ -23,7 +22,7 @@ export default function ExoticAssetForm({
             id="name"
             type="text"
             placeholder="Watch, Car, Art"
-            value={formData.exotic.name}
+            value={formData.name}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               onFormDataChange("name", e.target.value)
             }
@@ -37,7 +36,7 @@ export default function ExoticAssetForm({
             id="quantity"
             type="number"
             placeholder="0"
-            value={formData.exotic.quantity}
+            value={formData.quantity}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               onFormDataChange("quantity", e.target.value)
             }
@@ -53,7 +52,7 @@ export default function ExoticAssetForm({
             id="buyingPrice"
             type="number"
             placeholder="0.00"
-            value={formData.exotic.buyingPrice}
+            value={formData.buyingPrice}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               onFormDataChange("buyingPrice", e.target.value)
             }
@@ -66,7 +65,7 @@ export default function ExoticAssetForm({
             id="currentPrice"
             type="number"
             placeholder="0.00"
-            value={formData.exotic.currentPrice}
+            value={formData.currentPrice}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               onFormDataChange("currentPrice", e.target.value)
             }

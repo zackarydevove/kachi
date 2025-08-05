@@ -3,10 +3,10 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/app-sidebar";
 import { Separator } from "@/components/ui/separator";
 import { Breadcrumb } from "@/components/ui/breadcrumb";
 import BreadcrumbSegment from "@/components/navbar/breadcrumb-segment";
+import { AppSidebar } from "@/components/navbar/app-sidebar";
 
 export default function MainAppLayout({
   children,

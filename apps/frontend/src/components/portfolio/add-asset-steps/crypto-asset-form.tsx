@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { AssetFormData } from "./types";
+import { AssetFormData } from "@/types";
 import {
   Select,
   SelectContent,
@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface CryptoAssetFormProps {
-  formData: AssetFormData;
+  formData: AssetFormData["crypto"];
   onFormDataChange: (field: string, value: string) => void;
 }
 
@@ -55,7 +55,7 @@ export default function CryptoAssetForm({
       <div className="flex flex-col gap-2">
         <span>Select a crypto</span>
         <Select
-          value={formData.crypto.name || ""}
+          value={formData.name || ""}
           onValueChange={(value) => onFormDataChange("name", value)}
         >
           <SelectTrigger>
@@ -85,7 +85,7 @@ export default function CryptoAssetForm({
             id="unitPrice"
             type="number"
             placeholder="0.00"
-            value={formData.crypto.unitPrice}
+            value={formData.unitPrice}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               onFormDataChange("unitPrice", e.target.value)
             }
@@ -98,7 +98,7 @@ export default function CryptoAssetForm({
             id="quantity"
             type="number"
             placeholder="0"
-            value={formData.crypto.quantity}
+            value={formData.quantity}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               onFormDataChange("quantity", e.target.value)
             }
