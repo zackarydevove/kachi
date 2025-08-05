@@ -39,8 +39,8 @@ export default function PortfolioPieChart() {
               data={mockData}
               cx="50%"
               cy="50%"
-              innerRadius={110}
-              outerRadius="100%"
+              innerRadius={100}
+              outerRadius="80%"
               dataKey="value"
               onMouseEnter={(_, index) => setActiveIndex(index)}
               onMouseLeave={() => setActiveIndex(-1)}
