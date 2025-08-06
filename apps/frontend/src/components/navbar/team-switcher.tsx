@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronsUpDown, Plus } from "lucide-react";
+import { BadgeCheckIcon, ChevronsUpDown, Plus } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/sidebar";
 import EditSubAccountDialog from "./sub-accounts/edit-sub-account-dialog";
 import { useAccountStore } from "@/store/account.store";
+import { Badge } from "@/components/ui/badge";
 
 export function TeamSwitcher() {
   const { isMobile } = useSidebar();
@@ -65,12 +66,15 @@ export function TeamSwitcher() {
                 onClick={() => setActiveAccount(account)}
                 className="flex p-2"
               >
-                <div className="flex gap-2 flex-1">
+                <div className="flex gap-2 flex-1 items-center">
                   <div className="flex size-6 items-center justify-center rounded-md border">
                     {/* TODO: Add logo for accounts */}
                     {/* <account.logo className="size-3.5 shrink-0" />  */}
                   </div>
-                  {account.name}
+                  <p>{account.name}</p>
+                  {activeAccount.id === account.id && (
+                    <BadgeCheckIcon className="text-constructive" />
+                  )}
                 </div>
                 <EditSubAccountDialog type="edit" account={account} />
               </DropdownMenuItem>

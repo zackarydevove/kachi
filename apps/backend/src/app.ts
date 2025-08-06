@@ -25,7 +25,7 @@ export default class App {
           'http://localhost:3000',
           // 'https://mywebsite.com',
         ],
-        methods: ['GET', 'POST', 'DELETE'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true, // to get the httpOnly cookies
       }),
     );

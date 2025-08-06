@@ -16,6 +16,15 @@ class AccountRoutes extends BaseRouter {
         ],
         handler: AccountController.addAccount,
       },
+      {
+        method: 'put',
+        path: '/:accountId',
+        middlewares: [
+          AuthMiddleware.authenticateUser,
+          ValidationMiddleware.validateBody(accountFormSchema),
+        ],
+        handler: AccountController.editAccount,
+      },
     ];
   }
 }

@@ -37,7 +37,7 @@ export default function EditSubAccountDialog(props: {
   );
   const [open, setOpen] = useState(false);
 
-  const { createAccount } = useAccountStore();
+  const { createAccount, editAccount } = useAccountStore();
 
   // Update form data when account prop changes
   useEffect(() => {
@@ -59,27 +59,32 @@ export default function EditSubAccountDialog(props: {
     setError(null);
 
     try {
-      if (editType) {
-        // editAccount(formData, accountId);
-        console.log("edit", formData);
+      if (editType && props.account) {
+        await editAccount(props.account.id, formData);
+        console.log("edit completed", formData);
       } else {
         await createAccount(formData);
       }
       setFormData(resetFormData());
       setOpen(false); // Close dialog only on success
     } catch (error: unknown) {
-      console.error("Error creating account:", error);
+      console.error(
+        `Error ${editType ? "updating" : "creating"} account:`,
+        error
+      );
       // If error is 409, show error message
       if (
         (error as { response?: { status: number } })?.response?.status === 409
       ) {
         setError({
-          message: "Account already exists",
+          message: "Account with this name already exists",
           path: "name",
         });
       } else {
         setError({
-          message: "Failed to create account. Please try again.",
+          message: `Failed to ${
+            editType ? "update" : "create"
+          } account. Please try again.`,
           path: "avatar", // general error
         });
       }
