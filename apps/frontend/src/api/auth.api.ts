@@ -1,12 +1,12 @@
-import { ApiBase } from "./api.base";
+import { userResponseSchema } from "@/schemas/user.schema";
+import { ApiBase } from "@/api/api.base";
 import {
   AuthResponse,
   LoginRequest,
   LoginResponse,
   SignupRequest,
   SignupResponse,
-} from "../schema/auth.schema";
-import { userResponseSchema } from "../schema/user.schema";
+} from "@/types/auth.type";
 
 export class AuthApi extends ApiBase {
   constructor() {

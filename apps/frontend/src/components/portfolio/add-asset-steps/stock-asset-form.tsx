@@ -1,4 +1,4 @@
-import { AssetFormData } from "@/types";
+import { AssetFormData } from "@/types/asset.type";
 import {
   Select,
   SelectContent,

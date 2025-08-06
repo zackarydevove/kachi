@@ -1,5 +1,42 @@
-// Asset types (categories)
-export type AssetType = "crypto" | "stock" | "realEstate" | "cash" | "exotic";
+import {
+  assetGroupSchema,
+  assetSchema,
+  assetTypeSchema,
+  cashFormSchema,
+  cryptoFormSchema,
+  exoticFormSchema,
+  realEstateFormSchema,
+  stockFormSchema,
+} from "@/schemas/asset.schema";
+import z from "zod";
+
+// Inferred types
+export type AssetType = z.infer<typeof assetTypeSchema>;
+export type Asset = z.infer<typeof assetSchema>;
+export type AssetGroup = z.infer<typeof assetGroupSchema>;
+
+// Form data types
+type CryptoFormData = z.infer<typeof cryptoFormSchema>;
+type StockFormData = z.infer<typeof stockFormSchema>;
+type RealEstateFormData = z.infer<typeof realEstateFormSchema>;
+type CashFormData = z.infer<typeof cashFormSchema>;
+type ExoticFormData = z.infer<typeof exoticFormSchema>;
+
+export type AssetFormData = {
+  crypto: CryptoFormData;
+  stock: StockFormData;
+  realEstate: RealEstateFormData;
+  cash: CashFormData;
+  exotic: ExoticFormData;
+};
+
+// API request/response types
+export type AssetCreateRequest = AssetFormData[AssetType];
+export type AssetCreateResponse = Asset;
+export type AssetGetAllResponse = AssetGroup[];
+export type AssetUpdateRequest = AssetFormData[AssetType];
+export type AssetUpdateResponse = Asset;
+export type AssetDeleteResponse = { id: number };
 
 // Labels for asset types
 export const assetTypeLabels: Record<AssetType, string> = {
@@ -10,80 +47,7 @@ export const assetTypeLabels: Record<AssetType, string> = {
   exotic: "Exotic Assets",
 };
 
-// Database-friendly asset interface
-export interface Asset {
-  id: number;
-  name: string;
-  type: AssetType; // The asset type (e.g., "crypto", "cash")
-  color: string;
-  split: number;
-  value: number;
-  pnl: string;
-  // Asset-specific fields
-  unitPrice?: string;
-  quantity?: string;
-  address?: string;
-  realEstateType?: string;
-  category?: string;
-  cost?: string;
-  cashType?: string;
-  currency?: string;
-  buyingPrice?: string;
-  currentPrice?: string;
-  // Database fields
-  createdAt: Date;
-  updatedAt: Date;
-  userId: number;
-}
-
-// Asset group interface (groups assets by type)
-export interface AssetGroup {
-  id: number;
-  name: string;
-  type: AssetType; // The group type (e.g., "crypto", "cash")
-  color: string;
-  split: number;
-  value: number;
-  pnl: string;
-  assets: Asset[]; // Array of assets in this group
-  // Database fields
-  createdAt: Date;
-  updatedAt: Date;
-  userId: number;
-}
-
-// Form data structure for each asset type
-export interface AssetFormData {
-  crypto: {
-    name: string;
-    unitPrice: string;
-    quantity: string;
-  };
-  stock: {
-    name: string;
-    unitPrice: string;
-    quantity: string;
-  };
-  realEstate: {
-    name: string;
-    address: string;
-    realEstateType: string;
-    category: string;
-    cost: string;
-  };
-  cash: {
-    cashType: string;
-    currency: string;
-    quantity: string;
-  };
-  exotic: {
-    name: string;
-    quantity: string;
-    buyingPrice: string;
-    currentPrice: string;
-  };
-}
-
+// Initial form data using schema-inferred types
 export const initialFormData: AssetFormData = {
   crypto: {
     name: "",
@@ -115,45 +79,7 @@ export const initialFormData: AssetFormData = {
   },
 };
 
-// API response types
-export interface AssetApiResponse {
-  success: boolean;
-  data?: AssetGroup[] | Asset;
-  error?: string;
-}
-
-// Create asset request
-export interface CreateAssetRequest {
-  type: AssetType;
-  formData: AssetFormData[AssetType];
-  userId: string;
-}
-
-// Update asset request
-export interface UpdateAssetRequest {
-  assetId: string;
-  type: AssetType;
-  formData: AssetFormData[AssetType];
-  userId: string;
-}
-
-// Delete asset request
-export interface DeleteAssetRequest {
-  assetId: string;
-  userId: string;
-}
-
-// Portfolio summary for dashboard
-export interface PortfolioSummary {
-  totalValue: number;
-  totalPnL: string;
-  assetCount: number;
-  groups: AssetGroup[];
-}
-
-// MOCK DATA
-
-// GET ALL
+// MOCK DATA TODO: DELETE
 export const mockDataGetAllAssetsOfUser: AssetGroup[] = [
   {
     id: 1,

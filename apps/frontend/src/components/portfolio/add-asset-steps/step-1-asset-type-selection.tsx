@@ -1,6 +1,6 @@
 "use client";
 
-import { AssetType, assetTypeLabels } from "@/types";
+import { AssetType, assetTypeLabels } from "@/types/asset.type";
 import { Button } from "../../ui/button";
 import {
   Card,

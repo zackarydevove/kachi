@@ -1,6 +1,6 @@
 import React from "react";
 import { Label } from "../../ui/label";
-import { AssetFormData } from "@/types";
+import { AssetFormData } from "@/types/asset.type";
 import { Input } from "@/components/ui/input";
 import {
   Select,

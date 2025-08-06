@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { AssetFormData, AssetType } from "@/types";
+import { AssetFormData, AssetType } from "@/types/asset.type";
 import CryptoAssetForm from "./crypto-asset-form";
 import RealEstateAssetForm from "./real-estate-asset-form";
 import StockAssetForm from "./stock-asset-form";

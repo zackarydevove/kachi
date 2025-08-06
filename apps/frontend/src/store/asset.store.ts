@@ -5,7 +5,7 @@ import {
   AssetType,
   AssetFormData,
   mockDataGetAllAssetsOfUser,
-} from "@/types";
+} from "@/types/asset.type";
 
 interface AssetStore {
   assetGroups: AssetGroup[];

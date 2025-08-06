@@ -14,7 +14,7 @@ import {
 } from "../ui/dropdown-menu";
 import DeleteAssetDialog from "./delete-asset-dialog";
 import EditAssetDialog from "./edit-asset-dialog";
-import { Asset, AssetType, AssetFormData } from "@/types";
+import { Asset, AssetType, AssetFormData } from "@/types/asset.type";
 import { useAssetStore } from "@/store/asset.store";
 
 export default function AssetsTable() {

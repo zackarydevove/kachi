@@ -14,14 +14,13 @@ import {
 } from "../ui/dialog";
 import Step1AssetTypeSelection from "./add-asset-steps/step-1-asset-type-selection";
 import Step2AssetDetails from "./add-asset-steps/step-2-asset-details";
-import {
-  AssetType,
-  AssetFormData,
-  initialFormData,
-  assetTypeLabels,
-  Asset,
-} from "@/types";
 import { useAssetStore } from "@/store/asset.store";
+import {
+  AssetFormData,
+  AssetType,
+  assetTypeLabels,
+  initialFormData,
+} from "@/types/asset.type";
 
 export default function AddAssetDialog() {
   const addAsset = useAssetStore((state) => state.addAsset);

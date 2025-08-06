@@ -25,7 +25,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { AuthApi } from "@/services/api/auth.api";
+import { AuthApi } from "@/api/auth.api";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/user.store";
 

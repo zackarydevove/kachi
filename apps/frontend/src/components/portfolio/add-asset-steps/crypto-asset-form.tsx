@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { AssetFormData } from "@/types";
+import { AssetFormData } from "@/types/asset.type";
 import {
   Select,
   SelectContent,

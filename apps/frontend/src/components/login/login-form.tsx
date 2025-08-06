@@ -13,10 +13,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AuthApi, AuthRequest } from "@/services/api/auth.api";
+import { AuthApi } from "@/api/auth.api";
 import { Loader2Icon } from "lucide-react";
 import { AuthUtil } from "@/utils/auth.util";
 import { useUserStore } from "@/store/user.store";
+import { LoginRequest } from "@/types/auth.type";
 
 export function LoginForm({
   className,
@@ -38,7 +39,7 @@ export function LoginForm({
     e.preventDefault();
     setError(null);
 
-    const payload: AuthRequest = { email, password };
+    const payload: LoginRequest = { email, password };
     if (!authUtil.checkError(payload, setError)) return;
 
     try {

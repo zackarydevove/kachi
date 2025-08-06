@@ -9,7 +9,7 @@ import {
   DialogContent,
 } from "../ui/dialog";
 import { Button } from "../ui/button";
-import { AssetType, AssetFormData } from "@/types";
+import { AssetType, AssetFormData } from "@/types/asset.type";
 import Step2AssetDetails from "./add-asset-steps/step-2-asset-details";
 
 interface EditAssetDialogProps<T extends AssetType> {

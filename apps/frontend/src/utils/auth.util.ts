@@ -1,16 +1,16 @@
-import { AuthRequest } from "@/services/api/auth.api";
-import authSchema from "@/services/schema/auth.schema";
+import authSchema from "@/schemas/auth.schema";
+import { LoginRequest, SignupRequest } from "@/types/auth.type";
 import { Dispatch, SetStateAction } from "react";
 
 export class AuthUtil {
   public checkError(
-    payload: AuthRequest,
+    payload: LoginRequest | SignupRequest,
     setError: Dispatch<SetStateAction<{ message: string; path: string } | null>>
   ): boolean {
-    const result =
-      payload.confirmPassword == undefined
-        ? authSchema.login.safeParse(payload)
-        : authSchema.signup.safeParse(payload);
+    const isSignup = "confirmPassword" in payload;
+    const result = isSignup
+      ? authSchema.signup.safeParse(payload)
+      : authSchema.login.safeParse(payload);
 
     if (!result.success) {
       const parsed = JSON.parse(result.error.message);

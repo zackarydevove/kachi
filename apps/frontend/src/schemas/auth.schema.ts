@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { userResponseSchema } from "./user.schema";
 
 const passwordSchema = z
   .string()
@@ -41,14 +40,3 @@ const authSchema = {
 };
 
 export default authSchema;
-
-// We already know that all response wwill contain success, data, error, so just set the schema of data
-
-// Request schemas
-export type LoginRequest = z.infer<typeof loginSchema>;
-export type SignupRequest = z.infer<typeof signupSchema>;
-
-// Response schemas
-export type LoginResponse = z.infer<typeof userResponseSchema>;
-export type SignupResponse = z.infer<typeof userResponseSchema>;
-export type AuthResponse = null;
