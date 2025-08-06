@@ -189,7 +189,7 @@ a   */
 
   async create(data: TCreateRequest): Promise<TCreateResponse> {
     return this.fetchApi<TCreateRequest, TCreateResponse>(
-      "get",
+      "post",
       this.endpoint,
       data,
       this.schemas.createResponse

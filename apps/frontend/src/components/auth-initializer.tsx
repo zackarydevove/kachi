@@ -4,12 +4,15 @@ import { useEffect, useState } from "react";
 import { UserApi } from "@/api/user.api";
 import { useUserStore } from "@/store/user.store";
 import { usePathname, useRouter } from "next/navigation";
+import { useAccountStore } from "@/store/account.store";
 
 export function AuthInitializer() {
   const pathname = usePathname();
   const userApi = new UserApi();
   const router = useRouter();
   const setUser = useUserStore((state) => state.setUser);
+  const setAccounts = useAccountStore((state) => state.setAccounts);
+  const setActiveAccount = useAccountStore((state) => state.setActiveAccount);
   const [isAuthChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
@@ -17,6 +20,8 @@ export function AuthInitializer() {
       try {
         const res = await userApi.get();
         setUser(res.user);
+        setAccounts(res.accounts);
+        setActiveAccount(res.accounts[0]);
         if (pathname === "/login" || pathname === "/signup") {
           router.replace("/portfolio");
         }

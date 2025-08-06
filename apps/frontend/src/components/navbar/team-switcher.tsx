@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { ChevronsUpDown, Plus } from "lucide-react";
 
 import {
@@ -18,20 +17,15 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import EditSubAccountDialog from "./sub-accounts/edit-sub-account-dialog";
+import { useAccountStore } from "@/store/account.store";
 
-export function TeamSwitcher({
-  teams,
-}: {
-  teams: {
-    name: string;
-    logo: React.ElementType;
-    plan: string;
-  }[];
-}) {
+export function TeamSwitcher() {
   const { isMobile } = useSidebar();
-  const [activeTeam, setActiveTeam] = React.useState(teams[0]);
+  const activeAccount = useAccountStore((state) => state.activeAccount);
+  const setActiveAccount = useAccountStore((state) => state.setActiveAccount);
+  const accounts = useAccountStore((state) => state.accounts);
 
-  if (!activeTeam) {
+  if (!activeAccount) {
     return null;
   }
 
@@ -45,11 +39,13 @@ export function TeamSwitcher({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                <activeTeam.logo className="size-4" />
+                {/* <activeAccount.logo className="size-4" /> */}
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{activeTeam.name}</span>
-                <span className="truncate text-xs">{activeTeam.plan}</span>
+                <span className="truncate font-medium">
+                  {activeAccount.name}
+                </span>
+                {/* <span className="truncate text-xs">{activeAccount.plan}</span> */}
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
@@ -63,19 +59,20 @@ export function TeamSwitcher({
             <DropdownMenuLabel className="text-muted-foreground text-xs">
               Teams
             </DropdownMenuLabel>
-            {teams.map((team) => (
+            {accounts.map((account) => (
               <DropdownMenuItem
-                key={team.name}
-                onClick={() => setActiveTeam(team)}
+                key={account.name}
+                onClick={() => setActiveAccount(account)}
                 className="flex p-2"
               >
                 <div className="flex gap-2 flex-1">
                   <div className="flex size-6 items-center justify-center rounded-md border">
-                    <team.logo className="size-3.5 shrink-0" />
+                    {/* TODO: Add logo for accounts */}
+                    {/* <account.logo className="size-3.5 shrink-0" />  */}
                   </div>
-                  {team.name}
+                  {account.name}
                 </div>
-                <EditSubAccountDialog type="edit" />
+                <EditSubAccountDialog type="edit" account={account} />
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />

@@ -20,19 +20,20 @@ export default class UserController {
         return Send.notFound(res, {}, 'User not found');
       }
 
-      const account = await prisma.account.findFirst({
+      const accounts = await prisma.account.findMany({
         where: { userId: user.id },
+        orderBy: { id: 'asc' },
         select: {
           id: true,
           name: true,
+          avatar: true,
         },
       });
+      if (!accounts) return Send.notFound(res, {}, 'Accounts not found');
 
       const data = {
-        user: {
-          ...user,
-          account,
-        },
+        user,
+        accounts,
       };
 
       return Send.success(res, data);

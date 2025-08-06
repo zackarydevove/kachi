@@ -15,7 +15,10 @@ export default class AuthController {
 
     try {
       // Check user exist
-      const user = await prisma.user.findUnique({ where: { email } });
+      const user = await prisma.user.findUnique({
+        where: { email },
+        select: { id: true, email: true, password: true },
+      });
       if (!user)
         return Send.unauthorized(res, null, 'Invalid email or password');
 
@@ -24,11 +27,16 @@ export default class AuthController {
       if (!isPasswordValid)
         return Send.unauthorized(res, null, 'Invalid email or password.'); // Don't send only password otherwise it gives information for hackers
 
-      // TODO: I don't think we should do this in the login but only when we arrive on the page after login
-      const account = await prisma.account.findFirst({
+      const accounts = await prisma.account.findMany({
         where: { userId: user.id },
+        orderBy: { id: 'asc' },
+        select: {
+          id: true,
+          name: true,
+          avatar: true,
+        },
       });
-      if (!account)
+      if (!accounts)
         return Send.notFound(res, null, 'Invalid email or password.'); // Don't send only password otherwise it gives information for hackers
 
       const accessToken = jwt.sign({ userId: user.id }, authConfig.secret, {
@@ -66,11 +74,8 @@ export default class AuthController {
         user: {
           id: user.id,
           email: user.email,
-          account: {
-            id: account.id,
-            name: account.name,
-          },
         },
+        accounts,
       });
     } catch (error) {
       console.error('Login Failed:', error);
@@ -103,22 +108,30 @@ export default class AuthController {
             email,
             password: hashedPassword,
           },
+          select: { id: true, email: true },
         });
 
         const newAccount = await tx.account.create({
           data: {
             name,
             userId: newUser.id,
+            avatar: '/avatars/shadcn.jpg',
           },
+          select: { id: true, name: true, avatar: true },
         });
 
         return {
-          id: newUser.id,
-          email: newUser.email,
-          account: {
-            id: newAccount.id,
-            name: newAccount.name,
+          user: {
+            id: newUser.id,
+            email: newUser.email,
           },
+          accounts: [
+            {
+              id: newAccount.id,
+              name: newAccount.name,
+              avatar: newAccount.avatar,
+            },
+          ],
         };
       });
 

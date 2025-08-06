@@ -18,6 +18,7 @@ import { Loader2Icon } from "lucide-react";
 import { AuthUtil } from "@/utils/auth.util";
 import { useUserStore } from "@/store/user.store";
 import { LoginRequest } from "@/types/auth.type";
+import { useAccountStore } from "@/store/account.store";
 
 export function LoginForm({
   className,
@@ -31,6 +32,8 @@ export function LoginForm({
     null
   );
   const setUser = useUserStore((state) => state.setUser);
+  const setAccounts = useAccountStore((state) => state.setAccounts);
+  const setActiveAccount = useAccountStore((state) => state.setActiveAccount);
 
   const authApi = new AuthApi();
   const authUtil = new AuthUtil();
@@ -45,8 +48,9 @@ export function LoginForm({
     try {
       setLoading(true);
       const res = await authApi.login(payload);
-      console.log("res: ", res);
       setUser(res.user);
+      setAccounts(res.accounts);
+      setActiveAccount(res.accounts[0]);
       router.push("/portfolio");
     } catch (err: any) {
       setError({

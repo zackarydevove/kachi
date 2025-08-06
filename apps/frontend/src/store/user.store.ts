@@ -1,11 +1,8 @@
+import { User } from "@/types/user.type";
 import { create } from "zustand";
 
 interface UserState {
-  user: {
-    id: number;
-    email: string;
-    account: { id: number; name: string };
-  } | null;
+  user: User | null;
   setUser: (user: UserState["user"]) => void;
   logout: () => void;
 }

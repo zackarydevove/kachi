@@ -26,6 +26,7 @@ model User {
   deletedAt    DateTime?
 
   accounts      Account[]
+  assets    Asset[]
 }
 
 // TODO: Add a column "main account" if its main, then you cannot delete it if user is not deleted
@@ -33,6 +34,7 @@ model Account {
   id           Int      @id @default(autoincrement())
   name         String
   userId        Int
+  avatar       String?
 
   user      User @relation(fields: [userId], references: [id])
 
@@ -41,6 +43,7 @@ model Account {
 
 model Asset {
   id           Int      @id @default(autoincrement())
+  userId       Int
   accountId    Int
   name        String
   type        AssetType // (crypto, real_estate, stock, cash, divers) (enum)
@@ -52,8 +55,8 @@ model Asset {
   updatedAt    DateTime @updatedAt
   deletedAt    DateTime?
 
+  user      User  @relation(fields: [userId], references: [id])
   account Account @relation(fields: [accountId], references: [id])
-  
   // liabilities  AssetLiability[] // 👈 back-reference
 }
 
