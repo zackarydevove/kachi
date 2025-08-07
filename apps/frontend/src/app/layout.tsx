@@ -1,6 +1,7 @@
 import { AuthInitializer } from "@/components/auth-initializer";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({
   children,
@@ -19,6 +20,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <Toaster position="bottom-right" />
         </ThemeProvider>
       </body>
     </html>

@@ -17,3 +17,7 @@ export type AccountCreateResponse = {
 export type AccountUpdateResponse = {
   updatedAccount: z.infer<typeof accountSchema>;
 };
+
+export type AccountDeleteResponse = {
+  deletedAccountId: number;
+};

@@ -200,7 +200,7 @@ a   */
     return this.fetchApi<null, TGetAllResponse>(
       "get",
       this.endpoint,
-      null,
+      undefined,
       this.schemas.getAllResponse
     );
   }
@@ -209,7 +209,7 @@ a   */
     return this.fetchApi<null, TGetResponse>(
       "get",
       `${this.endpoint}/${id}`,
-      null,
+      undefined,
       this.schemas.getResponse
     );
   }
@@ -218,7 +218,7 @@ a   */
     return this.fetchApi<null, TGetResponse>(
       "get",
       `${this.endpoint}`,
-      null,
+      undefined,
       this.schemas.getResponse
     );
   }
@@ -236,7 +236,7 @@ a   */
     return this.fetchApi<null, TDeleteResponse>(
       "delete",
       `${this.endpoint}/${id}`,
-      null,
+      undefined,
       this.schemas?.deleteResponse
     );
   }

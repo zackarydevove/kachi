@@ -18,6 +18,7 @@ import { useState, useEffect } from "react";
 import { Account, AccountForm } from "@/types/account.type";
 import { parseSchemaError } from "@/utils/parse-schema.util";
 import { accountFormSchema } from "@/schemas/account.schema";
+import DeleteAccountDialog from "./delete-account-dialog";
 
 export default function EditSubAccountDialog(props: {
   type: "edit" | "create";
@@ -37,12 +38,13 @@ export default function EditSubAccountDialog(props: {
   );
   const [open, setOpen] = useState(false);
 
-  const { createAccount, editAccount } = useAccountStore();
+  const { createAccount, editAccount, deleteAccount } = useAccountStore();
 
   // Update form data when account prop changes
   useEffect(() => {
     setFormData(resetFormData());
-  }, [props.account]);
+    setError(null);
+  }, [props.account, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     console.log("handleSubmit called!");
@@ -61,7 +63,6 @@ export default function EditSubAccountDialog(props: {
     try {
       if (editType && props.account) {
         await editAccount(props.account.id, formData);
-        console.log("edit completed", formData);
       } else {
         await createAccount(formData);
       }
@@ -72,22 +73,20 @@ export default function EditSubAccountDialog(props: {
         `Error ${editType ? "updating" : "creating"} account:`,
         error
       );
-      // If error is 409, show error message
-      if (
+      setError(
+        // If error is 409, show error message
         (error as { response?: { status: number } })?.response?.status === 409
-      ) {
-        setError({
-          message: "Account with this name already exists",
-          path: "name",
-        });
-      } else {
-        setError({
-          message: `Failed to ${
-            editType ? "update" : "create"
-          } account. Please try again.`,
-          path: "avatar", // general error
-        });
-      }
+          ? {
+              message: "Account with this name already exists",
+              path: "name",
+            }
+          : {
+              message: `Failed to ${
+                editType ? "update" : "create"
+              } account. Please try again.`,
+              path: "avatar", // general error
+            }
+      );
     } finally {
       setLoading(false);
     }
@@ -96,6 +95,33 @@ export default function EditSubAccountDialog(props: {
   const handleFormChange = (key: string, value: string) => {
     const newFormData = { ...formData, [key]: value };
     setFormData(newFormData);
+  };
+
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      if (!props.account) {
+        console.error("No account to delete");
+        setError({
+          message: "No account to delete",
+          path: "avatar",
+        });
+        return;
+      }
+      await deleteAccount(props.account.id);
+      setFormData(resetFormData());
+      setOpen(false);
+    } catch (error: unknown) {
+      console.error("Error deleting account:", error);
+      setError({
+        message:
+          (error as { response?: { data: { message: string } } })?.response
+            ?.data?.message || "Failed to delete account. Please try again.",
+        path: "avatar", // general error
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -115,7 +141,12 @@ export default function EditSubAccountDialog(props: {
             </div>
           )}
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent
+          className="sm:max-w-[425px]"
+          deleteDialog={
+            editType && <DeleteAccountDialog handleDelete={handleDelete} />
+          }
+        >
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <DialogHeader>
               <DialogTitle>
@@ -128,7 +159,7 @@ export default function EditSubAccountDialog(props: {
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-2">
                 <Label htmlFor="name-1">Name</Label>
                 <Input
                   id="name-1"
@@ -140,19 +171,15 @@ export default function EditSubAccountDialog(props: {
                   <p className="text-sm text-red-500">{error?.message}</p>
                 )}
               </div>
+              {/* TODO: Implement avatar later */}
               <div className="flex flex-col gap-3">
-                Here implement avatar later
+                <p>Here implement avatar later</p>
                 {error?.path === "avatar" && (
                   <p className="text-sm text-red-500">{error?.message}</p>
                 )}
               </div>
             </div>
             <DialogFooter className="flex">
-              {editType && (
-                <div className="flex-1">
-                  <Button variant="destructive">Delete</Button>
-                </div>
-              )}
               <div className="flex gap-2">
                 <Button
                   type="button"

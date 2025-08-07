@@ -96,4 +96,53 @@ export default class AccountController {
       return Send.error(res, { error }, 'Internal server error');
     }
   };
+  static deleteAccount = async (req: Request, res: Response) => {
+    try {
+      const accountId = parseInt(req.params.accountId);
+      const userId = (req as any).userId;
+
+      // Validate accountId
+      if (isNaN(accountId)) {
+        return Send.badRequest(
+          res,
+          { error: 'Invalid account ID' },
+          'Invalid account ID',
+        );
+      }
+
+      // Check the account exists and belongs to the user
+      const existingAccount = await prisma.account.findFirst({
+        where: { id: accountId, userId },
+      });
+      if (!existingAccount) {
+        return Send.notFound(
+          res,
+          { error: 'Account not found or access denied' },
+          'Account not found or access denied',
+        );
+      }
+
+      // Check user has at least two accounts, if not they cannot delete the account
+      const userAccountsCount = await prisma.account.count({
+        where: { userId },
+      });
+      if (userAccountsCount <= 1) {
+        return Send.badRequest(
+          res,
+          { error: 'User must have at least one account' },
+          'User must have at least one account',
+        );
+      }
+
+      const deletedAccount = await prisma.account.delete({
+        where: { id: accountId },
+        select: { id: true },
+      });
+
+      return Send.success(res, { deletedAccountId: deletedAccount.id });
+    } catch (error) {
+      console.error('Error deleting account: ', error);
+      return Send.error(res, { error }, 'Internal server error');
+    }
+  };
 }

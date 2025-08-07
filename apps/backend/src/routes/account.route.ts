@@ -25,6 +25,12 @@ class AccountRoutes extends BaseRouter {
         ],
         handler: AccountController.editAccount,
       },
+      {
+        method: 'delete',
+        path: '/:accountId',
+        middlewares: [AuthMiddleware.authenticateUser],
+        handler: AccountController.deleteAccount,
+      },
     ];
   }
 }
