@@ -1,69 +1,128 @@
-import { Dispatch, SetStateAction, useState, useEffect } from "react";
+"use client";
+
+import { Button } from "../ui/button";
 import {
   Dialog,
-  DialogTitle,
-  DialogDescription,
-  DialogHeader,
   DialogClose,
-  DialogFooter,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "../ui/dialog";
-import { Button } from "../ui/button";
-import { AssetType, AssetFormData } from "@/types/asset.type";
-import Step2AssetDetails from "./add-asset-steps/step-2-asset-details";
+import { Label } from "../ui/label";
+import { Input } from "../ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { Asset, AssetFormData, assetTypeLabels } from "@/types/asset.type";
+import { useState } from "react";
+import { useAssetStore } from "@/store/asset.store";
 
-interface EditAssetDialogProps<T extends AssetType> {
+export default function EditAssetDialog(props: {
+  asset: Asset;
   open: boolean;
-  setOpen: Dispatch<SetStateAction<boolean>>;
-  assetType: T;
-  initialFormData: AssetFormData[T];
-  onSave: (data: AssetFormData[T]) => void;
-}
+  onOpenChange: (open: boolean) => void;
+}) {
+  const editAsset = useAssetStore((state) => state.editAsset);
 
-export default function EditAssetDialog<T extends AssetType>({
-  open,
-  setOpen,
-  assetType,
-  initialFormData,
-  onSave,
-}: EditAssetDialogProps<T>) {
-  console.log("initialFormData dans EditAssetDialog: ", initialFormData);
-  const [formData, setFormData] = useState<AssetFormData[T]>(initialFormData);
-  console.log("formData dans EditAssetDialog: ", formData);
+  const initialFormData = {
+    type: props.asset?.type || null,
+    name: props.asset?.name || "",
+    value: props.asset?.value || 0,
+  };
 
-  // Update formData when initialFormData changes
-  useEffect(() => {
-    setFormData(initialFormData);
-  }, [initialFormData]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [formData, setFormData] = useState<AssetFormData>(initialFormData);
 
-  const handleFormDataChange = (field: string, value: string) => {
+  const handleOpenChange = (open: boolean) => {
+    if (props.onOpenChange) {
+      props.onOpenChange(open);
+    } else {
+      setIsOpen(open);
+    }
+    if (!open) setFormData(initialFormData);
+  };
+
+  const handleFormDataChange = (field: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSave = () => {
-    onSave(formData);
-    setOpen(false);
+  const handleApply = () => {
+    editAsset(props.asset.id, formData);
+    handleOpenChange(false);
+  };
+
+  const isFormValid = () => {
+    return formData.name.trim() !== "" && formData.value > 0;
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={props.open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Edit asset</DialogTitle>
+          <DialogTitle>Edit Asset Details</DialogTitle>
           <DialogDescription>Edit details for your asset.</DialogDescription>
         </DialogHeader>
-        <Step2AssetDetails
-          selectedAssetType={assetType}
-          formData={formData}
-          onFormDataChange={handleFormDataChange}
-        />
-        <DialogFooter>
+
+        {/* Type */}
+        <Select
+          value={formData.type || ""}
+          onValueChange={(value) => handleFormDataChange("type", value)}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select an asset type" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.keys(assetTypeLabels).map((type) => (
+              <SelectItem key={type} value={type}>
+                {type}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Name */}
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="name">Name</Label>
+          <Input
+            id="name"
+            type="text"
+            placeholder="My Asset Name"
+            value={formData.name}
+            onChange={(e) => handleFormDataChange("name", e.target.value)}
+            required
+          />
+        </div>
+
+        {/* Value */}
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="value">Value</Label>
+          <Input
+            id="value"
+            type="number"
+            placeholder="My Asset Value"
+            value={formData.value}
+            onChange={(e) =>
+              handleFormDataChange("value", Number(e.target.value))
+            }
+            required
+          />
+        </div>
+
+        <DialogFooter className="flex gap-2">
           <DialogClose asChild>
-            <Button variant="outline" onClick={() => setOpen(false)}>
+            <Button variant="outline" onClick={() => handleOpenChange(false)}>
               Cancel
             </Button>
           </DialogClose>
-          <Button onClick={handleSave}>Save</Button>
+          <Button onClick={handleApply} disabled={!isFormValid()}>
+            Edit Asset
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

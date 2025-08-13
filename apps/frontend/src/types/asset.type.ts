@@ -1,45 +1,32 @@
 import {
-  assetGroupSchema,
+  assetFormDataSchema,
   assetSchema,
   assetTypeSchema,
-  cashFormSchema,
-  cryptoFormSchema,
-  exoticFormSchema,
-  realEstateFormSchema,
-  stockFormSchema,
+  snapshotsSchema,
+  splitSchema,
 } from "@/schemas/asset.schema";
 import z from "zod";
 
 // Inferred types
 export type AssetType = z.infer<typeof assetTypeSchema>;
 export type Asset = z.infer<typeof assetSchema>;
-export type AssetGroup = z.infer<typeof assetGroupSchema>;
-
-// Form data types
-type CryptoFormData = z.infer<typeof cryptoFormSchema>;
-type StockFormData = z.infer<typeof stockFormSchema>;
-type RealEstateFormData = z.infer<typeof realEstateFormSchema>;
-type CashFormData = z.infer<typeof cashFormSchema>;
-type ExoticFormData = z.infer<typeof exoticFormSchema>;
-
-export type AssetFormData = {
-  crypto: CryptoFormData;
-  stock: StockFormData;
-  realEstate: RealEstateFormData;
-  cash: CashFormData;
-  exotic: ExoticFormData;
-};
+export type AssetFormData = z.infer<typeof assetFormDataSchema>;
+export type AssetSnapshot = z.infer<typeof snapshotsSchema>;
+export type AssetSplit = z.infer<typeof splitSchema>;
+export type AssetsData = { snapshots: AssetSnapshot[]; split: AssetSplit };
 
 // API request/response types
-export type AssetCreateRequest = AssetFormData[AssetType];
-export type AssetCreateResponse = Asset;
-export type AssetGetAllResponse = AssetGroup[];
-export type AssetUpdateRequest = AssetFormData[AssetType];
-export type AssetUpdateResponse = Asset;
-export type AssetDeleteResponse = { id: number };
+export type AssetCreateRequest = AssetFormData & { accountId: number };
+export type AssetCreateResponse = AssetsData[];
+export type AssetGetAllResponse = AssetsData[];
+export type AssetUpdateRequest = AssetFormData & { accountId: number };
+export type AssetUpdateResponse = AssetsData[];
+export type AssetDeleteRequest = { accountId: number; assetId: number };
+export type AssetDeleteResponse = AssetsData[];
 
 // Labels for asset types
 export const assetTypeLabels: Record<AssetType, string> = {
+  networth: "Net Worth",
   crypto: "Crypto",
   realEstate: "Real Estate",
   stock: "Stocks",
@@ -47,256 +34,175 @@ export const assetTypeLabels: Record<AssetType, string> = {
   exotic: "Exotic Assets",
 };
 
-// Initial form data using schema-inferred types
-export const initialFormData: AssetFormData = {
-  crypto: {
-    name: "",
-    unitPrice: "",
-    quantity: "",
-  },
-  stock: {
-    name: "",
-    unitPrice: "",
-    quantity: "",
-  },
-  realEstate: {
-    name: "",
-    address: "",
-    realEstateType: "",
-    category: "",
-    cost: "",
-  },
-  cash: {
-    cashType: "",
-    currency: "",
-    quantity: "",
-  },
-  exotic: {
-    name: "",
-    quantity: "",
-    buyingPrice: "",
-    currentPrice: "",
-  },
+export const assetTypeColor: Record<AssetType, string> = {
+  networth: "#000000", // black
+  crypto: "#0000FF", // blue
+  stock: "#008000", // green
+  realEstate: "#FF0000", // red
+  cash: "#FFFF00", // yellow
+  exotic: "#800080", // purple
 };
 
 // MOCK DATA TODO: DELETE
-export const mockDataGetAllAssetsOfUser: AssetGroup[] = [
-  {
-    id: 1,
-    name: "Crypto",
-    type: "crypto",
-    color: "blue",
-    split: 23,
-    value: 123,
-    pnl: "$1,450",
-    assets: [
-      {
-        id: 1,
-        name: "BTC",
-        type: "crypto",
-        color: "blue",
-        split: 80,
-        value: 123,
-        pnl: "$1,000",
-        unitPrice: "12",
-        quantity: "12",
-        createdAt: new Date("2024-01-01"),
-        updatedAt: new Date("2024-01-01"),
-        userId: 1,
-      },
-      {
-        id: 2,
-        name: "ETH",
-        type: "crypto",
-        color: "blue",
-        split: 20,
-        value: 123,
-        pnl: "$450",
-        unitPrice: "12",
-        quantity: "12",
-        createdAt: new Date("2024-01-01"),
-        updatedAt: new Date("2024-01-01"),
-        userId: 1,
-      },
-    ],
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-01-01"),
-    userId: 1,
+export const mockDataGetAllAssetsOfUser: AssetsData = {
+  snapshots: [
+    {
+      date: new Date("2024-01-01"),
+      networth: 10000,
+      crypto: 3000,
+      realEstate: 4000,
+      stock: 2000,
+      cash: 800,
+      exotic: 200,
+    },
+    {
+      date: new Date("2024-02-01"),
+      networth: 10250,
+      crypto: 3200,
+      realEstate: 4000,
+      stock: 2100,
+      cash: 750,
+      exotic: 200,
+    },
+    {
+      date: new Date("2024-03-01"),
+      networth: 9800,
+      crypto: 2800,
+      realEstate: 4000,
+      stock: 1850,
+      cash: 750,
+      exotic: 400,
+    },
+  ],
+  split: {
+    networth: {
+      value: 9800,
+      split: 100,
+      pnl: "-$200", // overall down compared to Jan
+      assets: [],
+    },
+    crypto: {
+      value: 2800,
+      split: 28.6,
+      pnl: "-$400",
+      assets: [
+        {
+          id: 1,
+          accountId: 1,
+          name: "BTC",
+          type: "crypto",
+          value: 1800,
+          split: 64.3,
+          pnl: "-$300",
+          createdAt: new Date("2024-01-01"),
+          updatedAt: new Date("2024-03-01"),
+        },
+        {
+          id: 2,
+          accountId: 1,
+          name: "ETH",
+          type: "crypto",
+          value: 1000,
+          split: 35.7,
+          pnl: "-$100",
+          createdAt: new Date("2024-01-01"),
+          updatedAt: new Date("2024-03-01"),
+        },
+      ],
+    },
+    realEstate: {
+      value: 4000,
+      split: 40.8,
+      pnl: "$0",
+      assets: [
+        {
+          id: 3,
+          accountId: 1,
+          name: "Main House",
+          type: "realEstate",
+          value: 4000,
+          split: 100,
+          pnl: "$0",
+          createdAt: new Date("2024-01-01"),
+          updatedAt: new Date("2024-03-01"),
+        },
+      ],
+    },
+    stock: {
+      value: 1850,
+      split: 18.9,
+      pnl: "-$250",
+      assets: [
+        {
+          id: 4,
+          accountId: 1,
+          name: "TSLA",
+          type: "stock",
+          value: 1000,
+          split: 54.1,
+          pnl: "-$150",
+          createdAt: new Date("2024-01-01"),
+          updatedAt: new Date("2024-03-01"),
+        },
+        {
+          id: 5,
+          accountId: 1,
+          name: "AAPL",
+          type: "stock",
+          value: 850,
+          split: 45.9,
+          pnl: "-$100",
+          createdAt: new Date("2024-01-01"),
+          updatedAt: new Date("2024-03-01"),
+        },
+      ],
+    },
+    cash: {
+      value: 750,
+      split: 7.65,
+      pnl: "-$50",
+      assets: [
+        {
+          id: 6,
+          accountId: 1,
+          name: "Savings Account",
+          type: "cash",
+          value: 750,
+          split: 100,
+          pnl: "-$50",
+          createdAt: new Date("2024-01-01"),
+          updatedAt: new Date("2024-03-01"),
+        },
+      ],
+    },
+    exotic: {
+      value: 400,
+      split: 4.1,
+      pnl: "$200",
+      assets: [
+        {
+          id: 7,
+          accountId: 1,
+          name: "Pokemon Cards",
+          type: "exotic",
+          value: 250,
+          split: 62.5,
+          pnl: "$100",
+          createdAt: new Date("2024-01-01"),
+          updatedAt: new Date("2024-03-01"),
+        },
+        {
+          id: 8,
+          accountId: 1,
+          name: "Jordan Sneakers",
+          type: "exotic",
+          value: 150,
+          split: 37.5,
+          pnl: "$100",
+          createdAt: new Date("2024-01-01"),
+          updatedAt: new Date("2024-03-01"),
+        },
+      ],
+    },
   },
-  {
-    id: 2,
-    name: "Stocks",
-    type: "stock",
-    color: "green",
-    split: 37,
-    value: 123,
-    pnl: "$2,450",
-    assets: [
-      {
-        id: 3,
-        name: "TSLA",
-        type: "stock",
-        color: "green",
-        split: 80,
-        value: 123,
-        pnl: "$1,000",
-        unitPrice: "12",
-        quantity: "12",
-        createdAt: new Date("2024-01-01"),
-        updatedAt: new Date("2024-01-01"),
-        userId: 1,
-      },
-      {
-        id: 4,
-        name: "MSCI",
-        type: "stock",
-        color: "green",
-        split: 20,
-        value: 123,
-        pnl: "$450",
-        unitPrice: "12",
-        quantity: "12",
-        createdAt: new Date("2024-01-01"),
-        updatedAt: new Date("2024-01-01"),
-        userId: 1,
-      },
-    ],
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-01-01"),
-    userId: 1,
-  },
-  {
-    id: 3,
-    name: "Real Estate",
-    type: "realEstate",
-    color: "red",
-    split: 40,
-    value: 123,
-    pnl: "$2,450",
-    assets: [
-      {
-        id: 5,
-        name: "Main house",
-        type: "realEstate",
-        color: "red",
-        split: 80,
-        value: 123,
-        pnl: "$1,000",
-        address: "12 St. Robert, LA",
-        realEstateType: "Main Property",
-        category: "Rental",
-        cost: "$123",
-        createdAt: new Date("2024-01-01"),
-        updatedAt: new Date("2024-01-01"),
-        userId: 1,
-      },
-      {
-        id: 6,
-        name: "Rental",
-        type: "realEstate",
-        color: "red",
-        split: 20,
-        value: 123,
-        pnl: "$450",
-        address: "13 St. Greg, LA",
-        realEstateType: "Main Property",
-        category: "Rental",
-        cost: "$123",
-        createdAt: new Date("2024-01-01"),
-        updatedAt: new Date("2024-01-01"),
-        userId: 1,
-      },
-    ],
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-01-01"),
-    userId: 1,
-  },
-  {
-    id: 4,
-    name: "Cash",
-    type: "cash",
-    color: "yellow",
-    split: 40,
-    value: 123,
-    pnl: "$2,450",
-    assets: [
-      {
-        id: 7,
-        name: "Main account",
-        type: "cash",
-        color: "yellow",
-        split: 80,
-        value: 123,
-        pnl: "$1,000",
-        cashType: "Main account",
-        currency: "USD",
-        quantity: "12500",
-        createdAt: new Date("2024-01-01"),
-        updatedAt: new Date("2024-01-01"),
-        userId: 1,
-      },
-      {
-        id: 8,
-        name: "Saving Account",
-        type: "cash",
-        color: "yellow",
-        split: 20,
-        value: 123,
-        pnl: "$450",
-        cashType: "Saving Account",
-        currency: "USD",
-        quantity: "100500",
-        createdAt: new Date("2024-01-01"),
-        updatedAt: new Date("2024-01-01"),
-        userId: 1,
-      },
-    ],
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-01-01"),
-    userId: 1,
-  },
-  {
-    id: 5,
-    name: "Exotic",
-    type: "exotic",
-    color: "orange",
-    split: 40,
-    value: 123,
-    pnl: "$2,450",
-    assets: [
-      {
-        id: 9,
-        name: "Pokemon",
-        type: "exotic",
-        color: "orange",
-        split: 80,
-        value: 123,
-        pnl: "$1,000",
-        quantity: "100",
-        buyingPrice: "$12",
-        currentPrice: "$13",
-        createdAt: new Date("2024-01-01"),
-        updatedAt: new Date("2024-01-01"),
-        userId: 1,
-      },
-      {
-        id: 10,
-        name: "Jordan",
-        type: "exotic",
-        color: "orange",
-        split: 20,
-        value: 123,
-        pnl: "$450",
-        quantity: "3",
-        buyingPrice: "$450",
-        currentPrice: "$900",
-        createdAt: new Date("2024-01-01"),
-        updatedAt: new Date("2024-01-01"),
-        userId: 1,
-      },
-    ],
-    createdAt: new Date("2024-01-01"),
-    updatedAt: new Date("2024-01-01"),
-    userId: 1,
-  },
-];
+};

@@ -14,6 +14,7 @@ export class AccountApi extends ApiBase<
   null,
   AccountUpdateRequest,
   AccountUpdateResponse,
+  null,
   AccountDeleteResponse
 > {
   constructor() {

@@ -43,6 +43,7 @@ interface Schemas<
   TGetAllResponse,
   TUpdateRequest,
   TUpdateResponse,
+  TDeleteRequest,
   TDeleteResponse
 > {
   createRequest?: z.ZodType<TCreateRequest>;
@@ -51,6 +52,7 @@ interface Schemas<
   getAllResponse?: z.ZodType<TGetAllResponse>;
   updateRequest?: z.ZodType<TUpdateRequest>;
   updateResponse?: z.ZodType<TUpdateResponse>;
+  deleteRequest?: z.ZodType<TDeleteRequest>;
   deleteResponse?: z.ZodType<TDeleteResponse>;
 }
 
@@ -61,6 +63,7 @@ export abstract class ApiBase<
   TGetAllResponse = never,
   TUpdateRequest = never,
   TUpdateResponse = never,
+  TDeleteRequest = never,
   TDeleteResponse = never
 > {
   protected axiosInstance: AxiosInstance;
@@ -72,6 +75,7 @@ export abstract class ApiBase<
     TGetAllResponse,
     TUpdateRequest,
     TUpdateResponse,
+    TDeleteRequest,
     TDeleteResponse
   >;
 
@@ -84,6 +88,7 @@ export abstract class ApiBase<
       TGetAllResponse,
       TUpdateRequest,
       TUpdateResponse,
+      TDeleteRequest,
       TDeleteResponse
     > = {}
   ) {
@@ -232,11 +237,11 @@ a   */
     );
   }
 
-  async delete(id: number): Promise<TDeleteResponse> {
-    return this.fetchApi<null, TDeleteResponse>(
+  async delete(id: number, data?: TDeleteRequest): Promise<TDeleteResponse> {
+    return this.fetchApi<TDeleteRequest, TDeleteResponse>(
       "delete",
       `${this.endpoint}/${id}`,
-      undefined,
+      data,
       this.schemas?.deleteResponse
     );
   }

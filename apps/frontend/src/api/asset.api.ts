@@ -1,6 +1,7 @@
 import {
   AssetCreateRequest,
   AssetCreateResponse,
+  AssetDeleteRequest,
   AssetDeleteResponse,
   AssetGetAllResponse,
   AssetUpdateRequest,
@@ -16,6 +17,7 @@ export class AssetApi extends ApiBase<
   AssetGetAllResponse,
   AssetUpdateRequest,
   AssetUpdateResponse,
+  AssetDeleteRequest,
   AssetDeleteResponse
 > {
   constructor() {

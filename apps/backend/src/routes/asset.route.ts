@@ -30,7 +30,7 @@ class AssetRoutes extends BaseRouter {
           AuthMiddleware.authenticateUser,
           ValidationMiddleware.validateBody(assetFormDataSchema),
         ],
-        handler: AssetController.updateAsset,
+        handler: AssetController.editAsset,
       },
       {
         method: 'delete',

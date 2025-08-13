@@ -1,109 +1,107 @@
 import { create } from "zustand";
 import {
-  AssetGroup,
-  Asset,
-  AssetType,
   AssetFormData,
+  AssetSnapshot,
+  AssetSplit,
   mockDataGetAllAssetsOfUser,
 } from "@/types/asset.type";
 
 interface AssetStore {
-  assetGroups: AssetGroup[];
+  snapshots: AssetSnapshot[];
+  split: AssetSplit;
   getAllAssets: () => void;
-  addAsset: (assetType: AssetType, formData: AssetFormData[AssetType]) => void;
-  updateAsset: (
-    assetType: AssetType,
-    assetId: number,
-    formData: AssetFormData[AssetType]
-  ) => void;
-  deleteAsset: (assetType: AssetType, assetId: number) => void;
+  addAsset: (formData: AssetFormData) => void;
+  editAsset: (assetId: number, formData: AssetFormData) => void;
+  deleteAsset: (assetId: number) => void;
 }
 
 export const useAssetStore = create<AssetStore>((set, get) => ({
-  assetGroups: [],
+  snapshots: [],
+  split: {
+    networth: {
+      value: 0,
+      split: 0,
+      pnl: "$0",
+      assets: [],
+    },
+    crypto: {
+      value: 0,
+      split: 0,
+      pnl: "$0",
+      assets: [],
+    },
+    realEstate: {
+      value: 0,
+      split: 0,
+      pnl: "$0",
+      assets: [],
+    },
+    stock: {
+      value: 0,
+      split: 0,
+      pnl: "$0",
+      assets: [],
+    },
+    cash: {
+      value: 0,
+      split: 0,
+      pnl: "$0",
+      assets: [],
+    },
+    exotic: {
+      value: 0,
+      split: 0,
+      pnl: "$0",
+      assets: [],
+    },
+  },
   getAllAssets: () => {
-    // Simulate API call
     console.log("API: get all assets");
-    set({ assetGroups: mockDataGetAllAssetsOfUser });
+    set({
+      snapshots: mockDataGetAllAssetsOfUser.snapshots,
+      split: mockDataGetAllAssetsOfUser.split,
+    });
   },
-  addAsset: (assetType, formData) => {
-    // Simulate API call
-    console.log("API: add asset", { assetType, formData });
+  addAsset: (formData) => {
+    // const accountId = ...;
+    console.log("API: add asset", { formData });
 
-    // (RESPONSE FROM API) : Create Asset object from form data
-    const newAsset: Asset = {
-      id: 1234, // Generate temporary ID
-      name:
-        assetType === "cash"
-          ? (formData as AssetFormData["cash"]).cashType
-          : (
-              formData as
-                | AssetFormData["crypto"]
-                | AssetFormData["stock"]
-                | AssetFormData["realEstate"]
-                | AssetFormData["exotic"]
-            ).name || "New Asset",
-      type: assetType,
-      color: "blue", // Default color
-      split: 0, // Default split
-      value: 0, // Default value
-      pnl: "$0", // Default PnL
-      // Asset-specific fields - safely access based on type
-      ...formData,
-      // Database fields
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      userId: 1, // TODO: Get from auth context
-    };
+    // const res = ...;
 
-    // Update store
-    set((state) => ({
-      assetGroups: state.assetGroups.map((group) =>
-        group.type === assetType
-          ? { ...group, assets: [...group.assets, newAsset] }
-          : group
-      ),
-    }));
+    // // Update store
+    // set((state) => ({
+    //   // Modify only last snapshot: snapshot[lastIndex] with updated data
+    //   snapshots: ...,
+    //   // Modify split entirely, because adding an asset changes the split
+    //   split: res.split,
+    // }));
   },
-  updateAsset: (assetType, assetId, formData) => {
-    // Simulate API call
-    console.log("API: update asset", formData);
+  editAsset: (assetId, formData) => {
+    // const accountId = ...;
+    console.log("API: add asset", { assetId, formData });
 
-    // (RESPONSE FROM API) : Update Asset object from form data
+    // const res = ...;
 
-    // Update store
-    set((state) => ({
-      assetGroups: state.assetGroups.map((group) =>
-        group.type === assetType
-          ? {
-              ...group,
-              assets: group.assets.map((asset) =>
-                assetId === asset.id
-                  ? {
-                      ...asset,
-                      ...formData,
-                    }
-                  : asset
-              ),
-            }
-          : group
-      ),
-    }));
+    // // Update store
+    // set((state) => ({
+    //   // Modify only last snapshot: snapshot[lastIndex] with updated data
+    //   snapshots: ...,
+    //   // Modify split entirely, because editing an asset changes the split
+    //   split: res.split,
+    // }));
   },
-  deleteAsset: (assetType, assetId) => {
-    // Simulate API call
+  deleteAsset: (assetId) => {
+    // const accountId = ...;
     console.log("API: delete asset", assetId);
 
-    // Update store
-    set((state) => ({
-      assetGroups: state.assetGroups.map((group) =>
-        group.type === assetType
-          ? {
-              ...group,
-              assets: group.assets.filter((asset) => asset.id !== assetId),
-            }
-          : group
-      ),
-    }));
+    // const res = ...;
+
+    // // Update store
+    // set((state) => ({
+    //   // Modify only last snapshot: snapshot[lastIndex] with updated data
+    //   snapshots: ...,
+    //   // Modify split entirely, because deleting an asset changes the split
+    //   split: res.split,
+    // }));
   },
 }));

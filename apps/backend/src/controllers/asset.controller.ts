@@ -59,7 +59,7 @@ export default class AssetController {
     }
   };
 
-  static updateAsset = async (req: Request, res: Response) => {
+  static editAsset = async (req: Request, res: Response) => {
     try {
       const userId = (req as any).userId;
       const assetId = Number(req.params.assetId);
