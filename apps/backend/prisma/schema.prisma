@@ -11,7 +11,7 @@ datasource db {
 enum AssetTypeEnum {
   networth
   crypto
-  real_estate
+  realEstate
   stock
   cash
   exotic
@@ -56,9 +56,17 @@ model Asset {
 
 model AssetSnapshot {
   id          Int       @id @default(autoincrement())
-  assetId     Int
+  accountId   Int
+  assetId     Int?
+  type        AssetTypeEnum?
   value       Int
   date        DateTime
 
-  asset       Asset @relation(fields: [assetId], references: [id])
+  asset       Asset? @relation(fields: [assetId], references: [id])
+
+  @@unique([accountId, date, assetId, type])
 }
+
+// TODO ADD CONTRAINTE
+// -> Contrainte, can either have an assetId OR a type, not both at the same time possible
+// -> Contrainte, for the same date, can't have 2 snapshot with same assetId OR same type

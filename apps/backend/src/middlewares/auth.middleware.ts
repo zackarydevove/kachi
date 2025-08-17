@@ -1,5 +1,6 @@
 import authConfig from '@config/auth.config';
 import Send from '@utils/response.util';
+import { prisma } from 'db';
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
@@ -29,6 +30,34 @@ class AuthMiddleware {
       console.error('Authentication failed:', error);
       return Send.unauthorized(res, null);
     }
+  }
+
+  public static async authenticateAccount(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    const accountId = req.params.accountId;
+    const userId = (req as any).userId;
+
+    try {
+      const account = await prisma.account.findFirst({
+        where: { id: Number(accountId) },
+        select: {
+          userId: true,
+        },
+      });
+      if (!account) return Send.notFound(res, null, 'Account not found');
+      if (account.userId !== userId)
+        return Send.forbidden(res, null, 'Access denied');
+
+      next();
+    } catch (error) {
+      console.error('Account owner validation failed:', error);
+      return Send.notFound(res, null, 'Account not found');
+    }
+
+    next();
   }
 
   public static refreshTokenValidation(

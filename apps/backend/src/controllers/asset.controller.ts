@@ -1,97 +1,56 @@
 import Send from '@utils/response.util';
-import { prisma } from 'db';
 import { Request, Response } from 'express';
-import { Asset, AssetType } from '../../generated/prisma';
+import AssetService from 'services/asset.service';
 
-// TODO: Finish asset controller
+// TODO: Handle the error better in here, the service throw, find a way to write less code
 export default class AssetController {
-  static getAllAssets = async (req: Request, res: Response) => {
-    try {
-      const userId = (req as any).userId;
-
-      const assets = await prisma.asset.findMany({
-        where: { id: userId, deletedAt: null },
-        select: {
-          id: true,
-          name: true,
-          type: true,
-          value: true,
-          createdAt: true,
-          updatedAt: true,
-        },
-      });
-
-      // format in group by type
-      const assetsByType = assets.reduce(
-        (acc, asset) => {
-          acc[asset.type] = acc[asset.type] || [];
-          acc[asset.type].push(asset);
-          return acc;
-        },
-        {} as Record<AssetType, Asset[]>,
-      );
-
-      return Send.success(res, { assetsByType });
-    } catch (error) {
-      console.error('Error fetching user assets:', error);
-      return Send.error(res, {}, 'Internal server error');
-    }
-  };
+  private static assetService: AssetService = new AssetService();
 
   static createAsset = async (req: Request, res: Response) => {
     try {
-      const userId = (req as any).userId;
-      const formData = req.body as AssetFormData[AssetType];
+      const { accountId, ...formData } = req.body;
 
-      const value = unitPrice * quantity;
-      const newAsset = await prisma.asset.create({
-        data: {
-          accountId: userId, // TODO: add accountId
-          formData,
-          value,
-        },
-      });
+      const newAsset = await this.assetService.createAsset(
+        Number(accountId),
+        formData,
+      );
 
       return Send.success(res, { newAsset });
     } catch (error) {
-      console.error('Error fetching user assets:', error);
+      console.error('Error creating asset:', error);
       return Send.error(res, {}, 'Internal server error');
     }
   };
 
   static editAsset = async (req: Request, res: Response) => {
     try {
-      const userId = (req as any).userId;
-      const assetId = Number(req.params.assetId);
-      const formData = req.body as AssetFormData[AssetType];
+      const assetId = Number(req.params.id);
+      const { accountId, ...formData } = req.body;
 
-      const value = unitPrice * quantity;
-      const updatedAsset = await prisma.asset.update({
-        where: { id: assetId, accountId: userId }, // TODO: add accountId
-        data: {
-          accountId: userId, // TODO: add accountId
-          formData,
-          value,
-        },
-      });
+      const updatedAsset = await this.assetService.editAsset(
+        accountId,
+        assetId,
+        formData,
+      );
 
       return Send.success(res, { updatedAsset });
     } catch (error) {
-      console.error('Error fetching user assets:', error);
+      console.error('Error updating asset:', error);
       return Send.error(res, {}, 'Internal server error');
     }
   };
 
   static deleteAsset = async (req: Request, res: Response) => {
     try {
-      const userId = (req as any).userId;
-      const assetId = Number(req.params.assetId);
+      const assetId = Number(req.params.id);
+      const { accountId } = req.body;
 
-      await prisma.asset.delete({
-        where: { id: assetId, accountId: userId }, // TODO: add accountId
-      });
+      const deletedAsset = await this.assetService.deleteAsset(
+        accountId,
+        assetId,
+      );
 
-      return Send.success(res, { message: 'Asset deleted successfully' });
+      return Send.success(res, { deletedAsset });
     } catch (error) {
       console.error('Error deleting asset:', error);
       return Send.error(res, {}, 'Internal server error');

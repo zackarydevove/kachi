@@ -1,41 +1,46 @@
 import AuthMiddleware from '@middlewares/auth.middleware';
-import UserController from '@controllers/user.controller';
 import BaseRouter, { RouteConfig } from './router';
 import AssetController from '@controllers/asset.controller';
 import ValidationMiddleware from '@middlewares/validation.middleware';
-import { assetFormDataSchema } from 'schema/asset.schema';
+import { assetRequestSchema } from 'schema/asset.schema';
+import { z } from 'zod';
+import AssetMiddleware from '@middlewares/asset.middleware';
 
 class AssetRoutes extends BaseRouter {
   protected routes(): RouteConfig[] {
     return [
       {
-        method: 'get',
-        path: '/all',
-        middlewares: [AuthMiddleware.authenticateUser],
-        handler: AssetController.getAllAssets,
-      },
-      {
         method: 'post',
         path: '/',
         middlewares: [
           AuthMiddleware.authenticateUser,
-          ValidationMiddleware.validateBody(assetFormDataSchema),
+          ValidationMiddleware.validateBody(assetRequestSchema),
+          AuthMiddleware.authenticateAccount,
         ],
         handler: AssetController.createAsset,
       },
       {
         method: 'put',
-        path: '/:id',
+        path: '/:assetId',
         middlewares: [
           AuthMiddleware.authenticateUser,
-          ValidationMiddleware.validateBody(assetFormDataSchema),
+          ValidationMiddleware.validateBody(assetRequestSchema),
+          AuthMiddleware.authenticateAccount,
+          AssetMiddleware.authenticateAccountOwnAsset,
         ],
         handler: AssetController.editAsset,
       },
       {
         method: 'delete',
-        path: '/:id',
-        middlewares: [AuthMiddleware.authenticateUser],
+        path: '/:assetId',
+        middlewares: [
+          AuthMiddleware.authenticateUser,
+          ValidationMiddleware.validateBody(
+            z.object({ accountId: z.number() }),
+          ),
+          AuthMiddleware.authenticateAccount,
+          AssetMiddleware.authenticateAccountOwnAsset,
+        ],
         handler: AssetController.deleteAsset,
       },
     ];
