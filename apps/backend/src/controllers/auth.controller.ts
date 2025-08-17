@@ -7,6 +7,7 @@ import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 import authConfig from '@config/auth.config';
 import { DecodedToken } from '@middlewares/auth.middleware';
+import SnapshotService from 'services/snapshot.service';
 
 // TODO: Create response schema for each
 export default class AuthController {
@@ -119,6 +120,9 @@ export default class AuthController {
           },
           select: { id: true, name: true, avatar: true },
         });
+
+        const snapshotService = new SnapshotService();
+        await snapshotService.initializeAccountSnapshots(newAccount.id);
 
         return {
           user: {

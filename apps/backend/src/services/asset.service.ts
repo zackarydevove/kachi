@@ -5,26 +5,25 @@ import SnapshotService from './snapshot.service';
 export default class AssetService {
   private snapshotService: SnapshotService = new SnapshotService();
 
-  public async getAsset(assetId: number) {
-    const asset = await prisma.asset.findUnique({
-      where: { id: assetId },
-    });
-    return asset;
-  }
-
   // Create asset
   public async createAsset(accountId: number, formData: AssetFormData) {
-    const createAssetData = { accountId, ...formData };
-    const newAsset = await prisma.asset.create({
-      data: createAssetData,
-    });
+    const { type, name, value } = formData;
 
-    const newSnapshot = await this.snapshotService.createSnapshot(
+    // TO DO IN SAME TRANSACTION
+    // Create asset first
+    console.log('bbbb');
+    const newAsset = await prisma.asset.create({
+      data: { accountId, type, name },
+    });
+    console.log('cccc', newAsset);
+
+    await this.snapshotService.createSnapshot(
       accountId,
       newAsset.id,
-      formData.value,
-      formData.type,
+      value,
+      type,
     );
+    console.log('oooo');
 
     return newAsset;
   }
@@ -35,32 +34,52 @@ export default class AssetService {
     assetId: number,
     formData: AssetFormData,
   ) {
+    const { type, name, value } = formData;
+
+    // TO DO IN SAME TRANSACTION
     const updatedAsset = await prisma.asset.update({
       where: { id: assetId },
-      data: { ...formData },
+      data: { type, name },
     });
 
-    const updatedSnapshot = await this.snapshotService.editSnapshot(
+    await this.snapshotService.editSnapshot(
       accountId,
       updatedAsset.id,
-      formData.value,
-      formData.type,
+      value,
+      type,
     );
-
     return updatedAsset;
   }
 
   // Delete asset
   public async deleteAsset(accountId: number, assetId: number) {
+    // TODO IN SAME TRANSACTION
+    const existingSnapshot = await prisma.assetSnapshot.findFirst({
+      where: {
+        assetId,
+        date: this.snapshotService.today,
+        accountId,
+        type: null,
+      },
+      select: { value: true, id: true },
+    });
+
+    if (!existingSnapshot) {
+      throw new Error('Snapshot not found');
+    }
+
     const deletedAsset = await prisma.asset.delete({
       where: { id: assetId },
       select: { type: true },
     });
 
-    const deletedSnapshot = await this.snapshotService.deleteSnapshot(
+    // Edit type and networth snapshots
+    const isIncrement = false;
+    await this.snapshotService.editTypeAndNetworthSnapshots(
       accountId,
-      assetId,
+      existingSnapshot.value,
       deletedAsset.type,
+      isIncrement,
     );
 
     return deletedAsset;

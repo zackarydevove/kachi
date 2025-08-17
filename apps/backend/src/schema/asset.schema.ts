@@ -10,15 +10,12 @@ export const assetTypeSchema = z.enum([
   'exotic',
 ]);
 
-export const splitAndPnl = z.object({});
-
 // Base asset schema
 export const assetSchema = z.object({
   id: z.number(),
   accountId: z.number(),
   name: z.string(),
   type: assetTypeSchema,
-  value: z.number(),
   // Database fields
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -34,8 +31,8 @@ export const assetFormDataSchema = z.object({
   value: z.number().min(1, 'Value is required'),
 });
 
-export const snapshotsSchema = z.object({
-  date: z.date(),
+export const graphSnapshotsSchema = z.object({
+  date: z.string(),
   networth: z.number(),
   crypto: z.number(),
   realEstate: z.number(),
@@ -44,21 +41,21 @@ export const snapshotsSchema = z.object({
   exotic: z.number(),
 });
 
-const assetWithSplitAndPnlSchema = assetSchema.merge(
-  z.object({
-    split: z.number(),
-    pnl: z.string(),
-  }),
-);
+const assetSplitSchema = z.object({
+  id: z.number(),
+  split: z.number(),
+  pnl: z.string(),
+  value: z.number(),
+});
 
-const assetTypeSplitSchema = z.object({
+const typeSplitSchema = z.object({
   value: z.number(),
   split: z.number(),
   pnl: z.string(),
-  assets: z.array(assetWithSplitAndPnlSchema),
+  assets: z.array(assetSplitSchema),
 });
 
-export const splitSchema = z.record(assetTypeSchema, assetTypeSplitSchema);
+export const splitSchema = z.record(assetTypeSchema, typeSplitSchema);
 
 export const assetRequestSchema = assetFormDataSchema.merge(
   z.object({

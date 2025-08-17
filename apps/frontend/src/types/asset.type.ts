@@ -2,7 +2,8 @@ import {
   assetFormDataSchema,
   assetSchema,
   assetTypeSchema,
-  snapshotsSchema,
+  graphSnapshotsSchema,
+  splitAndSnapshotsSchema,
   splitSchema,
 } from "@/schemas/asset.schema";
 import z from "zod";
@@ -11,18 +12,18 @@ import z from "zod";
 export type AssetType = z.infer<typeof assetTypeSchema>;
 export type Asset = z.infer<typeof assetSchema>;
 export type AssetFormData = z.infer<typeof assetFormDataSchema>;
-export type AssetSnapshot = z.infer<typeof snapshotsSchema>;
+export type AssetSnapshot = z.infer<typeof graphSnapshotsSchema>;
 export type AssetSplit = z.infer<typeof splitSchema>;
-export type AssetsData = { snapshots: AssetSnapshot[]; split: AssetSplit };
+export type AssetsSplitAndSnapshot = z.infer<typeof splitAndSnapshotsSchema>;
 
 // API request/response types
 export type AssetCreateRequest = AssetFormData & { accountId: number };
-export type AssetCreateResponse = AssetsData[];
-export type AssetGetAllResponse = AssetsData[];
+export type AssetCreateResponse = AssetsSplitAndSnapshot;
+export type AssetGetAllResponse = AssetsSplitAndSnapshot;
 export type AssetUpdateRequest = AssetFormData & { accountId: number };
-export type AssetUpdateResponse = AssetsData[];
-export type AssetDeleteRequest = { accountId: number; assetId: number };
-export type AssetDeleteResponse = AssetsData[];
+export type AssetUpdateResponse = AssetsSplitAndSnapshot;
+export type AssetDeleteRequest = { accountId: number };
+export type AssetDeleteResponse = AssetsSplitAndSnapshot;
 
 // Labels for asset types
 export const assetTypeLabels: Record<AssetType, string> = {
@@ -44,10 +45,10 @@ export const assetTypeColor: Record<AssetType, string> = {
 };
 
 // MOCK DATA TODO: DELETE
-export const mockDataGetAllAssetsOfUser: AssetsData = {
+export const mockDataGetAllAssetsOfUser: AssetsSplitAndSnapshot = {
   snapshots: [
     {
-      date: new Date("2024-01-01"),
+      date: "2024-01-01",
       networth: 10000,
       crypto: 3000,
       realEstate: 4000,
@@ -56,7 +57,7 @@ export const mockDataGetAllAssetsOfUser: AssetsData = {
       exotic: 200,
     },
     {
-      date: new Date("2024-02-01"),
+      date: "2024-02-01",
       networth: 10250,
       crypto: 3200,
       realEstate: 4000,
@@ -65,7 +66,7 @@ export const mockDataGetAllAssetsOfUser: AssetsData = {
       exotic: 200,
     },
     {
-      date: new Date("2024-03-01"),
+      date: "2024-03-01",
       networth: 9800,
       crypto: 2800,
       realEstate: 4000,

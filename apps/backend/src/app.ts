@@ -5,6 +5,7 @@ import authRoutes from '@routes/auth.route';
 import appConfig from '@config/app.config';
 import userRoutes from '@routes/user.route';
 import accountRoutes from '@routes/account.route';
+import assetRoutes from '@routes/asset.route';
 
 export default class App {
   private app: Express;
@@ -35,6 +36,7 @@ export default class App {
     this.app.use('/api/auth', authRoutes);
     this.app.use('/api/user', userRoutes);
     this.app.use('/api/account', accountRoutes);
+    this.app.use('/api/asset', assetRoutes);
   }
 
   public start() {

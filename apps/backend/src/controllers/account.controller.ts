@@ -1,6 +1,7 @@
 import Send from '@utils/response.util';
 import { prisma } from 'db';
 import { Request, Response } from 'express';
+import SnapshotService from 'services/snapshot.service';
 
 export default class AccountController {
   static addAccount = async (req: Request, res: Response) => {
@@ -27,6 +28,10 @@ export default class AccountController {
           avatar: true,
         },
       });
+
+      // Initialize snapshots for the new account
+      const snapshotService = new SnapshotService();
+      await snapshotService.initializeAccountSnapshots(newAccount.id);
 
       return Send.success(res, { newAccount });
     } catch (error) {

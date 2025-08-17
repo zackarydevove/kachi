@@ -10,6 +10,15 @@ class AssetRoutes extends BaseRouter {
   protected routes(): RouteConfig[] {
     return [
       {
+        method: 'get',
+        path: '/all/:accountId',
+        middlewares: [
+          AuthMiddleware.authenticateUser,
+          AuthMiddleware.authenticateAccount,
+        ],
+        handler: AssetController.getAllAssets,
+      },
+      {
         method: 'post',
         path: '/',
         middlewares: [

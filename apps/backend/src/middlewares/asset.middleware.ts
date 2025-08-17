@@ -37,8 +37,6 @@ class AssetMiddleware {
       console.error('Account owner validation failed:', error);
       return Send.notFound(res, null, 'Account not found');
     }
-
-    next();
   }
 }
 

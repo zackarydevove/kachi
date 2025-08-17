@@ -1,8 +1,9 @@
 import { prisma } from 'db';
 import { AssetTypeEnum } from '../../generated/prisma';
+import { Asset } from 'types/asset.type';
 
 export default class SnapshotService {
-  private today = new Date();
+  public today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
 
   private async getSplit(accountId: number) {
     // Get all assets of accountId
@@ -41,12 +42,7 @@ export default class SnapshotService {
         value: number;
         pnl: number;
         split: number;
-        assets: {
-          id: number;
-          value: number;
-          pnl: number;
-          split: number;
-        }[];
+        assets: (Asset & { value: number; pnl: number; split: number })[];
       }
     > = {
       networth: { value: 0, pnl: 0, split: 0, assets: [] },
@@ -87,7 +83,7 @@ export default class SnapshotService {
             : 0,
         split:
           recentSnapshot?.value && networth.recentSnapshot?.value
-            ? recentSnapshot.value / networth.recentSnapshot.value
+            ? (recentSnapshot.value / networth.recentSnapshot.value) * 100
             : 0,
         assets: [],
       };
@@ -118,7 +114,7 @@ export default class SnapshotService {
       const assetType = asset.type;
       if (assetType && split[assetType]) {
         split[assetType].assets.push({
-          id: asset.id,
+          ...asset,
           value: recentSnapshot?.value ?? 0,
           pnl:
             recentSnapshot?.value && oldestSnapshot?.value
@@ -127,7 +123,7 @@ export default class SnapshotService {
               : 0,
           split:
             recentSnapshot?.value && split[assetType].value
-              ? recentSnapshot.value / split[assetType].value
+              ? (recentSnapshot.value / split[assetType].value) * 100
               : 0,
         });
       }
@@ -155,14 +151,12 @@ export default class SnapshotService {
     for (const snapshot of snapshots) {
       const { type, value, date } = snapshot;
       if (type) {
-        const dateString = date.toISOString().split('T')[0];
-        if (!snapshotByDate[dateString]) {
-          snapshotByDate[dateString] =
-            (snapshotByDate[dateString] as Record<AssetTypeEnum, number>) ||
+        if (!snapshotByDate[date]) {
+          snapshotByDate[date] =
+            (snapshotByDate[date] as Record<AssetTypeEnum, number>) ||
             ({} as Record<AssetTypeEnum, number>);
         }
-        (snapshotByDate[dateString] as Record<AssetTypeEnum, number>)[type] =
-          value;
+        (snapshotByDate[date] as Record<AssetTypeEnum, number>)[type] = value;
       }
     }
 
@@ -182,7 +176,7 @@ export default class SnapshotService {
     return { split, snapshots };
   }
 
-  private async editTypeAndNetworthSnapshots(
+  public async editTypeAndNetworthSnapshots(
     accountId: number,
     value: number,
     type: AssetTypeEnum,
@@ -199,7 +193,9 @@ export default class SnapshotService {
     });
 
     if (!typeSnapshot) {
-      throw new Error(`Type snapshot not found for ${type} on ${this.today}`);
+      throw new Error(
+        `${type} snapshot of ${accountId} not found on ${this.today}`,
+      );
     }
 
     // Edit type snapshot (because now that we have a new asset of that type, the total changed)
@@ -209,7 +205,6 @@ export default class SnapshotService {
         value: isIncrement ? { increment: value } : { decrement: value },
       },
     });
-
     // Find the networth snapshot first, then update it by ID
     const networthSnapshot = await prisma.assetSnapshot.findFirst({
       where: {
@@ -231,7 +226,6 @@ export default class SnapshotService {
         value: isIncrement ? { increment: value } : { decrement: value },
       },
     });
-
     return { editTypeSnapshot, editNetworthSnapshot };
   }
 
@@ -243,14 +237,15 @@ export default class SnapshotService {
     });
 
     // Get yesterday date
-    const yesterdayDate = new Date(this.today);
+    const yesterdayDate = new Date();
     yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+    const yesterday = yesterdayDate.toISOString().split('T')[0];
 
     // Get all yesterday snapshots
     const yesterdaySnapshots = await prisma.assetSnapshot.findMany({
       where: {
         accountId: { in: accountIds.map((account) => account.id) },
-        date: yesterdayDate,
+        date: yesterday,
       },
       select: {
         accountId: true,
@@ -270,6 +265,27 @@ export default class SnapshotService {
     await prisma.assetSnapshot.createMany({
       data: todaySnapshots,
     });
+  }
+
+  // Initialize snapshots for a new account
+  public async initializeAccountSnapshots(accountId: number) {
+    const today = this.today;
+
+    // Create type snapshots for all asset types
+    const typeSnapshots = Object.values(AssetTypeEnum).map((type) => ({
+      accountId,
+      assetId: null,
+      type,
+      date: today,
+      value: 0,
+    }));
+
+    // Create all snapshots
+    await prisma.assetSnapshot.createMany({
+      data: typeSnapshots,
+    });
+
+    return typeSnapshots;
   }
 
   // Create snapshot
@@ -331,9 +347,11 @@ export default class SnapshotService {
     });
 
     // Edit type and networth snapshots
-    const val = value - (existingSnapshot?.value ?? 0);
-    const isIncrement = val > 0;
-    if (val != 0)
+    const isIncrement = value > existingSnapshot?.value;
+    const val = isIncrement
+      ? value - existingSnapshot.value
+      : existingSnapshot.value - value;
+    if (val > 0)
       await this.editTypeAndNetworthSnapshots(
         accountId,
         val,
@@ -342,43 +360,5 @@ export default class SnapshotService {
       );
 
     return snapshot;
-  }
-
-  // Delete snapshot
-  public async deleteSnapshot(
-    accountId: number,
-    assetId: number,
-    type: AssetTypeEnum,
-  ) {
-    // Get the snapshot first to get its value before deletion
-    const existingSnapshot = await prisma.assetSnapshot.findFirst({
-      where: {
-        assetId,
-        date: this.today,
-        accountId,
-        type: null,
-      },
-      select: { value: true, id: true },
-    });
-
-    if (!existingSnapshot) {
-      throw new Error('Snapshot not found');
-    }
-
-    // Delete snapshot
-    await prisma.assetSnapshot.delete({
-      where: { id: existingSnapshot.id },
-    });
-
-    // Edit type and networth snapshots
-    const isIncrement = false;
-    await this.editTypeAndNetworthSnapshots(
-      accountId,
-      existingSnapshot.value,
-      type,
-      isIncrement,
-    );
-
-    return { id: existingSnapshot.id, value: existingSnapshot.value };
   }
 }

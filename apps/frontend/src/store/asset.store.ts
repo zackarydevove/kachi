@@ -5,6 +5,8 @@ import {
   AssetSplit,
   mockDataGetAllAssetsOfUser,
 } from "@/types/asset.type";
+import { AssetApi } from "@/api/asset.api";
+import { useAccountStore } from "./account.store";
 
 interface AssetStore {
   snapshots: AssetSnapshot[];
@@ -14,6 +16,8 @@ interface AssetStore {
   editAsset: (assetId: number, formData: AssetFormData) => void;
   deleteAsset: (assetId: number) => void;
 }
+
+const assetApi = new AssetApi();
 
 export const useAssetStore = create<AssetStore>((set, get) => ({
   snapshots: [],
@@ -55,53 +59,70 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
       assets: [],
     },
   },
-  getAllAssets: () => {
-    console.log("API: get all assets");
+  getAllAssets: async () => {
+    const accountId = useAccountStore.getState().activeAccount?.id;
+    if (!accountId) {
+      throw new Error("Account ID is required");
+    }
+
+    const res = await assetApi.getSplitAndSnapshotsByAccountId(accountId);
+
+    console.log("Get all assets response: ", res);
+
     set({
-      snapshots: mockDataGetAllAssetsOfUser.snapshots,
-      split: mockDataGetAllAssetsOfUser.split,
+      snapshots: res.snapshots,
+      split: res.split,
     });
   },
-  addAsset: (formData) => {
-    // const accountId = ...;
-    console.log("API: add asset", { formData });
+  addAsset: async (formData) => {
+    const accountId = useAccountStore.getState().activeAccount?.id;
+    if (!accountId) {
+      throw new Error("Account ID is required");
+    }
 
-    // const res = ...;
+    const res = await assetApi.create({
+      ...formData,
+      accountId: accountId,
+    });
 
-    // // Update store
-    // set((state) => ({
-    //   // Modify only last snapshot: snapshot[lastIndex] with updated data
-    //   snapshots: ...,
-    //   // Modify split entirely, because adding an asset changes the split
-    //   split: res.split,
-    // }));
+    console.log("Add Asset Response", res);
+
+    set({
+      snapshots: res.snapshots,
+      split: res.split,
+    });
   },
-  editAsset: (assetId, formData) => {
-    // const accountId = ...;
-    console.log("API: add asset", { assetId, formData });
+  editAsset: async (assetId, formData) => {
+    const accountId = useAccountStore.getState().activeAccount?.id;
+    if (!accountId) {
+      throw new Error("Account ID is required");
+    }
 
-    // const res = ...;
+    const res = await assetApi.update(assetId, {
+      ...formData,
+      accountId: accountId,
+    });
 
-    // // Update store
-    // set((state) => ({
-    //   // Modify only last snapshot: snapshot[lastIndex] with updated data
-    //   snapshots: ...,
-    //   // Modify split entirely, because editing an asset changes the split
-    //   split: res.split,
-    // }));
+    console.log("Edit Asset Response", res);
+
+    set({
+      snapshots: res.snapshots,
+      split: res.split,
+    });
   },
-  deleteAsset: (assetId) => {
-    // const accountId = ...;
-    console.log("API: delete asset", assetId);
+  deleteAsset: async (assetId) => {
+    const accountId = useAccountStore.getState().activeAccount?.id;
+    if (!accountId) {
+      throw new Error("Account ID is required");
+    }
 
-    // const res = ...;
+    const res = await assetApi.delete(assetId, { accountId: accountId });
 
-    // // Update store
-    // set((state) => ({
-    //   // Modify only last snapshot: snapshot[lastIndex] with updated data
-    //   snapshots: ...,
-    //   // Modify split entirely, because deleting an asset changes the split
-    //   split: res.split,
-    // }));
+    console.log("Delete Asset Response", res);
+
+    set({
+      snapshots: res.snapshots,
+      split: res.split,
+    });
   },
 }));

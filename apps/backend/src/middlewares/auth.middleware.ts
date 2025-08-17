@@ -37,8 +37,11 @@ class AuthMiddleware {
     res: Response,
     next: NextFunction,
   ) {
-    const accountId = req.params.accountId;
+    const accountId = req.body.accountId;
     const userId = (req as any).userId;
+
+    console.log('Account ID', accountId);
+    console.log('User ID', userId);
 
     try {
       const account = await prisma.account.findFirst({
@@ -47,17 +50,18 @@ class AuthMiddleware {
           userId: true,
         },
       });
-      if (!account) return Send.notFound(res, null, 'Account not found');
-      if (account.userId !== userId)
+      if (!account) {
+        return Send.notFound(res, null, 'Account not found');
+      }
+      if (account.userId !== userId) {
         return Send.forbidden(res, null, 'Access denied');
+      }
 
       next();
     } catch (error) {
       console.error('Account owner validation failed:', error);
       return Send.notFound(res, null, 'Account not found');
     }
-
-    next();
   }
 
   public static refreshTokenValidation(

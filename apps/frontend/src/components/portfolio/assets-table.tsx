@@ -125,7 +125,7 @@ export default function AssetsTable() {
                     {assetTypeLabels[type]}
                   </Link>
                 </th>
-                <th className="text-right">{split[type].split}%</th>
+                <th className="text-right">{split[type].split.toFixed(0)}%</th>
                 <th className="text-right">
                   ${split[type].value.toLocaleString()}
                 </th>
@@ -179,7 +179,9 @@ export default function AssetsTable() {
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </td>
-                    <td className="text-right text-sm">{asset.split}%</td>
+                    <td className="text-right text-sm">
+                      {asset.split.toFixed(0)}%
+                    </td>
                     <td className="text-right text-sm">
                       ${asset.value.toLocaleString()}
                     </td>

@@ -10,15 +10,12 @@ export const assetTypeSchema = z.enum([
   "exotic",
 ]);
 
-export const splitAndPnl = z.object({});
-
 // Base asset schema
 export const assetSchema = z.object({
   id: z.number(),
   accountId: z.number(),
   name: z.string(),
   type: assetTypeSchema,
-  value: z.number(),
   // Database fields
   createdAt: z.date(),
   updatedAt: z.date(),
@@ -27,12 +24,15 @@ export const assetSchema = z.object({
 // Form data schema collection
 export const assetFormDataSchema = z.object({
   type: assetTypeSchema.nullable(), // Nullable just for the Add Asset Dialog
-  name: z.string(),
-  value: z.number(),
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .regex(/^[a-zA-Z0-9 ]+$/, "Only letters, numbers, and spaces are allowed."),
+  value: z.number().min(1, "Value is required"),
 });
 
-export const snapshotsSchema = z.object({
-  date: z.date(),
+export const graphSnapshotsSchema = z.object({
+  date: z.string(),
   networth: z.number(),
   crypto: z.number(),
   realEstate: z.number(),
@@ -41,19 +41,24 @@ export const snapshotsSchema = z.object({
   exotic: z.number(),
 });
 
-const assetWithSplitAndPnlSchema = assetSchema.merge(
+const assetSplitSchema = assetSchema.merge(
   z.object({
     split: z.number(),
     pnl: z.string(),
+    value: z.number(),
   })
 );
 
-const assetTypeSplitSchema = z.object({
+const typeSplitSchema = z.object({
   value: z.number(),
   split: z.number(),
   pnl: z.string(),
-  assets: z.array(assetWithSplitAndPnlSchema),
+  assets: z.array(assetSplitSchema),
 });
 
-// 5. Dynamic split schema — no repeating keys
-export const splitSchema = z.record(assetTypeSchema, assetTypeSplitSchema);
+export const splitSchema = z.record(assetTypeSchema, typeSplitSchema);
+
+export const splitAndSnapshotsSchema = z.object({
+  split: splitSchema,
+  snapshots: z.array(graphSnapshotsSchema),
+});

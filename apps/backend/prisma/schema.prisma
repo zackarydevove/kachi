@@ -60,7 +60,7 @@ model AssetSnapshot {
   assetId     Int?
   type        AssetTypeEnum?
   value       Int
-  date        DateTime
+  date        String // YYYY-MM-DD format
 
   asset       Asset? @relation(fields: [assetId], references: [id])
 

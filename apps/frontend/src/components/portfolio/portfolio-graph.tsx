@@ -145,7 +145,7 @@ export default function PortfolioGraph() {
                     type="monotone"
                     dataKey={type}
                     stroke={assetTypeColor[type]}
-                    fill={`url(${assetTypeColor[type]})`}
+                    fill={`url(#${type})`}
                   />
                 );
               })}
