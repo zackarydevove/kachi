@@ -18,9 +18,10 @@ import {
 } from "@/components/ui/sidebar";
 import EditSubAccountDialog from "./sub-accounts/edit-sub-account-dialog";
 import { useAccountStore } from "@/store/account.store";
-import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { avatarFallbackUtil } from "@/utils/avatar-fallback.util";
 
-export function TeamSwitcher() {
+export function AccountSwitcher() {
   const { isMobile } = useSidebar();
   const activeAccount = useAccountStore((state) => state.activeAccount);
   const setActiveAccount = useAccountStore((state) => state.setActiveAccount);
@@ -39,9 +40,15 @@ export function TeamSwitcher() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                {/* <activeAccount.logo className="size-4" /> */}
-              </div>
+              <Avatar className="h-8 w-8 rounded-lg">
+                <AvatarImage
+                  src={activeAccount?.avatar}
+                  alt={activeAccount?.name}
+                />
+                <AvatarFallback className="rounded-lg">
+                  {avatarFallbackUtil(activeAccount?.name)}
+                </AvatarFallback>
+              </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
                   {activeAccount.name}
@@ -58,7 +65,7 @@ export function TeamSwitcher() {
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-muted-foreground text-xs">
-              Teams
+              Accounts
             </DropdownMenuLabel>
             {accounts.map((account) => (
               <DropdownMenuItem
@@ -67,10 +74,12 @@ export function TeamSwitcher() {
                 className="flex p-2"
               >
                 <div className="flex gap-2 flex-1 items-center">
-                  <div className="flex size-6 items-center justify-center rounded-md border">
-                    {/* TODO: Add logo for accounts */}
-                    {/* <account.logo className="size-3.5 shrink-0" />  */}
-                  </div>
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarImage src={account?.avatar} alt={account?.name} />
+                    <AvatarFallback className="rounded-lg">
+                      {avatarFallbackUtil(account?.name)}
+                    </AvatarFallback>
+                  </Avatar>
                   <p>{account.name}</p>
                   {activeAccount.id === account.id && (
                     <BadgeCheckIcon className="text-constructive" />

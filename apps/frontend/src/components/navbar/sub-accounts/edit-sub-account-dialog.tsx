@@ -19,6 +19,7 @@ import { Account, AccountForm } from "@/types/account.type";
 import { parseSchemaError } from "@/utils/parse-schema.util";
 import { accountFormSchema } from "@/schemas/account.schema";
 import DeleteAccountDialog from "./delete-account-dialog";
+import EditAvatar from "./edit-avatar";
 
 export default function EditSubAccountDialog(props: {
   type: "edit" | "create";
@@ -137,7 +138,7 @@ export default function EditSubAccountDialog(props: {
               <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                 <Plus className="size-4" />
               </div>
-              <p>Add team</p>
+              <p>Add account</p>
             </div>
           )}
         </DialogTrigger>
@@ -150,15 +151,15 @@ export default function EditSubAccountDialog(props: {
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <DialogHeader>
               <DialogTitle>
-                {editType ? "Edit profile" : "Create profile"}
+                {editType ? "Edit account" : "Create account"}
               </DialogTitle>
               <DialogDescription>
                 {editType
-                  ? "Make changes to your profile here. Click save when you're done."
-                  : "Create another profile here. Click create when you're done."}
+                  ? "Make changes to your account here. Click save when you're done."
+                  : "Create another account here. Click create when you're done."}
               </DialogDescription>
             </DialogHeader>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-6">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="name-1">Name</Label>
                 <Input
@@ -171,9 +172,15 @@ export default function EditSubAccountDialog(props: {
                   <p className="text-sm text-red-500">{error?.message}</p>
                 )}
               </div>
-              {/* TODO: Implement avatar later */}
-              <div className="flex flex-col gap-3">
-                <p>Here implement avatar later</p>
+              {/* Avatar upload */}
+              <div className="flex flex-col gap-4">
+                <Label htmlFor="avatar">Avatar</Label>
+                <EditAvatar
+                  formData={formData}
+                  setError={setError}
+                  editType={editType}
+                  handleFormChange={handleFormChange}
+                />
                 {error?.path === "avatar" && (
                   <p className="text-sm text-red-500">{error?.message}</p>
                 )}

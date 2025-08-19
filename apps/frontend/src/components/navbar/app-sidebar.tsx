@@ -5,7 +5,7 @@ import { ChartColumnIncreasing } from "lucide-react";
 
 import { NavMain } from "@/components/navbar/nav-main";
 import { NavUser } from "@/components/navbar/nav-user";
-import { TeamSwitcher } from "@/components/navbar/team-switcher";
+import { AccountSwitcher } from "@/components/navbar/team-switcher";
 import {
   Sidebar,
   SidebarContent,
@@ -28,7 +28,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher />
+        <AccountSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navItems} />

@@ -2,6 +2,7 @@ import { AccountApi } from "@/api/account.api";
 import { Account, AccountForm } from "@/types/account.type";
 import { create } from "zustand";
 import { toastUtil } from "@/utils/toast.util";
+import { useAssetStore } from "./asset.store";
 
 interface AccountState {
   activeAccount: Account | null;
@@ -11,6 +12,7 @@ interface AccountState {
   createAccount: (formData: AccountForm) => void;
   editAccount: (accountId: number, formData: AccountForm) => void;
   deleteAccount: (accountId: number) => void;
+  reset: () => void;
 }
 
 export const useAccountStore = create<AccountState>((set) => ({
@@ -78,5 +80,11 @@ export const useAccountStore = create<AccountState>((set) => ({
       console.error("Error in deleteAccount store:", error);
       throw error; // Re-throw the error so it can be handled in the component
     }
+  },
+  reset: () => {
+    set({
+      activeAccount: null,
+      accounts: [],
+    });
   },
 }));

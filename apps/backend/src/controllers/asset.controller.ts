@@ -10,7 +10,7 @@ export default class AssetController {
 
   static getAllAssets = async (req: Request, res: Response) => {
     try {
-      const { accountId } = req.body;
+      const { accountId } = req.params;
       const { split, snapshots } =
         await this.snapshotService.getSplitAndSnapshots(Number(accountId));
       return Send.success(res, { split, snapshots });

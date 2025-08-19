@@ -101,6 +101,7 @@ export default class AccountController {
       return Send.error(res, { error }, 'Internal server error');
     }
   };
+
   static deleteAccount = async (req: Request, res: Response) => {
     try {
       const accountId = parseInt(req.params.accountId);

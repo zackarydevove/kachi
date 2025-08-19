@@ -16,7 +16,6 @@ export default class SnapshotService {
       recentSnapshot: await prisma.assetSnapshot.findFirst({
         where: {
           type: AssetTypeEnum.networth,
-          date: this.today,
           accountId,
           assetId: null,
         },
@@ -26,7 +25,6 @@ export default class SnapshotService {
       oldestSnapshot: await prisma.assetSnapshot.findFirst({
         where: {
           type: AssetTypeEnum.networth,
-          date: this.today,
           accountId,
           assetId: null,
         },
@@ -57,7 +55,6 @@ export default class SnapshotService {
       const recentSnapshot = await prisma.assetSnapshot.findFirst({
         where: {
           type,
-          date: this.today,
           accountId,
           assetId: null,
         },
@@ -67,7 +64,6 @@ export default class SnapshotService {
       const oldestSnapshot = await prisma.assetSnapshot.findFirst({
         where: {
           type,
-          date: this.today,
           accountId,
           assetId: null,
         },
@@ -78,8 +74,7 @@ export default class SnapshotService {
         value: recentSnapshot?.value ?? 0,
         pnl:
           recentSnapshot?.value && oldestSnapshot?.value
-            ? (recentSnapshot.value - oldestSnapshot.value) /
-              oldestSnapshot.value
+            ? recentSnapshot.value - oldestSnapshot.value
             : 0,
         split:
           recentSnapshot?.value && networth.recentSnapshot?.value
@@ -93,7 +88,6 @@ export default class SnapshotService {
       const recentSnapshot = await prisma.assetSnapshot.findFirst({
         where: {
           assetId: asset.id,
-          date: this.today,
           accountId,
           type: null,
         },
@@ -103,7 +97,6 @@ export default class SnapshotService {
       const oldestSnapshot = await prisma.assetSnapshot.findFirst({
         where: {
           assetId: asset.id,
-          date: this.today,
           accountId,
           type: null,
         },
@@ -118,8 +111,7 @@ export default class SnapshotService {
           value: recentSnapshot?.value ?? 0,
           pnl:
             recentSnapshot?.value && oldestSnapshot?.value
-              ? (recentSnapshot.value - oldestSnapshot.value) /
-                oldestSnapshot.value
+              ? recentSnapshot.value - oldestSnapshot.value
               : 0,
           split:
             recentSnapshot?.value && split[assetType].value
@@ -144,6 +136,7 @@ export default class SnapshotService {
         type: true,
         value: true,
       },
+      orderBy: { date: 'asc' },
     });
 
     // Get all the snapshots by Date
@@ -230,45 +223,139 @@ export default class SnapshotService {
   }
 
   // Create snapshots for all assets of an account
-  public async createTodaySnapshots() {
-    // Get all accountIds
-    const accountIds = await prisma.account.findMany({
-      select: { id: true },
+  public async createTodaySnapshots(
+    date?: string,
+    preSelectedAccountIds?: number[],
+  ) {
+    console.log('date:', date);
+    console.log('preSelectedAccountIds:', preSelectedAccountIds);
+    const accountIds =
+      preSelectedAccountIds && preSelectedAccountIds?.length > 0
+        ? preSelectedAccountIds
+        : (
+            await prisma.account.findMany({
+              select: { id: true },
+            })
+          ).map((account) => account.id);
+
+    console.log(accountIds);
+
+    // Get most recent snapshot of each assetId without type and type without assetId
+    // First, get all assets for all accounts
+    const allAssets = await prisma.asset.findMany({
+      where: {
+        accountId: { in: accountIds },
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        accountId: true,
+      },
     });
 
-    // Get yesterday date
-    const yesterdayDate = new Date();
-    yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-    const yesterday = yesterdayDate.toISOString().split('T')[0];
+    // Get most recent snapshot of each asset (assetId with type: null)
+    const assetSnapshots = await Promise.all(
+      allAssets.map(async (asset) => {
+        return await prisma.assetSnapshot.findFirst({
+          where: {
+            accountId: asset.accountId,
+            assetId: asset.id,
+            type: null,
+          },
+          select: {
+            accountId: true,
+            assetId: true,
+            type: true,
+            value: true,
+          },
+          orderBy: { date: 'desc' },
+        });
+      }),
+    );
 
-    // Get all yesterday snapshots
-    const yesterdaySnapshots = await prisma.assetSnapshot.findMany({
+    // Get most recent snapshot of each type for each account (type with assetId: null)
+    const typeSnapshots = await Promise.all(
+      accountIds.flatMap((accountId) =>
+        Object.values(AssetTypeEnum).map(async (type) => {
+          return await prisma.assetSnapshot.findFirst({
+            where: {
+              accountId,
+              assetId: null,
+              type,
+            },
+            select: {
+              accountId: true,
+              assetId: true,
+              type: true,
+              value: true,
+            },
+            orderBy: { date: 'desc' },
+          });
+        }),
+      ),
+    );
+
+    // Combine and filter out null values
+    const recentSnapshots = [...assetSnapshots, ...typeSnapshots].filter(
+      (snapshot) => snapshot !== null,
+    );
+
+    console.log('recentSnapshots:', recentSnapshots);
+
+    // Check for existing snapshots on the target date to prevent duplicates
+    const targetDate = date ?? this.today;
+    const existingSnapshots = await prisma.assetSnapshot.findMany({
       where: {
-        accountId: { in: accountIds.map((account) => account.id) },
-        date: yesterday,
+        accountId: { in: accountIds },
+        date: targetDate,
       },
       select: {
         accountId: true,
         assetId: true,
         type: true,
-        value: true,
       },
     });
 
+    // Filter out snapshots that already exist for the target date
+    const snapshotsToCreate = recentSnapshots.filter((snapshot) => {
+      const exists = existingSnapshots.some(
+        (existing) =>
+          existing.accountId === snapshot.accountId &&
+          existing.assetId === snapshot.assetId &&
+          existing.type === snapshot.type,
+      );
+      return !exists;
+    });
+
+    console.log('snapshotsToCreate:', snapshotsToCreate);
+
+    // If no snapshots to create, return early
+    if (snapshotsToCreate.length === 0) {
+      console.log('No new snapshots to create for date:', targetDate);
+      return;
+    }
+
     // Duplicate them with today's date
-    const todaySnapshots = yesterdaySnapshots.map((snapshot) => ({
+    const todaySnapshots = snapshotsToCreate.map((snapshot) => ({
       ...snapshot,
-      date: this.today,
+      date: targetDate,
     }));
 
+    console.log('todaySnapshots:', todaySnapshots);
+
     // Create today snapshots
-    await prisma.assetSnapshot.createMany({
+    const created = await prisma.assetSnapshot.createMany({
       data: todaySnapshots,
     });
+
+    console.log('created:', created);
   }
 
   // Initialize snapshots for a new account
-  public async initializeAccountSnapshots(accountId: number) {
+  public async initializeAccountSnapshots(
+    accountId: number,
+    prismaClient: any = prisma,
+  ) {
     const today = this.today;
 
     // Create type snapshots for all asset types
@@ -281,7 +368,7 @@ export default class SnapshotService {
     }));
 
     // Create all snapshots
-    await prisma.assetSnapshot.createMany({
+    await prismaClient.assetSnapshot.createMany({
       data: typeSnapshots,
     });
 

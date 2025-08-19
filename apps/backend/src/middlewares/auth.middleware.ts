@@ -37,7 +37,9 @@ class AuthMiddleware {
     res: Response,
     next: NextFunction,
   ) {
-    const accountId = req.body.accountId;
+    console.log('req.body', req.body);
+    console.log('req.params', req.params);
+    const accountId = req.body?.accountId ?? req.params?.accountId;
     const userId = (req as any).userId;
 
     console.log('Account ID', accountId);

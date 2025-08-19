@@ -35,9 +35,10 @@ model Account {
   userId        Int
   avatar       String?
 
-  user      User @relation(fields: [userId], references: [id])
+  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   assets    Asset[]
+  assetSnapshots AssetSnapshot[]
 }
 
 model Asset {
@@ -49,7 +50,7 @@ model Asset {
   updatedAt    DateTime @updatedAt
   deletedAt    DateTime?
 
-  account   Account @relation(fields: [accountId], references: [id])
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
   assetSnapshots AssetSnapshot[]
 }
@@ -62,7 +63,8 @@ model AssetSnapshot {
   value       Int
   date        String // YYYY-MM-DD format
 
-  asset       Asset? @relation(fields: [assetId], references: [id])
+  account     Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  asset       Asset? @relation(fields: [assetId], references: [id], onDelete: Cascade)
 
   @@unique([accountId, date, assetId, type])
 }

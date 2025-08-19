@@ -44,14 +44,14 @@ export const graphSnapshotsSchema = z.object({
 const assetSplitSchema = z.object({
   id: z.number(),
   split: z.number(),
-  pnl: z.string(),
+  pnl: z.number(),
   value: z.number(),
 });
 
 const typeSplitSchema = z.object({
   value: z.number(),
   split: z.number(),
-  pnl: z.string(),
+  pnl: z.number(),
   assets: z.array(assetSplitSchema),
 });
 

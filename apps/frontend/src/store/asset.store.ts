@@ -1,10 +1,5 @@
 import { create } from "zustand";
-import {
-  AssetFormData,
-  AssetSnapshot,
-  AssetSplit,
-  mockDataGetAllAssetsOfUser,
-} from "@/types/asset.type";
+import { AssetFormData, AssetSnapshot, AssetSplit } from "@/types/asset.type";
 import { AssetApi } from "@/api/asset.api";
 import { useAccountStore } from "./account.store";
 
@@ -15,50 +10,53 @@ interface AssetStore {
   addAsset: (formData: AssetFormData) => void;
   editAsset: (assetId: number, formData: AssetFormData) => void;
   deleteAsset: (assetId: number) => void;
+  reset: () => void;
 }
 
 const assetApi = new AssetApi();
 
+const initialSplit = {
+  networth: {
+    value: 0,
+    split: 0,
+    pnl: 0,
+    assets: [],
+  },
+  crypto: {
+    value: 0,
+    split: 0,
+    pnl: 0,
+    assets: [],
+  },
+  realEstate: {
+    value: 0,
+    split: 0,
+    pnl: 0,
+    assets: [],
+  },
+  stock: {
+    value: 0,
+    split: 0,
+    pnl: 0,
+    assets: [],
+  },
+  cash: {
+    value: 0,
+    split: 0,
+    pnl: 0,
+    assets: [],
+  },
+  exotic: {
+    value: 0,
+    split: 0,
+    pnl: 0,
+    assets: [],
+  },
+};
+
 export const useAssetStore = create<AssetStore>((set, get) => ({
   snapshots: [],
-  split: {
-    networth: {
-      value: 0,
-      split: 0,
-      pnl: "$0",
-      assets: [],
-    },
-    crypto: {
-      value: 0,
-      split: 0,
-      pnl: "$0",
-      assets: [],
-    },
-    realEstate: {
-      value: 0,
-      split: 0,
-      pnl: "$0",
-      assets: [],
-    },
-    stock: {
-      value: 0,
-      split: 0,
-      pnl: "$0",
-      assets: [],
-    },
-    cash: {
-      value: 0,
-      split: 0,
-      pnl: "$0",
-      assets: [],
-    },
-    exotic: {
-      value: 0,
-      split: 0,
-      pnl: "$0",
-      assets: [],
-    },
-  },
+  split: initialSplit,
   getAllAssets: async () => {
     const accountId = useAccountStore.getState().activeAccount?.id;
     if (!accountId) {
@@ -123,6 +121,12 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
     set({
       snapshots: res.snapshots,
       split: res.split,
+    });
+  },
+  reset: () => {
+    set({
+      snapshots: [],
+      split: initialSplit,
     });
   },
 }));

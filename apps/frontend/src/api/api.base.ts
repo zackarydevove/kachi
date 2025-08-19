@@ -167,6 +167,8 @@ a   */
       const config: AxiosRequestConfig = { method, url, data };
       const response: AxiosResponse = await this.axiosInstance.request(config);
 
+      console.log("response", response);
+
       // Validate response if schema is provided
       if (responseSchema) {
         const parsed = responseSchema.parse(
@@ -237,10 +239,10 @@ a   */
     );
   }
 
-  async delete(id: number, data?: TDeleteRequest): Promise<TDeleteResponse> {
+  async delete(id?: number, data?: TDeleteRequest): Promise<TDeleteResponse> {
     return this.fetchApi<TDeleteRequest, TDeleteResponse>(
       "delete",
-      `${this.endpoint}/${id}`,
+      `${this.endpoint}${id ? `/${id}` : ""}`,
       data,
       this.schemas?.deleteResponse
     );

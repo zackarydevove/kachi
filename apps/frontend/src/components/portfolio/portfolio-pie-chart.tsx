@@ -4,6 +4,7 @@ import { useAssetStore } from "@/store/asset.store";
 import { AssetType, assetTypeColor, assetTypeLabels } from "@/types/asset.type";
 import { useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
+import AddAssetDialog from "./add-asset-dialog";
 
 export default function PortfolioPieChart() {
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -27,13 +28,16 @@ export default function PortfolioPieChart() {
   if (!splitData.length || !split.networth?.value) {
     return (
       <div className="bg-component rounded-md p-6 w-1/3 flex flex-col gap-6 relative">
-        <p>Pie Chart</p>
+        <p className="text-lg font-semibold">Pie Chart</p>
         <div className="flex justify-center items-center w-full h-[300px]">
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-lg font-medium">No portfolio data</p>
-            <p className="text-sm text-muted-foreground">
-              Add some assets to see your portfolio breakdown
-            </p>
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-lg font-medium">No portfolio data</p>
+              <p className="text-sm text-muted-foreground">
+                Add some assets to see your portfolio breakdown
+              </p>
+            </div>
+            <AddAssetDialog />
           </div>
         </div>
       </div>
@@ -42,7 +46,7 @@ export default function PortfolioPieChart() {
 
   return (
     <div className="bg-component rounded-md p-6 w-1/3 flex flex-col gap-6 relative">
-      <p>Pie Chart</p>
+      <p className="text-lg font-semibold">Pie Chart</p>
       <div className="flex justify-center items-center w-full h-[300px] relative">
         {/* Center content */}
         <div className="absolute inset-0 flex flex-col justify-center items-center pointer-events-none">

@@ -17,8 +17,9 @@ export const assetSchema = z.object({
   name: z.string(),
   type: assetTypeSchema,
   // Database fields
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional().nullable(),
+  deletedAt: z.string().optional().nullable(),
 });
 
 // Form data schema collection
@@ -44,7 +45,7 @@ export const graphSnapshotsSchema = z.object({
 const assetSplitSchema = assetSchema.merge(
   z.object({
     split: z.number(),
-    pnl: z.string(),
+    pnl: z.number(),
     value: z.number(),
   })
 );
@@ -52,7 +53,7 @@ const assetSplitSchema = assetSchema.merge(
 const typeSplitSchema = z.object({
   value: z.number(),
   split: z.number(),
-  pnl: z.string(),
+  pnl: z.number(),
   assets: z.array(assetSplitSchema),
 });
 

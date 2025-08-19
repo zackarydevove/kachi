@@ -23,19 +23,26 @@ import { useAssetStore } from "@/store/asset.store";
 import EditAssetDialog from "./edit-asset-dialog";
 import AddAssetDialog from "./add-asset-dialog";
 
+// Utility function to format PnL values with proper colors and formatting
+const formatPnL = (pnl: number) => {
+  const isPositive = pnl >= 0;
+  const formattedValue = Math.abs(pnl).toLocaleString();
+  const sign = isPositive ? "+" : "-";
+
+  return {
+    display: `${sign}$${formattedValue}`,
+    className: isPositive ? "text-green-500" : "text-red-500",
+  };
+};
+
 export default function AssetsTable() {
   const split = useAssetStore((state) => state.split);
-  const getAllAssets = useAssetStore((state) => state.getAllAssets);
   const deleteAsset = useAssetStore((state) => state.deleteAsset);
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
-
-  useEffect(() => {
-    getAllAssets();
-  }, [getAllAssets]);
 
   const toggleGroup = (groupName: string) => {
     setOpenGroups((prev) => ({
@@ -75,10 +82,37 @@ export default function AssetsTable() {
     closeDeleteDialog();
   };
 
+  console.log(split);
+
+  // Count split[type].assets.length and if total is 0 return the div
+  const totalAssets = Object.values(split).reduce(
+    (acc, type) => acc + type.assets.length,
+    0
+  );
+
+  if (totalAssets === 0) {
+    return (
+      <div className="bg-component rounded-md p-6 flex flex-col gap-5">
+        <p className="text-lg font-semibold">Assets</p>
+        <div className="flex justify-center items-center w-full pb-10">
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-lg font-medium">No portfolio data</p>
+              <p className="text-sm text-muted-foreground">
+                Add some assets to see your portfolio breakdown
+              </p>
+            </div>
+            <AddAssetDialog />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-component rounded-md p-6 flex flex-col gap-5">
       <div className="flex justify-between items-center">
-        <p>Assets</p>
+        <p className="text-lg font-semibold">Assets</p>
         <AddAssetDialog />
       </div>
       <table className="border-separate border-spacing-y-2">
@@ -92,7 +126,7 @@ export default function AssetsTable() {
         </thead>
         {Object.keys(split).map((t) => {
           const type = t as AssetType;
-          if (type === "networth") return;
+          if (type === "networth" || split[type].assets.length === 0) return;
           return (
             <tbody key={type} className="rounded-md">
               <tr
@@ -106,30 +140,36 @@ export default function AssetsTable() {
                     variant="ghost"
                     size="icon"
                     className="size-6"
-                    onClick={() => toggleGroup(type)}
+                    onClick={() =>
+                      split[type].assets.length > 0 && toggleGroup(type)
+                    }
                   >
                     {openGroups[type] ? (
                       <ChevronDown size={16} />
-                    ) : (
+                    ) : split[type].assets.length > 0 ? (
                       <ChevronRight size={16} />
-                    )}
+                    ) : null}
                   </Button>
                   <span
                     className="w-2 h-2 rounded-full"
                     style={{ backgroundColor: assetTypeColor[type] }}
                   />
-                  <Link
-                    href={`/portfolio/${type.toLowerCase()}`}
-                    className="font-medium ml-1 hover:underline"
-                  >
+                  <span className="font-medium ml-1">
                     {assetTypeLabels[type]}
-                  </Link>
+                  </span>
                 </th>
                 <th className="text-right">{split[type].split.toFixed(0)}%</th>
                 <th className="text-right">
                   ${split[type].value.toLocaleString()}
                 </th>
-                <th className="text-right text-green-500">{split[type].pnl}</th>
+                <th
+                  className={cn(
+                    "text-right",
+                    formatPnL(split[type].pnl).className
+                  )}
+                >
+                  {formatPnL(split[type].pnl).display}
+                </th>
               </tr>
               {openGroups[type] &&
                 split[type].assets?.map((asset) => (
@@ -185,8 +225,13 @@ export default function AssetsTable() {
                     <td className="text-right text-sm">
                       ${asset.value.toLocaleString()}
                     </td>
-                    <td className="text-right text-sm text-green-500">
-                      {asset.pnl}
+                    <td
+                      className={cn(
+                        "text-right text-sm",
+                        formatPnL(asset.pnl).className
+                      )}
+                    >
+                      {formatPnL(asset.pnl).display}
                     </td>
                   </tr>
                 ))}

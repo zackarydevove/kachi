@@ -29,6 +29,7 @@ import { AuthApi } from "@/api/auth.api";
 import { useRouter } from "next/navigation";
 import { useUserStore } from "@/store/user.store";
 import { useAccountStore } from "@/store/account.store";
+import { avatarFallbackUtil } from "@/utils/avatar-fallback.util";
 
 export function NavUser() {
   const router = useRouter();
@@ -64,7 +65,9 @@ export function NavUser() {
                   src={activeAccount?.avatar}
                   alt={activeAccount?.name}
                 />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  {avatarFallbackUtil(activeAccount?.name)}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
@@ -88,7 +91,9 @@ export function NavUser() {
                     src={activeAccount?.avatar}
                     alt={activeAccount?.name}
                   />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {avatarFallbackUtil(activeAccount?.name)}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">

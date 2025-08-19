@@ -42,4 +42,25 @@ export default class UserController {
       return Send.error(res, {}, 'Internal server error');
     }
   };
+
+  static deleteUser = async (req: Request, res: Response) => {
+    try {
+      const userId = (req as any).userId;
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) return Send.notFound(res, {}, 'User not found');
+
+      await prisma.user.delete({
+        where: { id: userId },
+      });
+
+      return Send.success(res, {}, 'User deleted successfully');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      return Send.error(res, {}, 'Internal server error');
+    }
+  };
 }

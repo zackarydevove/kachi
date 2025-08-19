@@ -6,25 +6,45 @@ import PortfolioGraph from "@/components/portfolio/portfolio-graph";
 import { useEffect, useState } from "react";
 import { useAssetStore } from "@/store/asset.store";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAccountStore } from "@/store/account.store";
 
 export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
   const getAllAssets = useAssetStore((state) => state.getAllAssets);
+  const activeAccount = useAccountStore((state) => state.activeAccount);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsLargeScreen(window.innerWidth >= 1280); // xl breakpoint
+    };
+
+    // Check on mount
+    checkScreenSize();
+
+    // Add resize listener
+    window.addEventListener("resize", checkScreenSize);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
 
   useEffect(() => {
     const loadAssets = async () => {
       setIsLoading(true);
-      try {
-        await getAllAssets();
-      } catch (error) {
-        console.error("Failed to load assets:", error);
-      } finally {
-        setIsLoading(false);
+      if (activeAccount) {
+        try {
+          await getAllAssets();
+        } catch (error) {
+          console.error("Failed to load assets:", error);
+        } finally {
+          setIsLoading(false);
+        }
       }
     };
 
     loadAssets();
-  }, [getAllAssets]);
+  }, [activeAccount, getAllAssets]);
 
   if (isLoading) {
     return (
@@ -43,12 +63,12 @@ export default function Page() {
   return (
     <main>
       <div className="flex flex-col gap-4 p-4 pt-0">
-        {/* up */}
+        {/* Charts section */}
         <div className="flex gap-4 h-[420px]">
-          <PortfolioGraph />
-          <PortfolioPieChart />
+          <PortfolioGraph isLargeScreen={isLargeScreen} />
+          {isLargeScreen && <PortfolioPieChart />}
         </div>
-        {/* down */}
+        {/* Assets table */}
         <AssetsTable />
       </div>
     </main>

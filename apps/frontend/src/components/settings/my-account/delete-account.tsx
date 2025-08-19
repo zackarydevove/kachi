@@ -1,6 +1,40 @@
+"use client";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "../../ui/button";
+import { useState } from "react";
+import { useUserStore } from "@/store/user.store";
+import { useRouter } from "next/navigation";
+import { Loader2Icon } from "lucide-react";
 
 export default function DeleteAccount() {
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
+  const { deleteUser } = useUserStore();
+
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      await deleteUser();
+      setLoading(false);
+      router.push("/login");
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-7">
       <span className="text-2xl">Delete account</span>
@@ -10,7 +44,32 @@ export default function DeleteAccount() {
           be undone.
         </p>
         <div>
-          <Button variant="destructive">I want to delete my account</Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" disabled={loading}>
+                {loading ? (
+                  <Loader2Icon className="animate-spin" />
+                ) : (
+                  "I want to delete my account"
+                )}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your account and remove its data from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete}>
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </div>
