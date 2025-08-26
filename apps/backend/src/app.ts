@@ -6,6 +6,7 @@ import appConfig from '@config/app.config';
 import userRoutes from '@routes/user.route';
 import accountRoutes from '@routes/account.route';
 import assetRoutes from '@routes/asset.route';
+import twoFactorRoutes from '@routes/two-factor.route';
 
 export default class App {
   private app: Express;
@@ -37,6 +38,7 @@ export default class App {
     this.app.use('/api/user', userRoutes);
     this.app.use('/api/account', accountRoutes);
     this.app.use('/api/asset', assetRoutes);
+    this.app.use('/api/2fa', twoFactorRoutes);
   }
 
   public start() {

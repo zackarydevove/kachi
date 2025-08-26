@@ -11,9 +11,11 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { InputOTP } from "@/components/ui/input-otp";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthApi } from "@/api/auth.api";
+import { TwoFactorApi } from "@/api/two-factor.api";
 import { Loader2Icon } from "lucide-react";
 import { AuthUtil } from "@/utils/auth.util";
 import { useUserStore } from "@/store/user.store";
@@ -31,11 +33,18 @@ export function LoginForm({
   const [error, setError] = useState<{ message: string; path: string } | null>(
     null
   );
+
+  // 2FA state
+  const [show2FA, setShow2FA] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [twoFactorLoading, setTwoFactorLoading] = useState(false);
+
   const setUser = useUserStore((state) => state.setUser);
   const setAccounts = useAccountStore((state) => state.setAccounts);
   const setActiveAccount = useAccountStore((state) => state.setActiveAccount);
 
   const authApi = new AuthApi();
+  const twoFactorApi = new TwoFactorApi();
   const authUtil = new AuthUtil();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -48,9 +57,19 @@ export function LoginForm({
     try {
       setLoading(true);
       const res = await authApi.login(payload);
+
+      if (res.user.twoFactorEnabled) {
+        setShow2FA(true);
+        setLoading(false);
+        return;
+      }
+
+      // Regular login flow
       setUser(res.user);
-      setAccounts(res.accounts);
-      setActiveAccount(res.accounts[0]);
+      if (res.accounts) {
+        setAccounts(res.accounts);
+        setActiveAccount(res.accounts[0]);
+      }
       router.push("/portfolio");
     } catch (err: any) {
       setError({
@@ -60,11 +79,98 @@ export function LoginForm({
             : "Something went wrong. Please try again later.",
         path: "password",
       });
-      setLoading(false);
     } finally {
       setLoading(false);
     }
   };
+
+  const handle2FALogin = async () => {
+    if (otp.length !== 6) {
+      setError({
+        message: "Please enter a valid 6-digit OTP code",
+        path: "otp",
+      });
+      return;
+    }
+
+    try {
+      setTwoFactorLoading(true);
+      setError(null);
+
+      const res = await twoFactorApi.login2FA({ email, otp });
+
+      // Success - set user and accounts
+      setUser(res.user);
+      if (res.accounts) {
+        setAccounts(res.accounts);
+        setActiveAccount(res.accounts[0]);
+      }
+      router.push("/portfolio");
+    } catch (err: unknown) {
+      setError({
+        message: "Invalid OTP code. Please try again.",
+        path: "otp",
+      });
+    } finally {
+      setTwoFactorLoading(false);
+    }
+  };
+
+  const handleBackToLogin = () => {
+    setShow2FA(false);
+    setOtp("");
+    setError(null);
+  };
+
+  if (show2FA) {
+    return (
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="text-xl">Two-Factor Authentication</CardTitle>
+            <CardDescription>
+              Enter the 6-digit code from your authenticator app
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-6">
+              <div className="grid gap-3">
+                <Label htmlFor="otp">Authentication Code</Label>
+                <div className="flex justify-center">
+                  <InputOTP value={otp} onChange={setOtp} length={6} />
+                </div>
+                {error && error.path === "otp" ? (
+                  <p className="text-sm text-destructive text-center">
+                    {error.message}
+                  </p>
+                ) : null}
+              </div>
+
+              <Button
+                onClick={handle2FALogin}
+                className="w-full"
+                disabled={twoFactorLoading || otp.length !== 6}
+              >
+                {twoFactorLoading ? (
+                  <Loader2Icon className="animate-spin" />
+                ) : (
+                  "Verify & Login"
+                )}
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={handleBackToLogin}
+                className="w-full"
+              >
+                Back to Login
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

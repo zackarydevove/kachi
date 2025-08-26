@@ -22,6 +22,8 @@ model User {
   email        String   @unique
   password     String
   refreshToken String?
+  twoFactorEnabled  Boolean  @default(false)
+  twoFactorSecret   String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   deletedAt    DateTime?
@@ -68,7 +70,3 @@ model AssetSnapshot {
 
   @@unique([accountId, date, assetId, type])
 }
-
-// TODO ADD CONTRAINTE
-// -> Contrainte, can either have an assetId OR a type, not both at the same time possible
-// -> Contrainte, for the same date, can't have 2 snapshot with same assetId OR same type

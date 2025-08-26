@@ -20,8 +20,10 @@ export function AuthInitializer() {
       try {
         const res = await userApi.get();
         setUser(res.user);
-        setAccounts(res.accounts);
-        setActiveAccount(res.accounts[0]);
+        if (res.accounts) {
+          setAccounts(res.accounts);
+          setActiveAccount(res.accounts[0]);
+        }
         if (pathname === "/login" || pathname === "/signup") {
           router.replace("/portfolio");
         }

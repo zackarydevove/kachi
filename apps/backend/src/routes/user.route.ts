@@ -1,6 +1,8 @@
 import AuthMiddleware from '@middlewares/auth.middleware';
 import UserController from '@controllers/user.controller';
 import BaseRouter, { RouteConfig } from './router';
+import userSchema from 'schema/user.schema';
+import ValidationMiddleware from '@middlewares/validation.middleware';
 
 class UserRoutes extends BaseRouter {
   protected routes(): RouteConfig[] {
@@ -16,6 +18,15 @@ class UserRoutes extends BaseRouter {
         path: '/',
         middlewares: [AuthMiddleware.authenticateUser],
         handler: UserController.deleteUser,
+      },
+      {
+        method: 'put',
+        path: '/password',
+        middlewares: [
+          AuthMiddleware.authenticateUser,
+          ValidationMiddleware.validateBody(userSchema.updatePassword),
+        ],
+        handler: UserController.updatePassword,
       },
     ];
   }

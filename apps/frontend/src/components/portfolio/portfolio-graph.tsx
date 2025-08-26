@@ -8,15 +8,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
 import { useAssetStore } from "@/store/asset.store";
 import { AssetType, assetTypeColor } from "@/types/asset.type";
 import { useState, useEffect } from "react";
@@ -50,10 +41,6 @@ export default function PortfolioGraph({
     day: "numeric",
     year: "numeric",
   });
-
-  useEffect(() => {
-    getAllAssets();
-  }, [snapshots, getAllAssets]);
 
   // Filter snapshots based on selected timeframe
   const filteredSnapshots =

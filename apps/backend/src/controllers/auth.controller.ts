@@ -6,8 +6,8 @@ import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 import authConfig from '@config/auth.config';
-import { DecodedToken } from '@middlewares/auth.middleware';
 import SnapshotService from 'services/snapshot.service';
+import AuthService from 'services/auth.service';
 
 // TODO: Create response schema for each
 export default class AuthController {
@@ -18,7 +18,12 @@ export default class AuthController {
       // Check user exist
       const user = await prisma.user.findUnique({
         where: { email },
-        select: { id: true, email: true, password: true },
+        select: {
+          id: true,
+          email: true,
+          password: true,
+          twoFactorEnabled: true,
+        },
       });
       if (!user)
         return Send.unauthorized(res, null, 'Invalid email or password');
@@ -28,53 +33,31 @@ export default class AuthController {
       if (!isPasswordValid)
         return Send.unauthorized(res, null, 'Invalid email or password.'); // Don't send only password otherwise it gives information for hackers
 
-      const accounts = await prisma.account.findMany({
-        where: { userId: user.id },
-        orderBy: { id: 'asc' },
-        select: {
-          id: true,
-          name: true,
-          avatar: true,
-        },
-      });
-      if (!accounts)
-        return Send.notFound(res, null, 'Invalid email or password.'); // Don't send only password otherwise it gives information for hackers
+      if (user.twoFactorEnabled) {
+        return Send.success(
+          res,
+          {
+            user: {
+              id: user.id,
+              email: user.email,
+              twoFactorEnabled: user.twoFactorEnabled,
+            },
+          },
+          '2FA is enabled for this account',
+        );
+      }
 
-      const accessToken = jwt.sign({ userId: user.id }, authConfig.secret, {
-        expiresIn: authConfig.secret_expires_in as any,
-      });
-
-      const refreshToken = jwt.sign(
-        { userId: user.id },
-        authConfig.refresh_secret,
-        { expiresIn: authConfig.refresh_secret_expires_in as any },
+      const accounts = await AuthService.generateTokens(
+        res,
+        user.id,
+        user.email,
       );
-
-      await prisma.user.update({
-        where: { email },
-        data: { refreshToken },
-      });
-
-      res.clearCookie('accessToken');
-      res.clearCookie('refreshToken');
-
-      res.cookie('accessToken', accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 15 * 60 * 1000,
-        sameSite: 'strict',
-      });
-      res.cookie('refreshToken', refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000,
-        sameSite: 'strict',
-      });
 
       return Send.success(res, {
         user: {
           id: user.id,
           email: user.email,
+          twoFactorEnabled: user.twoFactorEnabled,
         },
         accounts,
       });

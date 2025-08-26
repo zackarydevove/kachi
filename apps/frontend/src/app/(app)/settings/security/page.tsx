@@ -1,6 +1,6 @@
+import TwoFABadge from "@/components/settings/security/2fa-badge";
 import Enable2FADialog from "@/components/settings/security/enable-2fa-dialog";
 import SetPasswordDialog from "@/components/settings/security/set-password-dialog";
-import { Badge } from "@/components/ui/badge";
 
 export default function Page() {
   return (
@@ -14,9 +14,7 @@ export default function Page() {
         <div className="flex flex-col gap-2">
           <div className="flex gap-2 items-center">
             <span>Two-Factor Authentication (2FA)</span>
-            <Badge variant="secondary" className="bg-warning text-warning-text">
-              Not Enabled
-            </Badge>
+            <TwoFABadge />
           </div>
           <Enable2FADialog />
         </div>
