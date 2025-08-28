@@ -11,11 +11,9 @@ export default class AssetService {
 
     // TO DO IN SAME TRANSACTION
     // Create asset first
-    console.log('bbbb');
     const newAsset = await prisma.asset.create({
       data: { accountId, type, name },
     });
-    console.log('cccc', newAsset);
 
     await this.snapshotService.createSnapshot(
       accountId,
@@ -23,7 +21,6 @@ export default class AssetService {
       value,
       type,
     );
-    console.log('oooo');
 
     return newAsset;
   }

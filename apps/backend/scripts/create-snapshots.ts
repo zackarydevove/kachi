@@ -34,15 +34,11 @@ async function createSnapshots() {
   }
 
   try {
-    console.log(`Creating snapshots for date: ${dateArg}`);
-
     const snapshotService = new SnapshotService();
     await snapshotService.createTodaySnapshots(
       dateArg,
       accountIds ?? undefined,
     );
-
-    console.log('Snapshots created successfully!');
   } catch (error) {
     console.error('Failed to create snapshots:', error);
     process.exit(1);

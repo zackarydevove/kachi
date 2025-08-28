@@ -65,8 +65,6 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
 
     const res = await assetApi.getSplitAndSnapshotsByAccountId(accountId);
 
-    console.log("Get all assets response: ", res);
-
     set({
       snapshots: res.snapshots,
       split: res.split,
@@ -82,8 +80,6 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
       ...formData,
       accountId: accountId,
     });
-
-    console.log("Add Asset Response", res);
 
     set({
       snapshots: res.snapshots,
@@ -101,8 +97,6 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
       accountId: accountId,
     });
 
-    console.log("Edit Asset Response", res);
-
     set({
       snapshots: res.snapshots,
       split: res.split,
@@ -115,8 +109,6 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
     }
 
     const res = await assetApi.delete(assetId, { accountId: accountId });
-
-    console.log("Delete Asset Response", res);
 
     set({
       snapshots: res.snapshots,

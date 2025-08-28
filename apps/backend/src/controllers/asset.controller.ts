@@ -44,10 +44,6 @@ export default class AssetController {
       const assetId = Number(req.params.assetId);
       const { accountId, ...formData } = req.body;
 
-      console.log('assetId', assetId);
-      console.log('accountId', accountId);
-      console.log('formData', formData);
-
       const updatedAsset = await this.assetService.editAsset(
         accountId,
         assetId,

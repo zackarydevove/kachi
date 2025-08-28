@@ -37,13 +37,8 @@ class AuthMiddleware {
     res: Response,
     next: NextFunction,
   ) {
-    console.log('req.body', req.body);
-    console.log('req.params', req.params);
     const accountId = req.body?.accountId ?? req.params?.accountId;
     const userId = (req as any).userId;
-
-    console.log('Account ID', accountId);
-    console.log('User ID', userId);
 
     try {
       const account = await prisma.account.findFirst({

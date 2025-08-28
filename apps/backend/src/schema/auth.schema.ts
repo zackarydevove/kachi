@@ -34,9 +34,20 @@ const signup = z
     message: 'Passwords do not match',
   });
 
+const resetPassword = z.object({
+  email: z.string().min(1, 'Email is required').email('Invalid email format'),
+});
+
+const confirmResetPassword = z.object({
+  token: z.string().min(1, 'Token is required'),
+  newPassword: passwordSchema,
+});
+
 const authSchema = {
   login,
   signup,
+  resetPassword,
+  confirmResetPassword,
 };
 
 export default authSchema;

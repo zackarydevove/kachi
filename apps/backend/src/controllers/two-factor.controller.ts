@@ -55,8 +55,6 @@ export default class TwoFactorController {
         );
       }
 
-      console.log('secret', secret);
-
       // Generate QR code
       const qrCodeDataUrl = await this.twoFactorService.generateTwoFactorQRCode(
         secret,
@@ -116,19 +114,14 @@ export default class TwoFactorController {
       const decryptedSecret = this.twoFactorService.decryptTwoFactorSecret(
         user.twoFactorSecret,
       );
-      console.log('decryptedSecret', decryptedSecret);
-      console.log('otp', otp);
-
       const currentOTP =
         this.twoFactorService.generateCurrent2FAOTP(decryptedSecret);
-      console.log('currentOTP', currentOTP);
 
       // Validate OTP
       const isValid = this.twoFactorService.validateTwoFactorOTP(
         decryptedSecret,
         otp,
       );
-      console.log('isValid', isValid);
 
       if (!isValid) {
         return Send.badRequest(res, {}, 'Invalid OTP code. Please try again.');

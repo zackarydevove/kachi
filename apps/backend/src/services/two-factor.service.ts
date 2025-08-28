@@ -44,11 +44,6 @@ export default class TwoFactorService {
       throw new Error('Failed to generate valid base32 secret');
     }
 
-    console.log('Generated 2FA Secret:');
-    console.log('- Secret:', secret.base32);
-    console.log('- Length:', secret.base32.length);
-    console.log('- Valid base32:', this.isValidBase32(secret.base32));
-
     return secret.base32;
   }
 
@@ -61,28 +56,10 @@ export default class TwoFactorService {
       throw new Error('Invalid base32 secret provided for QR code generation');
     }
 
-    console.log('Generating QR Code with:');
-    console.log('- Secret:', secret);
-    console.log('- Email:', email);
-
-    // const otpauthUrl = speakeasy.otpauthURL({
-    //   secret,
-    //   label: email,
-    //   issuer: 'Kachi Portfolio',
-    //   algorithm: 'sha1',
-    //   digits: 6,
-    // });
     // Manually construct the otpauth URL to prevent speakeasy from modifying the secret
     const otpauthUrl = `otpauth://totp/${encodeURIComponent(email)}?secret=${secret}&issuer=${encodeURIComponent('Kachi Portfolio')}&algorithm=SHA1&digits=6`;
 
-    console.log('- OTP Auth URL:', otpauthUrl);
-    console.log(
-      '- Secret in URL matches original:',
-      otpauthUrl.includes(secret),
-    );
-
     const qrCode = await QRCode.toDataURL(otpauthUrl);
-    console.log('- QR Code generated successfully');
 
     return qrCode;
   }
@@ -94,11 +71,6 @@ export default class TwoFactorService {
       return false;
     }
 
-    console.log('Validating OTP:');
-    console.log('- Secret:', secret);
-    console.log('- Token:', token);
-    console.log('- Secret valid base32:', this.isValidBase32(secret));
-
     const result = speakeasy.totp.verify({
       secret,
       encoding: 'base32',
@@ -108,7 +80,6 @@ export default class TwoFactorService {
       digits: 6,
     });
 
-    console.log('- Validation result:', result);
     return result;
   }
 

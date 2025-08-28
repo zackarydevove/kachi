@@ -7,8 +7,6 @@ export default function TwoFABadge() {
   const user = useUserStore((state) => state.user);
   const twoFactorEnabled = user?.twoFactorEnabled || false;
 
-  console.log("twoFactorEnabled", twoFactorEnabled);
-
   return (
     <Badge
       variant={twoFactorEnabled ? "default" : "secondary"}

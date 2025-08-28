@@ -24,7 +24,6 @@ export const useAccountStore = create<AccountState>((set) => ({
     try {
       const accountApi = new AccountApi();
       const { newAccount } = await accountApi.create(formData);
-      console.log("newAccount", newAccount);
       set((state) => ({ accounts: [...state.accounts, newAccount] }));
       toastUtil.success(
         "Account created successfully",
@@ -39,7 +38,6 @@ export const useAccountStore = create<AccountState>((set) => ({
     try {
       const accountApi = new AccountApi();
       const { updatedAccount } = await accountApi.update(accountId, formData);
-      console.log("updatedAccount", updatedAccount);
       set((state) => ({
         accounts: state.accounts.map(
           (

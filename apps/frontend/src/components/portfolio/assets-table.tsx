@@ -81,8 +81,6 @@ export default function AssetsTable() {
     closeDeleteDialog();
   };
 
-  console.log(split);
-
   // Count split[type].assets.length and if total is 0 return the div
   const totalAssets = Object.values(split).reduce(
     (acc, type) => acc + type.assets.length,

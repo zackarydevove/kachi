@@ -38,4 +38,18 @@ export class AuthApi extends ApiBase {
   async refreshToken(): Promise<AuthResponse> {
     return this.fetchApi("post", `${this.endpoint}/refresh-token`);
   }
+
+  async resetPassword(email: string): Promise<AuthResponse> {
+    return this.fetchApi("put", `${this.endpoint}/reset-password`, { email });
+  }
+
+  async confirmResetPassword(
+    token: string,
+    newPassword: string
+  ): Promise<AuthResponse> {
+    return this.fetchApi("put", `${this.endpoint}/confirm-reset-password`, {
+      token,
+      newPassword,
+    });
+  }
 }

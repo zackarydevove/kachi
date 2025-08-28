@@ -28,7 +28,6 @@ export default function SetPasswordDialog() {
   const updatePassword = useUserStore((state) => state.updatePassword);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("hello");
     setLoading(true);
     e.preventDefault();
     try {

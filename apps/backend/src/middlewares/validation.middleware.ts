@@ -10,13 +10,11 @@ class ValidationMiddleware {
         const x = schema.safeParse(req.body);
         next();
       } catch (error) {
-        console.log('errror dans validateBody: ', error);
         if (error instanceof ZodError) {
           // Format errors like { email: ['error1', 'error2'], password: ['error1'] }
           const formattedErrors: Record<string, string[]> = {};
 
           const result = schema.safeParse(error);
-          console.log('result: ', result);
 
           // TODO : For each error, fulfill formatted Errors here
 

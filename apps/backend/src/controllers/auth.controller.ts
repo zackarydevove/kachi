@@ -8,6 +8,8 @@ import jwt from 'jsonwebtoken';
 import authConfig from '@config/auth.config';
 import SnapshotService from 'services/snapshot.service';
 import AuthService from 'services/auth.service';
+import EmailService from 'services/email.service';
+import { DecodedToken } from '@middlewares/auth.middleware';
 
 // TODO: Create response schema for each
 export default class AuthController {
@@ -210,6 +212,85 @@ export default class AuthController {
     } catch (error) {
       console.error('Refresh Token failed:', error);
       return Send.error(res, null, 'Failed to refresh token');
+    }
+  }
+
+  public static async resetPassword(req: Request, res: Response) {
+    // 1. Find user by email.
+    const { email } = req.body;
+    try {
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user)
+        return Send.notFound(
+          res,
+          null,
+          'An email has been sent to reset your password', // To avoid leaking information
+        );
+
+      // 2. Generate a **reset token** (JWT or random UUID).
+      const resetToken = jwt.sign(
+        { userId: user.id },
+        authConfig.reset_password_secret,
+        {
+          expiresIn: authConfig.reset_password_secret_expires_in as any,
+        },
+      );
+
+      // 3. Save token hash in DB (`passwordResetToken`, `passwordResetExpires`).
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { passwordResetToken: resetToken },
+      });
+
+      // 4. Send email with reset link
+      const resetLink = `${process.env.FRONTEND_URL}/password/reset?token=${resetToken}`;
+      const emailService = new EmailService();
+      await emailService.sendResetPasswordEmail(user.email, resetLink);
+
+      return Send.success(
+        res,
+        null,
+        'An email has been sent to reset your password',
+      );
+    } catch (error) {
+      console.error('Reset password failed:', error);
+      return Send.error(res, null, 'Reset password failed.');
+    }
+  }
+
+  public static async confirmResetPassword(req: Request, res: Response) {
+    // 1. Verify token (JWT verify or lookup hashed token in DB).
+    const { token, newPassword } = req.body;
+
+    try {
+      // 2. Check token expiry and valid
+      const decoded = jwt.verify(
+        token,
+        authConfig.reset_password_secret,
+      ) as DecodedToken;
+      if (!decoded) return Send.unauthorized(res, null, 'Invalid token');
+
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId as number },
+      });
+      if (!user) return Send.notFound(res, null, 'User not found');
+
+      // 3. Hash new password with bcrypt.
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      // 4. Update user's password and Clear/reset `passwordResetToken` field.
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          password: hashedPassword,
+          passwordResetToken: null,
+        },
+      });
+
+      return Send.success(res, null, 'Password reset successfully');
+    } catch (error) {
+      console.error('Confirm reset password failed:', error);
+      return Send.error(res, null, 'Confirm reset password failed.');
     }
   }
 }

@@ -227,8 +227,6 @@ export default class SnapshotService {
     date?: string,
     preSelectedAccountIds?: number[],
   ) {
-    console.log('date:', date);
-    console.log('preSelectedAccountIds:', preSelectedAccountIds);
     const accountIds =
       preSelectedAccountIds && preSelectedAccountIds?.length > 0
         ? preSelectedAccountIds
@@ -237,8 +235,6 @@ export default class SnapshotService {
               select: { id: true },
             })
           ).map((account) => account.id);
-
-    console.log(accountIds);
 
     // Get most recent snapshot of each assetId without type and type without assetId
     // First, get all assets for all accounts
@@ -300,8 +296,6 @@ export default class SnapshotService {
       (snapshot) => snapshot !== null,
     );
 
-    console.log('recentSnapshots:', recentSnapshots);
-
     // Check for existing snapshots on the target date to prevent duplicates
     const targetDate = date ?? this.today;
     const existingSnapshots = await prisma.assetSnapshot.findMany({
@@ -327,11 +321,8 @@ export default class SnapshotService {
       return !exists;
     });
 
-    console.log('snapshotsToCreate:', snapshotsToCreate);
-
     // If no snapshots to create, return early
     if (snapshotsToCreate.length === 0) {
-      console.log('No new snapshots to create for date:', targetDate);
       return;
     }
 
@@ -341,14 +332,10 @@ export default class SnapshotService {
       date: targetDate,
     }));
 
-    console.log('todaySnapshots:', todaySnapshots);
-
     // Create today snapshots
     const created = await prisma.assetSnapshot.createMany({
       data: todaySnapshots,
     });
-
-    console.log('created:', created);
   }
 
   // Initialize snapshots for a new account

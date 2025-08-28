@@ -48,13 +48,9 @@ export default function EditSubAccountDialog(props: {
   }, [props.account, open]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log("handleSubmit called!");
     e.preventDefault();
 
-    console.log("formData", formData);
-
     if (!parseSchemaError<AccountForm>(formData, accountFormSchema, setError)) {
-      console.log("error", error);
       return;
     }
 

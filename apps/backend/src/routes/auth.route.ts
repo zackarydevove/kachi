@@ -35,6 +35,24 @@ class AuthRouter extends BaseRouter {
         middlewares: [AuthMiddleware.refreshTokenValidation],
         handler: AuthController.refreshToken,
       },
+      {
+        // reset password
+        method: 'put',
+        path: '/reset-password',
+        middlewares: [
+          ValidationMiddleware.validateBody(authSchema.resetPassword),
+        ],
+        handler: AuthController.resetPassword,
+      },
+      {
+        // verify reset password token
+        method: 'put',
+        path: '/confirm-reset-password',
+        middlewares: [
+          ValidationMiddleware.validateBody(authSchema.confirmResetPassword),
+        ],
+        handler: AuthController.confirmResetPassword,
+      },
     ];
   }
 }

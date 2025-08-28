@@ -16,6 +16,16 @@ export function AuthInitializer() {
   const [isAuthChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
+    // Skip authentication check for public pages
+    if (
+      pathname === "/login" ||
+      pathname === "/signup" ||
+      pathname.startsWith("/password/")
+    ) {
+      setAuthChecked(true);
+      return;
+    }
+
     const fetchUser = async () => {
       try {
         const res = await userApi.get();
@@ -34,7 +44,7 @@ export function AuthInitializer() {
       }
     };
     fetchUser();
-  }, []);
+  }, [pathname]);
 
   if (!isAuthChecked) return null;
 
