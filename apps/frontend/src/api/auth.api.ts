@@ -6,6 +6,8 @@ import {
   LoginResponse,
   SignupRequest,
   SignupResponse,
+  VerifyEmailRequest,
+  ResendVerificationEmailRequest,
 } from "@/types/auth.type";
 
 export class AuthApi extends ApiBase {
@@ -28,6 +30,22 @@ export class AuthApi extends ApiBase {
       `${this.endpoint}/signup`,
       data,
       userResponseSchema
+    );
+  }
+
+  async verifyEmail(data: VerifyEmailRequest) {
+    return this.fetchApi<VerifyEmailRequest, null>(
+      "post",
+      `${this.endpoint}/verify-email`,
+      data
+    );
+  }
+
+  async resendVerificationEmail(data: ResendVerificationEmailRequest) {
+    return this.fetchApi<ResendVerificationEmailRequest, null>(
+      "post",
+      `${this.endpoint}/resend-verification-email`,
+      data
     );
   }
 

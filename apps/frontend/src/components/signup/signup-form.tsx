@@ -10,12 +10,14 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AuthApi } from "@/api/auth.api";
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, Mail } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { AuthUtil } from "@/utils/auth.util";
 import { SignupRequest } from "@/types/auth.type";
+import { toast } from "sonner";
+import { parseApiError } from "@/utils/error.util";
 
 export function SignupForm({
   className,
@@ -31,8 +33,24 @@ export function SignupForm({
     null
   );
 
+  // Unverified user state
+  const [showUnverified, setShowUnverified] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
+
   const authApi = new AuthApi();
   const authUtil = new AuthUtil();
+
+  // Timer effect for resend button
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,13 +62,97 @@ export function SignupForm({
     try {
       setLoading(true);
       await authApi.signup(payload);
-      router.push("/login");
-    } catch (err) {
-      console.error("Authentication error: ", err);
+      router.push("/verify-email");
+    } catch (err: any) {
+      console.log("allloooo: ", err);
+      const { status, message } = parseApiError(err);
+
+      if (status === 409) {
+        const errorMessage = message || "Email is already in use";
+        setError({
+          message: errorMessage,
+          path: "email",
+        });
+        if (!err.response.data.data.isVerified) setShowUnverified(true);
+      } else {
+        setError({
+          message: "Something went wrong. Please try again later.",
+          path: "email",
+        });
+      }
     } finally {
       setLoading(false);
     }
   };
+
+  const handleResendVerification = async () => {
+    try {
+      setResendLoading(true);
+      await authApi.resendVerificationEmail({ email });
+      toast.success("Verification email sent successfully!");
+      setResendTimer(60); // 1 minute timer
+    } catch (err: unknown) {
+      const { message } = parseApiError(err);
+      const errorMessage =
+        message || "Failed to send verification email. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  const handleBackToSignup = () => {
+    setShowUnverified(false);
+    setError(null);
+  };
+
+  if (showUnverified) {
+    return (
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <Card>
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-warning">
+              <Mail className="h-8 w-8 text-warning-text" />
+            </div>
+            <CardTitle className="text-xl">Account Already Exists</CardTitle>
+            <CardDescription>
+              This email is already registered but not verified
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="text-sm text-muted-foreground mb-6">
+              We sent a verification link to <strong>{email}</strong>. Please
+              check your email and click the link to verify your account.
+            </p>
+
+            <div className="space-y-3">
+              <Button
+                onClick={handleResendVerification}
+                disabled={resendLoading || resendTimer > 0}
+                className="w-full"
+              >
+                {resendLoading ? (
+                  <Loader2Icon className="animate-spin" />
+                ) : resendTimer > 0 ? (
+                  `Resend in ${resendTimer}s`
+                ) : (
+                  "Resend Verification Email"
+                )}
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={handleBackToSignup}
+                className="w-full"
+              >
+                Back to Signup
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>

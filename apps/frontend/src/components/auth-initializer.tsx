@@ -15,13 +15,18 @@ export function AuthInitializer() {
   const setActiveAccount = useAccountStore((state) => state.setActiveAccount);
   const [isAuthChecked, setAuthChecked] = useState(false);
 
+  const skipRoutes = [
+    "/login",
+    "/signup",
+    "/password/forgotten",
+    "/password/reset",
+    "/verify-email",
+    "/resend-verification",
+  ];
+
   useEffect(() => {
     // Skip authentication check for public pages
-    if (
-      pathname === "/login" ||
-      pathname === "/signup" ||
-      pathname.startsWith("/password/")
-    ) {
+    if (skipRoutes.includes(pathname)) {
       setAuthChecked(true);
       return;
     }

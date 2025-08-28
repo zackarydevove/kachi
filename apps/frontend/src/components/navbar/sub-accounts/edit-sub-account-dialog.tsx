@@ -165,7 +165,7 @@ export default function EditSubAccountDialog(props: {
                   onChange={(e) => handleFormChange("name", e.target.value)}
                 />
                 {error?.path === "name" && (
-                  <p className="text-sm text-red-500">{error?.message}</p>
+                  <p className="text-sm text-destructive">{error?.message}</p>
                 )}
               </div>
               {/* Avatar upload */}
@@ -178,7 +178,7 @@ export default function EditSubAccountDialog(props: {
                   handleFormChange={handleFormChange}
                 />
                 {error?.path === "avatar" && (
-                  <p className="text-sm text-red-500">{error?.message}</p>
+                  <p className="text-sm text-destructive">{error?.message}</p>
                 )}
               </div>
             </div>

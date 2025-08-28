@@ -19,6 +19,41 @@ export default class EmailService {
     });
   }
 
+  async sendVerificationEmail(
+    email: string,
+    verificationLink: string,
+  ): Promise<void> {
+    const mailOptions = {
+      to: email,
+      subject: 'Kachi — Email Verification',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+  
+        <p>Click the button below to verify your email:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${verificationLink}" 
+             style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+            Verify Email
+          </a>
+        </div>
+        <p style="color: #666; font-size: 14px;">
+          This link expires in 15 minutes.
+        </p>
+        <p style="color: #666; font-size: 14px;">
+          If you didn't request this email verification, please ignore this email.
+        </p>
+      </div>
+    `,
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+    } catch (error) {
+      console.error('Error sending verification email:', error);
+      throw new Error('Failed to send verification email');
+    }
+  }
+
   async sendResetPasswordEmail(
     email: string,
     resetLink: string,

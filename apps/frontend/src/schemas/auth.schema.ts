@@ -34,9 +34,19 @@ const signupSchema = z
     message: "Passwords do not match",
   });
 
+const verifyEmailSchema = z.object({
+  token: z.string().min(1, "Token is required"),
+});
+
+const resendVerificationEmailSchema = z.object({
+  email: z.string().min(1, "Email is required").email("Invalid email format"),
+});
+
 const authSchema = {
   login: loginSchema,
   signup: signupSchema,
+  verifyEmail: verifyEmailSchema,
+  resendVerificationEmail: resendVerificationEmailSchema,
 };
 
 export default authSchema;

@@ -22,6 +22,24 @@ class AuthRouter extends BaseRouter {
         handler: AuthController.register,
       },
       {
+        // verify email
+        method: 'post',
+        path: '/verify-email',
+        middlewares: [
+          ValidationMiddleware.validateBody(authSchema.verifyEmail),
+        ],
+        handler: AuthController.verifyEmail,
+      },
+      {
+        // resend verification email
+        method: 'post',
+        path: '/resend-verification-email',
+        middlewares: [
+          ValidationMiddleware.validateBody(authSchema.resendVerificationEmail),
+        ],
+        handler: AuthController.resendVerificationEmail,
+      },
+      {
         // logout
         method: 'post',
         path: '/logout',

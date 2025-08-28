@@ -25,6 +25,7 @@ export default class AuthController {
           email: true,
           password: true,
           twoFactorEnabled: true,
+          isVerified: true,
         },
       });
       if (!user)
@@ -34,6 +35,13 @@ export default class AuthController {
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid)
         return Send.unauthorized(res, null, 'Invalid email or password.'); // Don't send only password otherwise it gives information for hackers
+
+      if (!user.isVerified)
+        return Send.unauthorized(
+          res,
+          null,
+          `Your email isn't verified. Please verify your account to log in.`,
+        );
 
       if (user.twoFactorEnabled) {
         return Send.success(
@@ -77,9 +85,16 @@ export default class AuthController {
 
     try {
       // Check if user credentials already exist
-      const existingUser = await prisma.user.findUnique({ where: { email } });
+      const existingUser = await prisma.user.findUnique({
+        where: { email },
+        select: { isVerified: true },
+      });
       if (existingUser) {
-        return Send.conflict(res, null, 'Email is already in use.');
+        return Send.conflict(
+          res,
+          { isVerified: existingUser.isVerified },
+          'Email is already in use',
+        );
       }
 
       // Check if password match (but should already check in schema middleware)
@@ -124,10 +139,66 @@ export default class AuthController {
         };
       });
 
-      return Send.success(res, data, 'User successfully registered.');
+      await AuthService.sendVerificationEmail(data.user.id, data.user.email);
+
+      return Send.success(
+        res,
+        data,
+        'User successfully registered. Please verify your email to log in.',
+      );
     } catch (error) {
       console.error('Registration failed:', error);
       return Send.error(res, null, 'Registration failed.');
+    }
+  }
+
+  public static async verifyEmail(req: Request, res: Response) {
+    const { token } = req.body;
+
+    try {
+      const decoded = jwt.verify(
+        token,
+        authConfig.verification_secret,
+      ) as DecodedToken;
+      if (!decoded) return Send.unauthorized(res, null, 'Invalid token');
+
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId as number },
+      });
+      if (!user) return Send.notFound(res, null, 'User not found');
+
+      if (user.isVerified)
+        return Send.success(res, null, 'Email already verified');
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          isVerified: true,
+        },
+      });
+
+      return Send.success(res, null, 'Email verified successfully');
+    } catch (error) {
+      console.error('Verify email failed:', error);
+      return Send.error(res, null, 'Verify email failed.');
+    }
+  }
+
+  public static async resendVerificationEmail(req: Request, res: Response) {
+    const { email } = req.body;
+    try {
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user) return Send.notFound(res, null, 'User not found');
+
+      if (user.isVerified)
+        return Send.success(res, null, 'Email already verified');
+
+      await AuthService.sendVerificationEmail(user.id, user.email);
+
+      return Send.success(res, null, 'Verification email sent');
+    } catch (error) {
+      console.error('Resend verification email failed:', error);
+      return Send.error(res, null, 'Resend verification email failed.');
     }
   }
 
@@ -216,7 +287,6 @@ export default class AuthController {
   }
 
   public static async resetPassword(req: Request, res: Response) {
-    // 1. Find user by email.
     const { email } = req.body;
     try {
       const user = await prisma.user.findUnique({ where: { email } });
@@ -227,7 +297,6 @@ export default class AuthController {
           'An email has been sent to reset your password', // To avoid leaking information
         );
 
-      // 2. Generate a **reset token** (JWT or random UUID).
       const resetToken = jwt.sign(
         { userId: user.id },
         authConfig.reset_password_secret,
@@ -236,13 +305,6 @@ export default class AuthController {
         },
       );
 
-      // 3. Save token hash in DB (`passwordResetToken`, `passwordResetExpires`).
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { passwordResetToken: resetToken },
-      });
-
-      // 4. Send email with reset link
       const resetLink = `${process.env.FRONTEND_URL}/password/reset?token=${resetToken}`;
       const emailService = new EmailService();
       await emailService.sendResetPasswordEmail(user.email, resetLink);
@@ -259,11 +321,9 @@ export default class AuthController {
   }
 
   public static async confirmResetPassword(req: Request, res: Response) {
-    // 1. Verify token (JWT verify or lookup hashed token in DB).
     const { token, newPassword } = req.body;
 
     try {
-      // 2. Check token expiry and valid
       const decoded = jwt.verify(
         token,
         authConfig.reset_password_secret,
@@ -275,15 +335,12 @@ export default class AuthController {
       });
       if (!user) return Send.notFound(res, null, 'User not found');
 
-      // 3. Hash new password with bcrypt.
       const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-      // 4. Update user's password and Clear/reset `passwordResetToken` field.
       await prisma.user.update({
         where: { id: user.id },
         data: {
           password: hashedPassword,
-          passwordResetToken: null,
         },
       });
 

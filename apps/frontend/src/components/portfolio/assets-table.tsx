@@ -30,7 +30,7 @@ const formatPnL = (pnl: number) => {
 
   return {
     display: `${sign}$${formattedValue}`,
-    className: isPositive ? "text-green-500" : "text-red-500",
+    className: isPositive ? "text-constructive" : "text-destructive",
   };
 };
 

@@ -3,6 +3,7 @@ import { prisma } from '../db';
 import jwt from 'jsonwebtoken';
 import authConfig from '@config/auth.config';
 import { Response } from 'express';
+import EmailService from './email.service';
 
 export default class AuthService {
   public static async generateTokens(
@@ -54,5 +55,19 @@ export default class AuthService {
     });
 
     return accounts;
+  }
+
+  public static async sendVerificationEmail(userId: number, email: string) {
+    const verificationToken = jwt.sign(
+      { userId: userId },
+      authConfig.verification_secret,
+      {
+        expiresIn: authConfig.verification_secret_expires_in as any,
+      },
+    );
+
+    const verificationLink = `${process.env.FRONTEND_URL}/verify-email?token=${verificationToken}`;
+    const emailService = new EmailService();
+    await emailService.sendVerificationEmail(email, verificationLink);
   }
 }

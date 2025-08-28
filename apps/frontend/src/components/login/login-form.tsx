@@ -13,14 +13,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { InputOTP } from "@/components/ui/input-otp";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AuthApi } from "@/api/auth.api";
 import { TwoFactorApi } from "@/api/two-factor.api";
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, Mail } from "lucide-react";
 import { AuthUtil } from "@/utils/auth.util";
 import { useUserStore } from "@/store/user.store";
 import { LoginRequest } from "@/types/auth.type";
 import { useAccountStore } from "@/store/account.store";
+import { toast } from "sonner";
+import { parseApiError } from "@/utils/error.util";
 
 export function LoginForm({
   className,
@@ -39,6 +41,11 @@ export function LoginForm({
   const [otp, setOtp] = useState("");
   const [twoFactorLoading, setTwoFactorLoading] = useState(false);
 
+  // Unverified user state
+  const [showUnverified, setShowUnverified] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(0);
+
   const setUser = useUserStore((state) => state.setUser);
   const setAccounts = useAccountStore((state) => state.setAccounts);
   const setActiveAccount = useAccountStore((state) => state.setActiveAccount);
@@ -46,6 +53,17 @@ export function LoginForm({
   const authApi = new AuthApi();
   const twoFactorApi = new TwoFactorApi();
   const authUtil = new AuthUtil();
+
+  // Timer effect for resend button
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,17 +89,57 @@ export function LoginForm({
         setActiveAccount(res.accounts[0]);
       }
       router.push("/portfolio");
-    } catch (err: any) {
-      setError({
-        message:
-          err.response?.status === 401
-            ? "Invalid email or password"
-            : "Something went wrong. Please try again later.",
-        path: "password",
-      });
+    } catch (err: unknown) {
+      const { status, message } = parseApiError(err);
+
+      if (status === 401) {
+        const errorMessage = message || "Invalid email or password";
+
+        // Check if it's an unverified user error
+        if (
+          errorMessage.includes("isn't verified") ||
+          errorMessage.includes("verify your account")
+        ) {
+          setShowUnverified(true);
+          setError(null);
+        } else {
+          setError({
+            message: errorMessage,
+            path: "password",
+          });
+        }
+      } else {
+        setError({
+          message: "Something went wrong. Please try again later.",
+          path: "password",
+        });
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleResendVerification = async () => {
+    try {
+      setResendLoading(true);
+      await authApi.resendVerificationEmail({ email });
+      toast.success("Verification email sent successfully!");
+      setResendTimer(60); // 1 minute timer
+    } catch (err: unknown) {
+      const { message } = parseApiError(err);
+      const errorMessage =
+        message || "Failed to send verification email. Please try again.";
+      toast.error(errorMessage);
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  const handleBackToLogin = () => {
+    setShowUnverified(false);
+    setShow2FA(false);
+    setOtp("");
+    setError(null);
   };
 
   const handle2FALogin = async () => {
@@ -116,11 +174,53 @@ export function LoginForm({
     }
   };
 
-  const handleBackToLogin = () => {
-    setShow2FA(false);
-    setOtp("");
-    setError(null);
-  };
+  if (showUnverified) {
+    return (
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
+        <Card>
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-warning">
+              <Mail className="h-8 w-8 text-warning-text" />
+            </div>
+            <CardTitle className="text-xl">Email Not Verified</CardTitle>
+            <CardDescription>
+              Please verify your email address before logging in
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="text-sm text-muted-foreground mb-6">
+              We sent a verification link to <strong>{email}</strong>. Please
+              check your email and click the link to verify your account.
+            </p>
+
+            <div className="space-y-3">
+              <Button
+                onClick={handleResendVerification}
+                disabled={resendLoading || resendTimer > 0}
+                className="w-full"
+              >
+                {resendLoading ? (
+                  <Loader2Icon className="animate-spin" />
+                ) : resendTimer > 0 ? (
+                  `Resend in ${resendTimer}s`
+                ) : (
+                  "Resend Verification Email"
+                )}
+              </Button>
+
+              <Button
+                variant="outline"
+                onClick={handleBackToLogin}
+                className="w-full"
+              >
+                Back to Login
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (show2FA) {
     return (

@@ -43,9 +43,19 @@ const confirmResetPassword = z.object({
   newPassword: passwordSchema,
 });
 
+const verifyEmail = z.object({
+  token: z.string().min(1, 'Token is required'),
+});
+
+const resendVerificationEmail = z.object({
+  email: z.string().min(1, 'Email is required').email('Invalid email format'),
+});
+
 const authSchema = {
   login,
   signup,
+  verifyEmail,
+  resendVerificationEmail,
   resetPassword,
   confirmResetPassword,
 };

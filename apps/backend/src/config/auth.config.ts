@@ -7,6 +7,9 @@ const authConfig = {
   reset_password_secret: process.env.AUTH_RESET_PASSWORD_SECRET_KEY as string,
   reset_password_secret_expires_in: process.env
     .AUTH_RESET_PASSWORD_SECRET_EXPIRES_IN as string,
+  verification_secret: process.env.AUTH_VERIFICATION_SECRET_KEY as string,
+  verification_secret_expires_in: process.env
+    .AUTH_VERIFICATION_SECRET_EXPIRES_IN as string,
 };
 
 export default authConfig;
