@@ -24,6 +24,9 @@ export const useUserStore = create<UserState>((set) => ({
   updatePassword: async (data: UpdatePasswordRequest) => {
     const userApi = new UserApi();
     await userApi.updatePassword(data);
+    set((state) => ({
+      user: state.user ? { ...state.user, hasPassword: true } : null,
+    }));
     toastUtil.success("Password has been successfully updated!");
   },
   deleteUser: async () => {

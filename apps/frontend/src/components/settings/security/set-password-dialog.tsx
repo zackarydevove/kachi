@@ -25,7 +25,9 @@ export default function SetPasswordDialog() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const user = useUserStore((state) => state.user);
   const updatePassword = useUserStore((state) => state.updatePassword);
+  const isOauthAndFirstTime = !user?.hasPassword;
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setLoading(true);
@@ -99,18 +101,20 @@ export default function SetPasswordDialog() {
           </DialogHeader>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 mt-2">
-              <div className="grid gap-3">
-                <Label htmlFor="new-password-1">Current password</Label>
-                <Input
-                  disabled={loading}
-                  id="current-password"
-                  name="current-password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  required
-                  type="password"
-                />
-              </div>
+              {!isOauthAndFirstTime && (
+                <div className="grid gap-3">
+                  <Label htmlFor="current-password">Current password</Label>
+                  <Input
+                    disabled={loading}
+                    id="current-password"
+                    name="current-password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    required
+                    type="password"
+                  />
+                </div>
+              )}
               <div className="grid gap-3">
                 <Label htmlFor="new-password-1">New password</Label>
                 <Input

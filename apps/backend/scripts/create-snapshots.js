@@ -40,10 +40,8 @@ function createSnapshots() {
             process.exit(1);
         }
         try {
-            console.log(`Creating snapshots for date: ${dateArg}`);
             const snapshotService = new snapshot_service_1.default();
             yield snapshotService.createTodaySnapshots(dateArg, accountIds !== null && accountIds !== void 0 ? accountIds : undefined);
-            console.log('Snapshots created successfully!');
         }
         catch (error) {
             console.error('Failed to create snapshots:', error);

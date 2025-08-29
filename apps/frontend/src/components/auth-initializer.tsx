@@ -22,6 +22,7 @@ export function AuthInitializer() {
     "/password/reset",
     "/verify-email",
     "/resend-verification",
+    "/auth/google/callback",
   ];
 
   useEffect(() => {

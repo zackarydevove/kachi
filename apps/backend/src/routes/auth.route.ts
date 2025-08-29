@@ -22,6 +22,22 @@ class AuthRouter extends BaseRouter {
         handler: AuthController.register,
       },
       {
+        // Google OAuth - get auth URL
+        method: 'get',
+        path: '/google/auth-url',
+        middlewares: [],
+        handler: AuthController.getGoogleAuthUrl,
+      },
+      {
+        // Google OAuth - handle callback
+        method: 'post',
+        path: '/google/callback',
+        middlewares: [
+          ValidationMiddleware.validateBody(authSchema.googleCallback),
+        ],
+        handler: AuthController.handleGoogleCallback,
+      },
+      {
         // verify email
         method: 'post',
         path: '/verify-email',

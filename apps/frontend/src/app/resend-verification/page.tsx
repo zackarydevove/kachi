@@ -68,8 +68,8 @@ export default function ResendVerificationPage() {
 
           <Card>
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                <CheckCircle className="h-8 w-8 text-green-600" />
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-constructive">
+                <CheckCircle className="h-8 w-8 text-constructive" />
               </div>
               <CardTitle className="text-xl">Email Sent!</CardTitle>
               <CardDescription>

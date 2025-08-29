@@ -14,6 +14,7 @@ export default class UserController {
           id: true,
           email: true,
           twoFactorEnabled: true,
+          password: true,
         },
       });
 
@@ -33,7 +34,12 @@ export default class UserController {
       if (!accounts) return Send.notFound(res, {}, 'Accounts not found');
 
       const data = {
-        user,
+        user: {
+          id: user.id,
+          email: user.email,
+          twoFactorEnabled: user.twoFactorEnabled,
+          hasPassword: !!user.password,
+        },
         accounts,
       };
 
@@ -87,10 +93,10 @@ export default class UserController {
       if (newPassword !== confirmNewPassword)
         return Send.badRequest(res, {}, 'Passwords do not match');
 
-      const isPasswordValid = await bcrypt.compare(
-        currentPassword,
-        user.password,
-      );
+      // Check if user has a password (Google OAuth users won't, so they can create a new password)
+      const isPasswordValid = user.password
+        ? await bcrypt.compare(currentPassword, user.password)
+        : true;
 
       if (!isPasswordValid)
         return Send.badRequest(res, {}, 'Invalid current password');

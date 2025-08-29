@@ -5,6 +5,9 @@ import { passwordSchema } from "./auth.schema";
 export const userSchema = z.object({
   id: z.number(),
   email: z.string().email(),
+  hasPassword: z.boolean().optional(),
+  googleId: z.string().nullable().optional(),
+  isVerified: z.boolean().optional(),
   twoFactorEnabled: z.boolean().optional(),
 });
 
@@ -14,7 +17,7 @@ export const userResponseSchema = z.object({
 });
 
 export const updatePasswordSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required"),
+  currentPassword: z.string().optional(), // Optional for Google OAuth users
   newPassword: passwordSchema,
   confirmNewPassword: z.string().min(1, "Confirm new password is required"),
 });

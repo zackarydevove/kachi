@@ -8,6 +8,8 @@ import {
   SignupResponse,
   VerifyEmailRequest,
   ResendVerificationEmailRequest,
+  GoogleCallbackRequest,
+  GoogleAuthUrlResponse,
 } from "@/types/auth.type";
 
 export class AuthApi extends ApiBase {
@@ -69,5 +71,20 @@ export class AuthApi extends ApiBase {
       token,
       newPassword,
     });
+  }
+
+  async getGoogleAuthUrl(): Promise<GoogleAuthUrlResponse> {
+    return this.fetchApi("get", `${this.endpoint}/google/auth-url`);
+  }
+
+  async handleGoogleCallback(
+    data: GoogleCallbackRequest
+  ): Promise<LoginResponse> {
+    return this.fetchApi<GoogleCallbackRequest, LoginResponse>(
+      "post",
+      `${this.endpoint}/google/callback`,
+      data,
+      userResponseSchema
+    );
   }
 }

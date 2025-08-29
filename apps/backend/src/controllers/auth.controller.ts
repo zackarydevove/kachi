@@ -9,6 +9,7 @@ import authConfig from '@config/auth.config';
 import SnapshotService from 'services/snapshot.service';
 import AuthService from 'services/auth.service';
 import EmailService from 'services/email.service';
+import GoogleOAuthService from 'services/google-oauth.service';
 import { DecodedToken } from '@middlewares/auth.middleware';
 
 // TODO: Create response schema for each
@@ -31,7 +32,11 @@ export default class AuthController {
       if (!user)
         return Send.unauthorized(res, null, 'Invalid email or password');
 
-      // Check password valid
+      // Check password valid (handle Google users who don't have passwords)
+      if (!user.password) {
+        return Send.unauthorized(res, null, 'Invalid email or password');
+      }
+
       const isPasswordValid = await bcrypt.compare(password, user.password);
       if (!isPasswordValid)
         return Send.unauthorized(res, null, 'Invalid email or password.'); // Don't send only password otherwise it gives information for hackers
@@ -347,7 +352,33 @@ export default class AuthController {
       return Send.success(res, null, 'Password reset successfully');
     } catch (error) {
       console.error('Confirm reset password failed:', error);
-      return Send.error(res, null, 'Confirm reset password failed.');
+      return Send.error(res, null, 'Reset password failed.');
+    }
+  }
+
+  public static async getGoogleAuthUrl(req: Request, res: Response) {
+    try {
+      const authUrl = GoogleOAuthService.getAuthUrl();
+      return Send.success(res, { authUrl }, 'Google OAuth URL generated');
+    } catch (error) {
+      console.error('Failed to generate Google OAuth URL:', error);
+      return Send.error(res, null, 'Failed to generate Google OAuth URL');
+    }
+  }
+
+  public static async handleGoogleCallback(req: Request, res: Response) {
+    const { code } = req.body as z.infer<typeof authSchema.googleCallback>;
+
+    try {
+      const result = await GoogleOAuthService.handleCallback(code, res);
+      return Send.success(
+        res,
+        result,
+        'Google OAuth authentication successful',
+      );
+    } catch (error) {
+      console.error('Google OAuth callback failed:', error);
+      return Send.error(res, null, 'Google OAuth authentication failed');
     }
   }
 }

@@ -51,6 +51,10 @@ const resendVerificationEmail = z.object({
   email: z.string().min(1, 'Email is required').email('Invalid email format'),
 });
 
+const googleCallback = z.object({
+  code: z.string().min(1, 'Authorization code is required'),
+});
+
 const authSchema = {
   login,
   signup,
@@ -58,6 +62,7 @@ const authSchema = {
   resendVerificationEmail,
   resetPassword,
   confirmResetPassword,
+  googleCallback,
 };
 
 export default authSchema;

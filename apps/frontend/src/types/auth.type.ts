@@ -9,8 +9,12 @@ export type VerifyEmailRequest = z.infer<typeof authSchema.verifyEmail>;
 export type ResendVerificationEmailRequest = z.infer<
   typeof authSchema.resendVerificationEmail
 >;
+export type GoogleCallbackRequest = z.infer<typeof authSchema.googleCallback>;
 
 // Response schemas
 export type LoginResponse = z.infer<typeof userResponseSchema>;
 export type SignupResponse = z.infer<typeof userResponseSchema>;
+export type GoogleAuthUrlResponse = {
+  authUrl: string;
+};
 export type AuthResponse = null;
