@@ -10,6 +10,7 @@ export default function SettingNav() {
   const links = [
     { href: "/settings", label: "My account" },
     { href: "/settings/security", label: "Security" },
+    { href: "/settings/billing", label: "Billing" },
   ];
 
   return (

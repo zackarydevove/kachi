@@ -104,22 +104,18 @@ export function NavUser() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {/* <DropdownMenuGroup>
-              <DropdownMenuItem>
+            <DropdownMenuGroup>
+              <DropdownMenuItem onClick={() => router.push("/pro")}>
                 <Sparkles />
                 Upgrade to Pro
               </DropdownMenuItem>
-            </DropdownMenuGroup> 
-            <DropdownMenuSeparator /> */}
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem onClick={() => router.push("/settings")}>
                 <BadgeCheck />
                 My Account
               </DropdownMenuItem>
-              {/* <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem> */}
               {/* <DropdownMenuItem>
                 <Bell />
                 Notifications

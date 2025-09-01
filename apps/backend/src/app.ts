@@ -7,6 +7,7 @@ import userRoutes from '@routes/user.route';
 import accountRoutes from '@routes/account.route';
 import assetRoutes from '@routes/asset.route';
 import twoFactorRoutes from '@routes/two-factor.route';
+import stripeRoutes from '@routes/stripe.route';
 
 export default class App {
   private app: Express;
@@ -19,7 +20,16 @@ export default class App {
   }
 
   private initMiddlewares() {
-    this.app.use(express.json());
+    this.app.use(
+      express.json({
+        // Need rawBody for stripe webhook
+        verify(req, res, buf) {
+          if ((req as any).path.includes('stripe')) {
+            (req as any).rawBody = buf.toString(); // sets raw string in req.rawBody variable
+          }
+        },
+      }),
+    );
     this.app.use(cookieParser());
     this.app.use(
       cors({
@@ -39,6 +49,7 @@ export default class App {
     this.app.use('/api/account', accountRoutes);
     this.app.use('/api/asset', assetRoutes);
     this.app.use('/api/2fa', twoFactorRoutes);
+    this.app.use('/api/stripe', stripeRoutes);
   }
 
   public start() {
