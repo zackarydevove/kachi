@@ -10,6 +10,12 @@ class StripeRoutes extends BaseRouter {
         path: '/',
         handler: StripeController.webhookListener,
       },
+      {
+        method: 'get',
+        path: '/invoices',
+        middlewares: [AuthMiddleware.authenticateUser],
+        handler: StripeController.getCustomerInvoices,
+      },
     ];
   }
 }

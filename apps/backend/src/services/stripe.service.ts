@@ -1,6 +1,25 @@
 import { prisma } from 'db';
 
 export default class StripeService {
+  // Utility function to format Stripe timestamp to readable date
+  private static formatStripeDate(timestamp: number): string {
+    const date = new Date(timestamp * 1000); // Convert Unix timestamp to milliseconds
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
+
+  // Utility function to format Stripe amount (cents) to currency string
+  private static formatStripeAmount(amountInCents: number): string {
+    const amountInDollars = amountInCents / 100;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amountInDollars);
+  }
+
   static async handleCheckoutSessionCompleted(event: any, stripe: any) {
     const session = await stripe.checkout.sessions.retrieve(
       event.data.object.id,
@@ -60,5 +79,36 @@ export default class StripeService {
     // EmailService.sendProRevokeEmail(updatedUser.email);
 
     return updatedUser;
+  }
+
+  static async getCustomerInvoices(userId: number, stripe: any) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        customerId: true,
+      },
+    });
+    if (!user) {
+      throw new Error('No user found');
+    }
+    if (!user.customerId) {
+      throw new Error('No customerId found');
+    }
+    const invoices = await stripe.invoices.list({
+      customer: user.customerId,
+    });
+    if (!invoices) {
+      throw new Error('No invoices found');
+    }
+
+    const formattedInvoices = invoices.data.map((invoice: any) => ({
+      id: invoice.id,
+      date: this.formatStripeDate(invoice.created),
+      status: invoice.status,
+      amount: this.formatStripeAmount(invoice.total),
+      link: invoice.hosted_invoice_url,
+    }));
+
+    return formattedInvoices;
   }
 }

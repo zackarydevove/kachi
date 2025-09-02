@@ -47,4 +47,15 @@ export default class StripeController {
 
     return Send.success(res, {}, 'Webhook received');
   };
+
+  static getCustomerInvoices = async (req: Request, res: Response) => {
+    const userId = (req as any).userId;
+    try {
+      const invoices = await StripeService.getCustomerInvoices(userId, stripe);
+      return Send.success(res, invoices);
+    } catch (error) {
+      console.error('Error getting customer invoices: ', error);
+      return Send.error(res, {}, 'Internal server error');
+    }
+  };
 }
