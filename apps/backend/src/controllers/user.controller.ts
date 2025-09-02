@@ -15,6 +15,7 @@ export default class UserController {
           email: true,
           twoFactorEnabled: true,
           password: true,
+          isPro: true,
         },
       });
 
@@ -39,6 +40,7 @@ export default class UserController {
           email: user.email,
           twoFactorEnabled: user.twoFactorEnabled,
           hasPassword: !!user.password,
+          isPro: user.isPro,
         },
         accounts,
       };

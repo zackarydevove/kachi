@@ -2,16 +2,21 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import clsx from "clsx";
+import { useUserStore } from "@/store/user.store";
 
 export default function SettingNav() {
   const pathname = usePathname();
 
+  const user = useUserStore((state) => state.user);
+
   const links = [
     { href: "/settings", label: "My account" },
     { href: "/settings/security", label: "Security" },
-    { href: "/settings/billing", label: "Billing" },
   ];
+
+  if (user?.isPro) {
+    links.push({ href: "/settings/billing", label: "Billing" });
+  }
 
   return (
     <div className="min-w-68 py-6 pl-10 pr-2">

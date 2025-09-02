@@ -27,6 +27,7 @@ export default class AuthController {
           password: true,
           twoFactorEnabled: true,
           isVerified: true,
+          isPro: true,
         },
       });
       if (!user)
@@ -73,6 +74,7 @@ export default class AuthController {
           id: user.id,
           email: user.email,
           twoFactorEnabled: user.twoFactorEnabled,
+          isPro: user.isPro,
         },
         accounts,
       });

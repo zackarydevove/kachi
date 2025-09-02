@@ -8,6 +8,7 @@ export const userSchema = z.object({
   hasPassword: z.boolean().optional(),
   googleId: z.string().nullable().optional(),
   isVerified: z.boolean().optional(),
+  isPro: z.boolean().optional(),
   twoFactorEnabled: z.boolean().optional(),
 });
 

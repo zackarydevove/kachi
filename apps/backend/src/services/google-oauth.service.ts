@@ -51,6 +51,7 @@ export default class GoogleOAuthService {
           password: true,
           isVerified: true,
           twoFactorEnabled: true,
+          isPro: true,
         },
       });
 
@@ -101,6 +102,7 @@ export default class GoogleOAuthService {
           password: null, // Google users don't have passwords
           isVerified: data.user.isVerified,
           twoFactorEnabled: false, // New Google users start with 2FA disabled
+          isPro: false,
         };
       }
 
@@ -121,6 +123,7 @@ export default class GoogleOAuthService {
           id: user.id,
           email: user.email,
           twoFactorEnabled: user.twoFactorEnabled || false,
+          isPro: user.isPro,
         },
         accounts,
       };

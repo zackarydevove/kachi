@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUserStore } from "@/store/user.store";
 import { Check, X } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const proPlans = {
@@ -28,6 +29,12 @@ const proPlans = {
 export default function ProPage() {
   const [isAnnualPlan, setIsAnnualPlan] = useState(true);
   const { user } = useUserStore();
+
+  const router = useRouter();
+
+  if (user?.isPro) {
+    router.push("/portfolio");
+  }
 
   return (
     <div className="min-h-screen bg-background">
