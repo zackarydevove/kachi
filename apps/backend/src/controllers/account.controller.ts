@@ -9,6 +9,22 @@ export default class AccountController {
       const { name, avatar } = req.body;
       const userId = (req as any).userId;
 
+      // Check if the user is pro and has at least one account
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { isPro: true },
+      });
+      const userAccountsCount = await prisma.account.count({
+        where: { userId },
+      });
+      if (!user?.isPro && userAccountsCount >= 1) {
+        return Send.badRequest(
+          res,
+          { error: 'User is not pro and already has one account' },
+          'User is not pro and already has one account',
+        );
+      }
+
       const existingAccount = await prisma.account.findFirst({
         where: { name, userId },
       });

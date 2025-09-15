@@ -1,6 +1,6 @@
 "use client";
 
-import { BadgeCheckIcon, ChevronsUpDown, Plus } from "lucide-react";
+import { BadgeCheckIcon, ChevronsUpDown, Plus, Sparkles } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -20,9 +20,13 @@ import EditSubAccountDialog from "./sub-accounts/edit-sub-account-dialog";
 import { useAccountStore } from "@/store/account.store";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { avatarFallbackUtil } from "@/utils/avatar-fallback.util";
+import { useUserStore } from "@/store/user.store";
+import { useRouter } from "next/navigation";
 
 export function AccountSwitcher() {
+  const router = useRouter();
   const { isMobile } = useSidebar();
+  const { user } = useUserStore();
   const activeAccount = useAccountStore((state) => state.activeAccount);
   const setActiveAccount = useAccountStore((state) => state.setActiveAccount);
   const accounts = useAccountStore((state) => state.accounts);
@@ -89,7 +93,14 @@ export function AccountSwitcher() {
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <EditSubAccountDialog type="create" />
+            {user?.isPro ? (
+              <EditSubAccountDialog type="create" />
+            ) : (
+              <DropdownMenuItem onClick={() => router.push("/pro")}>
+                <Sparkles />
+                Upgrade to Pro to add more accounts
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>
