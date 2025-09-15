@@ -1,0 +1,28 @@
+import { Request, Response } from 'express';
+import Send from '@utils/response.util';
+import PlaidService from 'services/plaid.service';
+
+export default class PlaidController {
+  static generateLinkToken = async (req: Request, res: Response) => {
+    const accountId = parseInt(req.params.accountId);
+    try {
+      const linkToken = await PlaidService.generateLinkToken(accountId);
+      return Send.success(res, { linkToken }, 'Link token generated');
+    } catch (error) {
+      console.error(error);
+      return Send.error(res, {}, 'Error generating link token');
+    }
+  };
+
+  static exchangePublicToken = async (req: Request, res: Response) => {
+    const { publicTokenFromClient, accountId } = req.body;
+    try {
+      await PlaidService.exchangePublicToken(accountId, publicTokenFromClient);
+      await PlaidService.createOrUpdatePlaidAssets(accountId);
+      return Send.success(res, null, 'Public token exchanged');
+    } catch (error) {
+      console.error(error);
+      return Send.error(res, {}, 'Error exchanging plaid public token');
+    }
+  };
+}

@@ -85,8 +85,7 @@ export default class GoogleOAuthService {
             select: { id: true, name: true, avatar: true },
           });
 
-          const snapshotService = new SnapshotService();
-          await snapshotService.initializeAccountSnapshots(newAccount.id, tx);
+          await SnapshotService.initializeAccountSnapshots(newAccount.id, tx);
 
           return {
             user: newUser,

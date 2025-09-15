@@ -1,11 +1,12 @@
 import { prisma } from 'db';
 import { AssetTypeEnum } from '../../generated/prisma';
 import { Asset } from 'types/asset.type';
+import PlaidService from './plaid.service';
 
 export default class SnapshotService {
-  public today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  public static today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
 
-  private async getSplit(accountId: number) {
+  private static async getSplit(accountId: number) {
     // Get all assets of accountId
     const assets = await prisma.asset.findMany({
       where: { accountId },
@@ -123,7 +124,7 @@ export default class SnapshotService {
     return split;
   }
 
-  private async getSnapshots(accountId: number) {
+  private static async getSnapshots(accountId: number) {
     // Get all the snapshots type of accountId (type snapshots only, no assetId)
     const snapshots = await prisma.assetSnapshot.findMany({
       where: {
@@ -163,13 +164,13 @@ export default class SnapshotService {
     return snapshotsArray;
   }
 
-  public async getSplitAndSnapshots(accountId: number) {
+  public static async getSplitAndSnapshots(accountId: number) {
     const split = await this.getSplit(accountId);
     const snapshots = await this.getSnapshots(accountId);
     return { split, snapshots };
   }
 
-  public async editTypeAndNetworthSnapshots(
+  public static async editTypeAndNetworthSnapshots(
     accountId: number,
     value: number,
     type: AssetTypeEnum,
@@ -223,7 +224,7 @@ export default class SnapshotService {
   }
 
   // Create snapshots for all assets of an account
-  public async createTodaySnapshots(
+  public static async createTodaySnapshots(
     date?: string,
     preSelectedAccountIds?: number[],
   ) {
@@ -336,10 +337,15 @@ export default class SnapshotService {
     const created = await prisma.assetSnapshot.createMany({
       data: todaySnapshots,
     });
+
+    // For each accounts, if they connected to Plaid, fetch the holdings and create or update the snapshots
+    for (const accountId of accountIds) {
+      await PlaidService.createOrUpdatePlaidAssets(accountId);
+    }
   }
 
   // Initialize snapshots for a new account
-  public async initializeAccountSnapshots(
+  public static async initializeAccountSnapshots(
     accountId: number,
     prismaClient: any = prisma,
   ) {
@@ -363,7 +369,7 @@ export default class SnapshotService {
   }
 
   // Create snapshot
-  public async createSnapshot(
+  public static async createSnapshot(
     accountId: number,
     assetId: number,
     value: number,
@@ -393,7 +399,7 @@ export default class SnapshotService {
   }
 
   // Edit snapshot
-  public async editSnapshot(
+  public static async editSnapshot(
     accountId: number,
     assetId: number,
     value: number,

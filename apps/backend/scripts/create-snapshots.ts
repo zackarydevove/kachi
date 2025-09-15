@@ -34,8 +34,7 @@ async function createSnapshots() {
   }
 
   try {
-    const snapshotService = new SnapshotService();
-    await snapshotService.createTodaySnapshots(
+    await SnapshotService.createTodaySnapshots(
       dateArg,
       accountIds ?? undefined,
     );

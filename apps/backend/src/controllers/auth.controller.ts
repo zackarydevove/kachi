@@ -128,8 +128,7 @@ export default class AuthController {
           select: { id: true, name: true, avatar: true },
         });
 
-        const snapshotService = new SnapshotService();
-        await snapshotService.initializeAccountSnapshots(newAccount.id, tx);
+        await SnapshotService.initializeAccountSnapshots(newAccount.id, tx);
 
         return {
           user: {

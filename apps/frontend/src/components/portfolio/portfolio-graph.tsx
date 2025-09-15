@@ -21,7 +21,7 @@ const timeframes = [
 ];
 
 const currencyFormatter = (value: number) =>
-  value.toLocaleString("en-US", {
+  value?.toLocaleString("en-US", {
     style: "currency",
     currency: "USD",
     maximumFractionDigits: 0,
@@ -83,7 +83,7 @@ export default function PortfolioGraph({
           <p className="text-xs text-muted-foreground">{today}</p>
           <p className="text-3xl font-bold">
             {currencyFormatter(
-              filteredSnapshots[filteredSnapshots.length - 1].networth
+              filteredSnapshots[filteredSnapshots.length - 1]?.networth
             )}
           </p>
         </div>
@@ -94,7 +94,7 @@ export default function PortfolioGraph({
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={filteredSnapshots}>
             <defs>
-              {Object.keys(filteredSnapshots[0]).map((key) => {
+              {Object.keys(filteredSnapshots[0] ?? {}).map((key) => {
                 if (key === "date") return;
                 const type = key as AssetType;
                 return (
@@ -124,7 +124,7 @@ export default function PortfolioGraph({
               tick={{ fontSize: 10, fill: "#6e727a" }}
               width={50}
               tickFormatter={(value) =>
-                value.toLocaleString("en-US", {
+                value?.toLocaleString("en-US", {
                   style: "currency",
                   currency: "USD",
                   maximumFractionDigits: 0,
@@ -144,7 +144,7 @@ export default function PortfolioGraph({
               }}
             />
             <Tooltip content={<CustomTooltip />} />
-            {Object.keys(filteredSnapshots[0]).map((key) => {
+            {Object.keys(filteredSnapshots[0] ?? {}).map((key) => {
               if (key === "date") return;
               const type = key as AssetType;
               return (

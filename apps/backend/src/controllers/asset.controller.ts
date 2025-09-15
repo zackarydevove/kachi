@@ -5,14 +5,12 @@ import SnapshotService from 'services/snapshot.service';
 
 // TODO: Handle the error better in here, the service throw, find a way to write less code
 export default class AssetController {
-  private static assetService: AssetService = new AssetService();
-  private static snapshotService: SnapshotService = new SnapshotService();
-
   static getAllAssets = async (req: Request, res: Response) => {
     try {
       const { accountId } = req.params;
-      const { split, snapshots } =
-        await this.snapshotService.getSplitAndSnapshots(Number(accountId));
+      const { split, snapshots } = await SnapshotService.getSplitAndSnapshots(
+        Number(accountId),
+      );
       return Send.success(res, { split, snapshots });
     } catch (error) {
       console.error('Error getting all assets:', error);
@@ -24,13 +22,14 @@ export default class AssetController {
     try {
       const { accountId, ...formData } = req.body;
 
-      const newAsset = await this.assetService.createAsset(
+      const newAsset = await AssetService.createAsset(
         Number(accountId),
         formData,
       );
 
-      const { split, snapshots } =
-        await this.snapshotService.getSplitAndSnapshots(Number(accountId));
+      const { split, snapshots } = await SnapshotService.getSplitAndSnapshots(
+        Number(accountId),
+      );
 
       return Send.success(res, { split, snapshots });
     } catch (error) {
@@ -44,14 +43,15 @@ export default class AssetController {
       const assetId = Number(req.params.assetId);
       const { accountId, ...formData } = req.body;
 
-      const updatedAsset = await this.assetService.editAsset(
+      const updatedAsset = await AssetService.editAsset(
         accountId,
         assetId,
         formData,
       );
 
-      const { split, snapshots } =
-        await this.snapshotService.getSplitAndSnapshots(Number(accountId));
+      const { split, snapshots } = await SnapshotService.getSplitAndSnapshots(
+        Number(accountId),
+      );
 
       return Send.success(res, { split, snapshots });
     } catch (error) {
@@ -65,13 +65,11 @@ export default class AssetController {
       const assetId = Number(req.params.assetId);
       const { accountId } = req.body;
 
-      const deletedAsset = await this.assetService.deleteAsset(
-        accountId,
-        assetId,
-      );
+      const deletedAsset = await AssetService.deleteAsset(accountId, assetId);
 
-      const { split, snapshots } =
-        await this.snapshotService.getSplitAndSnapshots(Number(accountId));
+      const { split, snapshots } = await SnapshotService.getSplitAndSnapshots(
+        Number(accountId),
+      );
 
       return Send.success(res, { split, snapshots });
     } catch (error) {

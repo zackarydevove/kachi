@@ -8,6 +8,7 @@ import accountRoutes from '@routes/account.route';
 import assetRoutes from '@routes/asset.route';
 import twoFactorRoutes from '@routes/two-factor.route';
 import stripeRoutes from '@routes/stripe.route';
+import plaidRoutes from '@routes/plaid.route';
 
 export default class App {
   private app: Express;
@@ -50,6 +51,7 @@ export default class App {
     this.app.use('/api/asset', assetRoutes);
     this.app.use('/api/2fa', twoFactorRoutes);
     this.app.use('/api/stripe', stripeRoutes);
+    this.app.use('/api/plaid', plaidRoutes);
   }
 
   public start() {

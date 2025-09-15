@@ -30,8 +30,7 @@ export default class AccountController {
       });
 
       // Initialize snapshots for the new account
-      const snapshotService = new SnapshotService();
-      await snapshotService.initializeAccountSnapshots(newAccount.id);
+      await SnapshotService.initializeAccountSnapshots(newAccount.id);
 
       return Send.success(res, { newAccount });
     } catch (error) {

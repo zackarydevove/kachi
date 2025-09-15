@@ -41,6 +41,7 @@ model Account {
   name         String
   userId        Int
   avatar       String?
+  plaidAccessToken  String? @unique
 
   user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -51,6 +52,7 @@ model Account {
 model Asset {
   id           Int      @id @default(autoincrement())
   accountId    Int
+  plaidAccountId String? @unique
   name        String
   type       AssetTypeEnum
   createdAt    DateTime @default(now())

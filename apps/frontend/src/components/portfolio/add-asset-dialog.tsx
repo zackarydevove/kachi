@@ -23,6 +23,7 @@ import {
 import { AssetFormData, assetTypeLabels } from "@/types/asset.type";
 import { useState } from "react";
 import { useAssetStore } from "@/store/asset.store";
+import ConnectPlaidButton from "../plaid/connect-plaid-button";
 
 export default function AddAssetDialog() {
   const addAsset = useAssetStore((state) => state.addAsset);
@@ -66,22 +67,28 @@ export default function AddAssetDialog() {
           <DialogDescription>Add details for your new asset.</DialogDescription>
         </DialogHeader>
 
-        {/* Type */}
-        <Select
-          value={formData.type || ""}
-          onValueChange={(value) => handleFormDataChange("type", value)}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Select an asset type" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.keys(assetTypeLabels).map((type) => (
-              <SelectItem key={type} value={type}>
-                {type}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex justify-between items-center gap-4">
+          {/* Type */}
+          <Select
+            value={formData.type || ""}
+            onValueChange={(value) => handleFormDataChange("type", value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select an asset type" />
+            </SelectTrigger>
+            <SelectContent>
+              {Object.keys(assetTypeLabels).map((type) => (
+                <SelectItem key={type} value={type}>
+                  {type}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p>Or</p>
+          <div className="flex-1">
+            <ConnectPlaidButton />
+          </div>
+        </div>
 
         {/* Name */}
         <div className="flex flex-col gap-2">
