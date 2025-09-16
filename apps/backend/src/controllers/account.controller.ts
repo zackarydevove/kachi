@@ -36,17 +36,21 @@ export default class AccountController {
         );
       }
 
-      const newAccount = await prisma.account.create({
-        data: { name, avatar, userId },
-        select: {
-          id: true,
-          name: true,
-          avatar: true,
-        },
-      });
+      const newAccount = await prisma.$transaction(async (tx) => {
+        const newAccount = await tx.account.create({
+          data: { name, avatar, userId },
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+          },
+        });
 
-      // Initialize snapshots for the new account
-      await SnapshotService.initializeAccountSnapshots(newAccount.id);
+        // Initialize snapshots for the new account
+        await SnapshotService.initializeAccountSnapshots(newAccount.id, tx);
+
+        return newAccount;
+      });
 
       return Send.success(res, { newAccount });
     } catch (error) {

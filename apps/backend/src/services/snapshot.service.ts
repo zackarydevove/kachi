@@ -1,5 +1,5 @@
 import { prisma } from 'db';
-import { AssetTypeEnum } from '../../generated/prisma';
+import { AssetTypeEnum, Prisma } from '../../generated/prisma';
 import { Asset } from 'types/asset.type';
 import PlaidService from './plaid.service';
 
@@ -175,9 +175,10 @@ export default class SnapshotService {
     value: number,
     type: AssetTypeEnum,
     isIncrement: boolean,
+    transaction: Prisma.TransactionClient,
   ) {
     // Find the type snapshot first, then update it by ID
-    const typeSnapshot = await prisma.assetSnapshot.findFirst({
+    const typeSnapshot = await transaction.assetSnapshot.findFirst({
       where: {
         type: type,
         date: this.today,
@@ -193,14 +194,14 @@ export default class SnapshotService {
     }
 
     // Edit type snapshot (because now that we have a new asset of that type, the total changed)
-    const editTypeSnapshot = await prisma.assetSnapshot.update({
+    const editTypeSnapshot = await transaction.assetSnapshot.update({
       where: { id: typeSnapshot.id },
       data: {
         value: isIncrement ? { increment: value } : { decrement: value },
       },
     });
     // Find the networth snapshot first, then update it by ID
-    const networthSnapshot = await prisma.assetSnapshot.findFirst({
+    const networthSnapshot = await transaction.assetSnapshot.findFirst({
       where: {
         type: AssetTypeEnum.networth,
         date: this.today,
@@ -214,7 +215,7 @@ export default class SnapshotService {
     }
 
     // Edit networth snapshot (because now that we have a new asset, the total changed)
-    const editNetworthSnapshot = await prisma.assetSnapshot.update({
+    const editNetworthSnapshot = await transaction.assetSnapshot.update({
       where: { id: networthSnapshot.id },
       data: {
         value: isIncrement ? { increment: value } : { decrement: value },
@@ -237,48 +238,28 @@ export default class SnapshotService {
             })
           ).map((account) => account.id);
 
-    // Get most recent snapshot of each assetId without type and type without assetId
-    // First, get all assets for all accounts
-    const allAssets = await prisma.asset.findMany({
-      where: {
-        accountId: { in: accountIds },
-        deletedAt: null,
-      },
-      select: {
-        id: true,
-        accountId: true,
-      },
-    });
+    prisma.$transaction(async (transaction) => {
+      // Get most recent snapshot of each assetId without type and type without assetId
+      // First, get all assets for all accounts
+      const allAssets = await transaction.asset.findMany({
+        where: {
+          accountId: { in: accountIds },
+          deletedAt: null,
+        },
+        select: {
+          id: true,
+          accountId: true,
+        },
+      });
 
-    // Get most recent snapshot of each asset (assetId with type: null)
-    const assetSnapshots = await Promise.all(
-      allAssets.map(async (asset) => {
-        return await prisma.assetSnapshot.findFirst({
-          where: {
-            accountId: asset.accountId,
-            assetId: asset.id,
-            type: null,
-          },
-          select: {
-            accountId: true,
-            assetId: true,
-            type: true,
-            value: true,
-          },
-          orderBy: { date: 'desc' },
-        });
-      }),
-    );
-
-    // Get most recent snapshot of each type for each account (type with assetId: null)
-    const typeSnapshots = await Promise.all(
-      accountIds.flatMap((accountId) =>
-        Object.values(AssetTypeEnum).map(async (type) => {
-          return await prisma.assetSnapshot.findFirst({
+      // Get most recent snapshot of each asset (assetId with type: null)
+      const assetSnapshots = await Promise.all(
+        allAssets.map(async (asset) => {
+          return await transaction.assetSnapshot.findFirst({
             where: {
-              accountId,
-              assetId: null,
-              type,
+              accountId: asset.accountId,
+              assetId: asset.id,
+              type: null,
             },
             select: {
               accountId: true,
@@ -289,65 +270,87 @@ export default class SnapshotService {
             orderBy: { date: 'desc' },
           });
         }),
-      ),
-    );
-
-    // Combine and filter out null values
-    const recentSnapshots = [...assetSnapshots, ...typeSnapshots].filter(
-      (snapshot) => snapshot !== null,
-    );
-
-    // Check for existing snapshots on the target date to prevent duplicates
-    const targetDate = date ?? this.today;
-    const existingSnapshots = await prisma.assetSnapshot.findMany({
-      where: {
-        accountId: { in: accountIds },
-        date: targetDate,
-      },
-      select: {
-        accountId: true,
-        assetId: true,
-        type: true,
-      },
-    });
-
-    // Filter out snapshots that already exist for the target date
-    const snapshotsToCreate = recentSnapshots.filter((snapshot) => {
-      const exists = existingSnapshots.some(
-        (existing) =>
-          existing.accountId === snapshot.accountId &&
-          existing.assetId === snapshot.assetId &&
-          existing.type === snapshot.type,
       );
-      return !exists;
+
+      // Get most recent snapshot of each type for each account (type with assetId: null)
+      const typeSnapshots = await Promise.all(
+        accountIds.flatMap((accountId) =>
+          Object.values(AssetTypeEnum).map(async (type) => {
+            return await transaction.assetSnapshot.findFirst({
+              where: {
+                accountId,
+                assetId: null,
+                type,
+              },
+              select: {
+                accountId: true,
+                assetId: true,
+                type: true,
+                value: true,
+              },
+              orderBy: { date: 'desc' },
+            });
+          }),
+        ),
+      );
+
+      // Combine and filter out null values
+      const recentSnapshots = [...assetSnapshots, ...typeSnapshots].filter(
+        (snapshot) => snapshot !== null,
+      );
+
+      // Check for existing snapshots on the target date to prevent duplicates
+      const targetDate = date ?? this.today;
+      const existingSnapshots = await transaction.assetSnapshot.findMany({
+        where: {
+          accountId: { in: accountIds },
+          date: targetDate,
+        },
+        select: {
+          accountId: true,
+          assetId: true,
+          type: true,
+        },
+      });
+
+      // Filter out snapshots that already exist for the target date
+      const snapshotsToCreate = recentSnapshots.filter((snapshot) => {
+        const exists = existingSnapshots.some(
+          (existing) =>
+            existing.accountId === snapshot.accountId &&
+            existing.assetId === snapshot.assetId &&
+            existing.type === snapshot.type,
+        );
+        return !exists;
+      });
+
+      // If no snapshots to create, return early
+      if (snapshotsToCreate.length === 0) {
+        return;
+      }
+
+      // Duplicate them with today's date
+      const todaySnapshots = snapshotsToCreate.map((snapshot) => ({
+        ...snapshot,
+        date: targetDate,
+      }));
+
+      // Create today snapshots
+      await transaction.assetSnapshot.createMany({
+        data: todaySnapshots,
+      });
+
+      // For each accounts, if they connected to Plaid, fetch the holdings and create or update the snapshots
+      for (const accountId of accountIds) {
+        await PlaidService.createOrUpdatePlaidAssets(accountId, transaction);
+      }
     });
-
-    // If no snapshots to create, return early
-    if (snapshotsToCreate.length === 0) {
-      return;
-    }
-
-    // Duplicate them with today's date
-    const todaySnapshots = snapshotsToCreate.map((snapshot) => ({
-      ...snapshot,
-      date: targetDate,
-    }));
-
-    // Create today snapshots
-    const created = await prisma.assetSnapshot.createMany({
-      data: todaySnapshots,
-    });
-
-    // For each accounts, if they connected to Plaid, fetch the holdings and create or update the snapshots
-    for (const accountId of accountIds) {
-      await PlaidService.createOrUpdatePlaidAssets(accountId);
-    }
   }
 
   // Initialize snapshots for a new account
   public static async initializeAccountSnapshots(
     accountId: number,
-    prismaClient: any = prisma,
+    transaction: Prisma.TransactionClient | any = prisma,
   ) {
     const today = this.today;
 
@@ -361,7 +364,7 @@ export default class SnapshotService {
     }));
 
     // Create all snapshots
-    await prismaClient.assetSnapshot.createMany({
+    await transaction.assetSnapshot.createMany({
       data: typeSnapshots,
     });
 
@@ -374,9 +377,10 @@ export default class SnapshotService {
     assetId: number,
     value: number,
     type: AssetTypeEnum,
+    transaction: Prisma.TransactionClient,
   ) {
     // Create asset snapshot (assetId only, no type)
-    const newAssetSnapshot = await prisma.assetSnapshot.create({
+    const newAssetSnapshot = await transaction.assetSnapshot.create({
       data: {
         accountId,
         assetId,
@@ -393,6 +397,7 @@ export default class SnapshotService {
       value,
       type,
       isIncrement,
+      transaction,
     );
 
     return newAssetSnapshot;
@@ -404,9 +409,10 @@ export default class SnapshotService {
     assetId: number,
     value: number,
     type: AssetTypeEnum,
+    transaction: Prisma.TransactionClient,
   ) {
     // Get current value
-    const existingSnapshot = await prisma.assetSnapshot.findFirst({
+    const existingSnapshot = await transaction.assetSnapshot.findFirst({
       where: {
         assetId,
         date: this.today,
@@ -421,7 +427,7 @@ export default class SnapshotService {
     }
 
     // Update snapshot
-    const snapshot = await prisma.assetSnapshot.update({
+    const snapshot = await transaction.assetSnapshot.update({
       where: { id: existingSnapshot.id },
       data: { value },
     });
@@ -437,6 +443,7 @@ export default class SnapshotService {
         val,
         type,
         isIncrement,
+        transaction,
       );
 
     return snapshot;

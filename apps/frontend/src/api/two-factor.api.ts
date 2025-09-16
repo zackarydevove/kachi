@@ -1,5 +1,6 @@
 import { ApiBase } from "@/api/api.base";
 import twoFactorSchema from "@/schemas/two-factor.schema";
+import { userResponseSchema } from "@/schemas/user.schema";
 import {
   TwoFactorGenerateResponse,
   TwoFactorVerifyRequest,
@@ -39,7 +40,7 @@ export class TwoFactorApi extends ApiBase {
       "post",
       `${this.endpoint}/login`,
       data,
-      twoFactorSchema.loginResponse
+      userResponseSchema
     );
   }
 }

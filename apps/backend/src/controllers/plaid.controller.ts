@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Send from '@utils/response.util';
 import PlaidService from 'services/plaid.service';
+import { prisma } from 'db';
 
 export default class PlaidController {
   static generateLinkToken = async (req: Request, res: Response) => {
@@ -17,8 +18,14 @@ export default class PlaidController {
   static exchangePublicToken = async (req: Request, res: Response) => {
     const { publicTokenFromClient, accountId } = req.body;
     try {
-      await PlaidService.exchangePublicToken(accountId, publicTokenFromClient);
-      await PlaidService.createOrUpdatePlaidAssets(accountId);
+      prisma.$transaction(async (tx) => {
+        await PlaidService.exchangePublicToken(
+          accountId,
+          publicTokenFromClient,
+          tx,
+        );
+        await PlaidService.createOrUpdatePlaidAssets(accountId, tx);
+      });
       return Send.success(res, null, 'Public token exchanged');
     } catch (error) {
       console.error(error);

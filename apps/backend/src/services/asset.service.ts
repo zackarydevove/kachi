@@ -1,23 +1,28 @@
-import { prisma } from 'db';
 import { AssetFormData } from 'types/asset.type';
 import SnapshotService from './snapshot.service';
+import { Prisma } from '../../generated/prisma';
 
 export default class AssetService {
   // Create asset
   public static async createAsset(
     accountId: number,
     formData: AssetFormData,
+    transaction: Prisma.TransactionClient,
     plaidAccountId?: string,
   ) {
     const { type, name, value } = formData;
 
-    // TO DO IN SAME TRANSACTION
-    // Create asset first
-    const newAsset = await prisma.asset.create({
+    const newAsset = await transaction.asset.create({
       data: { accountId, type, name, plaidAccountId },
     });
 
-    await SnapshotService.createSnapshot(accountId, newAsset.id, value, type);
+    await SnapshotService.createSnapshot(
+      accountId,
+      newAsset.id,
+      value,
+      type,
+      transaction,
+    );
 
     return newAsset;
   }
@@ -27,23 +32,34 @@ export default class AssetService {
     accountId: number,
     assetId: number,
     formData: AssetFormData,
+    transaction: Prisma.TransactionClient,
   ) {
     const { type, name, value } = formData;
 
     // TO DO IN SAME TRANSACTION
-    const updatedAsset = await prisma.asset.update({
+    const updatedAsset = await transaction.asset.update({
       where: { id: assetId },
       data: { type, name },
     });
 
-    await SnapshotService.editSnapshot(accountId, updatedAsset.id, value, type);
+    await SnapshotService.editSnapshot(
+      accountId,
+      updatedAsset.id,
+      value,
+      type,
+      transaction,
+    );
     return updatedAsset;
   }
 
   // Delete asset
-  public static async deleteAsset(accountId: number, assetId: number) {
+  public static async deleteAsset(
+    accountId: number,
+    assetId: number,
+    transaction: Prisma.TransactionClient,
+  ) {
     // TODO IN SAME TRANSACTION
-    const existingSnapshot = await prisma.assetSnapshot.findFirst({
+    const existingSnapshot = await transaction.assetSnapshot.findFirst({
       where: {
         assetId,
         date: SnapshotService.today,
@@ -57,7 +73,7 @@ export default class AssetService {
       throw new Error('Snapshot not found');
     }
 
-    const deletedAsset = await prisma.asset.delete({
+    const deletedAsset = await transaction.asset.delete({
       where: { id: assetId },
       select: { type: true },
     });
@@ -69,6 +85,7 @@ export default class AssetService {
       existingSnapshot.value,
       deletedAsset.type,
       isIncrement,
+      transaction,
     );
 
     return deletedAsset;

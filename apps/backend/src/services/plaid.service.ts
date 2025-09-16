@@ -1,5 +1,4 @@
 import plaidConfig from '@config/plaid.config';
-import { prisma } from 'db';
 import {
   AccountType,
   Configuration,
@@ -9,7 +8,7 @@ import {
 } from 'plaid';
 import { AssetFormData } from 'types/asset.type';
 import AssetService from './asset.service';
-import { AssetTypeEnum } from '../../generated/prisma';
+import { AssetTypeEnum, Prisma } from '../../generated/prisma';
 
 const configuration = new Configuration(plaidConfig.configuration);
 const plaidClient = new PlaidApi(configuration);
@@ -55,6 +54,7 @@ export default class PlaidService {
   public static async exchangePublicToken(
     accountId: number,
     publicTokenFromClient: string,
+    transaction: Prisma.TransactionClient,
   ) {
     const response = await plaidClient.itemPublicTokenExchange({
       public_token: publicTokenFromClient,
@@ -63,7 +63,7 @@ export default class PlaidService {
       throw new Error('Failed to exchange public token');
 
     // Store access token in database
-    await prisma.account.update({
+    await transaction.account.update({
       where: { id: accountId },
       data: {
         plaidAccessToken: response.data.access_token,
@@ -71,8 +71,11 @@ export default class PlaidService {
     });
   }
 
-  public static async getPlaidAssets(accountId: number) {
-    const account = await prisma.account.findUnique({
+  public static async getPlaidAssets(
+    accountId: number,
+    transaction: Prisma.TransactionClient,
+  ) {
+    const account = await transaction.account.findUnique({
       where: { id: accountId },
       select: { plaidAccessToken: true },
     });
@@ -89,9 +92,12 @@ export default class PlaidService {
     return holdingsResponse.data;
   }
 
-  public static async createOrUpdatePlaidAssets(accountId: number) {
+  public static async createOrUpdatePlaidAssets(
+    accountId: number,
+    transaction: Prisma.TransactionClient,
+  ) {
     // Fetch the plaid assets
-    const holdings = await this.getPlaidAssets(accountId);
+    const holdings = await this.getPlaidAssets(accountId, transaction);
 
     // Parse .accounts
     for (const plaidAccount of holdings.accounts) {
@@ -105,19 +111,29 @@ export default class PlaidService {
       };
 
       // Check if  plaidAccount.id === plaidAccountId  already exist, then update today's snapshot with new value
-      const existingAsset = await prisma.asset.findFirst({
+      const existingAsset = await transaction.asset.findFirst({
         where: { plaidAccountId: plaidAccount.account_id },
         select: { id: true },
       });
       if (existingAsset) {
         // update today's snapshot of that asset, that type and networth
-        await AssetService.editAsset(accountId, existingAsset.id, formData);
+        await AssetService.editAsset(
+          accountId,
+          existingAsset.id,
+          formData,
+          transaction,
+        );
       }
       // Else create new asset and snapshots
       else {
         // create new asset, new snapshot, update today's snapshot of that type and networth
         const plaidAccountId = plaidAccount.account_id;
-        await AssetService.createAsset(accountId, formData, plaidAccountId);
+        await AssetService.createAsset(
+          accountId,
+          formData,
+          transaction,
+          plaidAccountId,
+        );
       }
     }
   }

@@ -4,12 +4,11 @@ import {
   AssetDeleteRequest,
   AssetDeleteResponse,
   AssetGetAllResponse,
-  AssetSplit,
   AssetUpdateRequest,
   AssetUpdateResponse,
 } from "@/types/asset.type";
 import { ApiBase } from "@/api/api.base";
-import { splitAndSnapshotsSchema, splitSchema } from "@/schemas/asset.schema";
+import { splitAndSnapshotsSchema } from "@/schemas/asset.schema";
 
 // Define schemas for different asset API operations
 export class AssetApi extends ApiBase<

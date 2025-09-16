@@ -1,4 +1,5 @@
 import Send from '@utils/response.util';
+import { prisma } from 'db';
 import { Request, Response } from 'express';
 import AssetService from 'services/asset.service';
 import SnapshotService from 'services/snapshot.service';
@@ -22,10 +23,9 @@ export default class AssetController {
     try {
       const { accountId, ...formData } = req.body;
 
-      const newAsset = await AssetService.createAsset(
-        Number(accountId),
-        formData,
-      );
+      await prisma.$transaction(async (tx) => {
+        await AssetService.createAsset(Number(accountId), formData, tx);
+      });
 
       const { split, snapshots } = await SnapshotService.getSplitAndSnapshots(
         Number(accountId),
@@ -43,11 +43,9 @@ export default class AssetController {
       const assetId = Number(req.params.assetId);
       const { accountId, ...formData } = req.body;
 
-      const updatedAsset = await AssetService.editAsset(
-        accountId,
-        assetId,
-        formData,
-      );
+      await prisma.$transaction(async (tx) => {
+        await AssetService.editAsset(accountId, assetId, formData, tx);
+      });
 
       const { split, snapshots } = await SnapshotService.getSplitAndSnapshots(
         Number(accountId),
@@ -65,7 +63,9 @@ export default class AssetController {
       const assetId = Number(req.params.assetId);
       const { accountId } = req.body;
 
-      const deletedAsset = await AssetService.deleteAsset(accountId, assetId);
+      await prisma.$transaction(async (tx) => {
+        await AssetService.deleteAsset(accountId, assetId, tx);
+      });
 
       const { split, snapshots } = await SnapshotService.getSplitAndSnapshots(
         Number(accountId),
