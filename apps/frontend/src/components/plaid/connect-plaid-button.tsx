@@ -2,13 +2,14 @@ import { useCallback, useEffect, useState } from "react";
 import { PlaidLinkOptions, usePlaidLink } from "react-plaid-link";
 import { Button } from "../ui/button";
 import { PlaidApi } from "@/api/plaid.api";
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, Sparkles } from "lucide-react";
 import { useUserStore } from "@/store/user.store";
 import { useAccountStore } from "@/store/account.store";
+import { useRouter } from "next/navigation";
 
 export default function ConnectPlaidButton() {
   const [linkToken, setLinkToken] = useState("");
-
+  const router = useRouter();
   const user = useUserStore((state) => state.user);
   const activeAccount = useAccountStore((state) => state.activeAccount);
   const plaidApi = new PlaidApi();
@@ -50,6 +51,14 @@ export default function ConnectPlaidButton() {
   };
 
   const { open, ready } = usePlaidLink(config);
+
+  if (!user?.isPro) {
+    return (
+      <Button type="button" onClick={() => router.push("/pro")}>
+        Connect Investment Account
+      </Button>
+    );
+  }
 
   return (
     <Button type="button" onClick={() => open()} disabled={!ready}>

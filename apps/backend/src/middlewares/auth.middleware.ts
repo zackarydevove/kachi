@@ -61,6 +61,27 @@ class AuthMiddleware {
     }
   }
 
+  public static async authenticatePro(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    const userId = (req as any).userId;
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { isPro: true },
+      });
+      if (!user?.isPro) {
+        return Send.forbidden(res, null, 'Access denied, user is not pro');
+      }
+      next();
+    } catch (error) {
+      console.error('User pro validation failed:', error);
+      return Send.notFound(res, null, 'User not found');
+    }
+  }
+
   public static refreshTokenValidation(
     req: Request,
     res: Response,

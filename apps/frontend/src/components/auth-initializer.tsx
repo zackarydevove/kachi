@@ -16,6 +16,7 @@ export function AuthInitializer() {
   const [isAuthChecked, setAuthChecked] = useState(false);
 
   const skipRoutes = [
+    "/",
     "/login",
     "/signup",
     "/password/forgotten",

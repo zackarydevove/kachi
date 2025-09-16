@@ -13,6 +13,7 @@ class PlaidRouter extends BaseRouter {
         middlewares: [
           AuthMiddleware.authenticateUser,
           AuthMiddleware.authenticateAccount,
+          AuthMiddleware.authenticatePro,
         ],
         handler: PlaidController.generateLinkToken,
       },
@@ -22,6 +23,7 @@ class PlaidRouter extends BaseRouter {
         middlewares: [
           AuthMiddleware.authenticateUser,
           AuthMiddleware.authenticateAccount,
+          AuthMiddleware.authenticatePro,
           ValidationMiddleware.validateBody(
             z.object({
               publicTokenFromClient: z.string().min(1, 'Password is required'),
