@@ -2,6 +2,7 @@ import Send from '@utils/response.util';
 import { prisma } from 'db';
 import { Request, Response } from 'express';
 import SnapshotService from 'services/snapshot.service';
+import RedisUtil from '@utils/redis.util';
 
 export default class AccountController {
   static addAccount = async (req: Request, res: Response) => {
@@ -51,6 +52,9 @@ export default class AccountController {
 
         return newAccount;
       });
+
+      // Invalidate user cache since accounts have changed
+      await RedisUtil.deleteCache(`user-${userId}-info`);
 
       return Send.success(res, { newAccount });
     } catch (error) {
@@ -114,6 +118,9 @@ export default class AccountController {
         },
       });
 
+      // Invalidate user cache since account data has changed
+      await RedisUtil.deleteCache(`user-${userId}-info`);
+
       return Send.success(res, { updatedAccount });
     } catch (error) {
       console.error('Error editing account: ', error);
@@ -163,6 +170,9 @@ export default class AccountController {
         where: { id: accountId },
         select: { id: true },
       });
+
+      // Invalidate user cache since accounts have changed
+      await RedisUtil.deleteCache(`user-${userId}-info`);
 
       return Send.success(res, { deletedAccountId: deletedAccount.id });
     } catch (error) {

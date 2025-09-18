@@ -47,6 +47,7 @@
     "nodemailer": "^7.0.5",
     "plaid": "^38.1.0",
     "qrcode": "^1.5.4",
+    "redis": "^5.8.2",
     "speakeasy": "^2.0.0",
     "stripe": "^18.5.0",
     "tsconfig-paths": "^4.2.0",

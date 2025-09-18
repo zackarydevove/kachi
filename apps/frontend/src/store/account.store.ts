@@ -1,8 +1,7 @@
 import { AccountApi } from "@/api/account.api";
 import { Account, AccountForm } from "@/types/account.type";
 import { create } from "zustand";
-import { toastUtil } from "@/utils/toast.util";
-import { useAssetStore } from "./asset.store";
+import { toast } from "sonner";
 
 interface AccountState {
   activeAccount: Account | null;
@@ -25,10 +24,7 @@ export const useAccountStore = create<AccountState>((set) => ({
       const accountApi = new AccountApi();
       const { newAccount } = await accountApi.create(formData);
       set((state) => ({ accounts: [...state.accounts, newAccount] }));
-      toastUtil.success(
-        "Account created successfully",
-        `Account "${newAccount.name}" has been created.`
-      );
+      toast.success("Account created successfully");
     } catch (error) {
       console.error("Error in createAccount store:", error);
       throw error; // Re-throw the error so it can be handled in the component
@@ -39,16 +35,11 @@ export const useAccountStore = create<AccountState>((set) => ({
       const accountApi = new AccountApi();
       const { updatedAccount } = await accountApi.update(accountId, formData);
       set((state) => ({
-        accounts: state.accounts.map(
-          (
-            account // TODO: Do a map with key = id instead, it will be easier to update
-          ) => (account.id === accountId ? updatedAccount : account)
+        accounts: state.accounts.map((account) =>
+          account.id === accountId ? updatedAccount : account
         ),
       }));
-      toastUtil.success(
-        "Account updated successfully",
-        `Account "${updatedAccount.name}" has been updated.`
-      );
+      toast.success("Account updated successfully");
     } catch (error) {
       console.error("Error in editAccount store:", error);
       throw error; // Re-throw the error so it can be handled in the component
@@ -70,10 +61,7 @@ export const useAccountStore = create<AccountState>((set) => ({
               : state.activeAccount,
         };
       });
-      toastUtil.success(
-        "Account deleted successfully",
-        "The account has been permanently deleted."
-      );
+      toast.success("Account deleted successfully");
     } catch (error) {
       console.error("Error in deleteAccount store:", error);
       throw error; // Re-throw the error so it can be handled in the component

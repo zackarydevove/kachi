@@ -2,14 +2,15 @@ import { create } from "zustand";
 import { AssetFormData, AssetSnapshot, AssetSplit } from "@/types/asset.type";
 import { AssetApi } from "@/api/asset.api";
 import { useAccountStore } from "./account.store";
+import { toast } from "sonner";
 
 interface AssetStore {
   snapshots: AssetSnapshot[];
   split: AssetSplit;
-  getAllAssets: () => void;
-  addAsset: (formData: AssetFormData) => void;
-  editAsset: (assetId: number, formData: AssetFormData) => void;
-  deleteAsset: (assetId: number) => void;
+  getAllAssets: () => Promise<void>;
+  addAsset: (formData: AssetFormData) => Promise<void>;
+  editAsset: (assetId: number, formData: AssetFormData) => Promise<void>;
+  deleteAsset: (assetId: number) => Promise<void>;
   reset: () => void;
 }
 
@@ -81,6 +82,8 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
       accountId: accountId,
     });
 
+    toast.success("Asset created successfully!");
+
     set({
       snapshots: res.snapshots,
       split: res.split,
@@ -97,6 +100,8 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
       accountId: accountId,
     });
 
+    toast.success("Asset updated successfully!");
+
     set({
       snapshots: res.snapshots,
       split: res.split,
@@ -109,6 +114,8 @@ export const useAssetStore = create<AssetStore>((set, get) => ({
     }
 
     const res = await assetApi.delete(assetId, { accountId: accountId });
+
+    toast.success("Asset deleted successfully!");
 
     set({
       snapshots: res.snapshots,

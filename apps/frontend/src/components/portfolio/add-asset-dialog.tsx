@@ -24,9 +24,11 @@ import { AssetFormData, assetTypeLabels } from "@/types/asset.type";
 import { useState } from "react";
 import { useAssetStore } from "@/store/asset.store";
 import ConnectPlaidButton from "../plaid/connect-plaid-button";
+import { Loader2Icon } from "lucide-react";
 
 export default function AddAssetDialog() {
   const addAsset = useAssetStore((state) => state.addAsset);
+  const [loading, setLoading] = useState(false);
 
   const initialFormData = {
     type: null,
@@ -46,9 +48,17 @@ export default function AddAssetDialog() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleAddAsset = () => {
-    addAsset(formData);
-    handleOpenChange(false);
+  const handleAddAsset = async () => {
+    try {
+      setLoading(true);
+      await addAsset(formData);
+      handleOpenChange(false);
+    } catch (error) {
+      console.error("Failed to add asset:", error);
+      // Error handling is already done in the store with toast notifications
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isFormValid = () => {
@@ -120,12 +130,16 @@ export default function AddAssetDialog() {
 
         <DialogFooter className="flex gap-2">
           <DialogClose asChild>
-            <Button variant="outline" onClick={() => handleOpenChange(false)}>
+            <Button
+              variant="outline"
+              onClick={() => handleOpenChange(false)}
+              disabled={loading}
+            >
               Cancel
             </Button>
           </DialogClose>
-          <Button onClick={handleAddAsset} disabled={!isFormValid()}>
-            Add Asset
+          <Button onClick={handleAddAsset} disabled={!isFormValid() || loading}>
+            {loading ? <Loader2Icon className="animate-spin" /> : "Add Asset"}
           </Button>
         </DialogFooter>
       </DialogContent>

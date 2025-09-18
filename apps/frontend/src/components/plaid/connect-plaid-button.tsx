@@ -24,7 +24,7 @@ export default function ConnectPlaidButton() {
         return;
       }
     };
-    if (!activeAccount?.id) return;
+    if (!activeAccount?.id || !user?.isPro) return;
     getLinkToken(activeAccount.id);
   }, []);
 

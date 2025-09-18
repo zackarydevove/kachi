@@ -22,9 +22,10 @@ import {
 import { Asset, AssetFormData, assetTypeLabels } from "@/types/asset.type";
 import { useState } from "react";
 import { useAssetStore } from "@/store/asset.store";
+import { Loader2Icon } from "lucide-react";
 
 export default function EditAssetDialog(props: {
-  asset: Asset;
+  asset: Asset & { value?: number };
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
@@ -38,6 +39,7 @@ export default function EditAssetDialog(props: {
 
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState<AssetFormData>(initialFormData);
+  const [loading, setLoading] = useState(false);
 
   const handleOpenChange = (open: boolean) => {
     if (props.onOpenChange) {
@@ -52,9 +54,16 @@ export default function EditAssetDialog(props: {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleApply = () => {
-    editAsset(props.asset.id, formData);
-    handleOpenChange(false);
+  const handleApply = async () => {
+    try {
+      setLoading(true);
+      await editAsset(props.asset.id, formData);
+      handleOpenChange(false);
+    } catch (error) {
+      console.error("Failed to edit asset:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isFormValid = () => {
@@ -116,12 +125,16 @@ export default function EditAssetDialog(props: {
 
         <DialogFooter className="flex gap-2">
           <DialogClose asChild>
-            <Button variant="outline" onClick={() => handleOpenChange(false)}>
+            <Button
+              variant="outline"
+              onClick={() => handleOpenChange(false)}
+              disabled={loading}
+            >
               Cancel
             </Button>
           </DialogClose>
-          <Button onClick={handleApply} disabled={!isFormValid()}>
-            Edit Asset
+          <Button onClick={handleApply} disabled={!isFormValid() || loading}>
+            {loading ? <Loader2Icon className="animate-spin" /> : "Edit Asset"}
           </Button>
         </DialogFooter>
       </DialogContent>

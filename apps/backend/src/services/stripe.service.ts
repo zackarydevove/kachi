@@ -48,7 +48,7 @@ export default class StripeService {
       },
     });
 
-    // TODO: send email to dashboard
+    // TODO: send successful email with link to dashboard
     // EmailService.sendProAccessEmail(updatedUser.email);
 
     return updatedUser;

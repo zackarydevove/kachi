@@ -2,48 +2,54 @@ import Send from '@utils/response.util';
 import { prisma } from 'db';
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
+import RedisUtil from '@utils/redis.util';
 
 export default class UserController {
   static getUser = async (req: Request, res: Response) => {
     try {
       const userId = (req as any).userId;
 
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: {
-          id: true,
-          email: true,
-          twoFactorEnabled: true,
-          password: true,
-          isPro: true,
-        },
-      });
+      const data = await RedisUtil.getOrSetCache(
+        `user-${userId}-info`,
+        async () => {
+          const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+              id: true,
+              email: true,
+              twoFactorEnabled: true,
+              password: true,
+              isPro: true,
+            },
+          });
 
-      if (!user) {
-        return Send.notFound(res, {}, 'User not found');
-      }
+          if (!user) {
+            return Send.notFound(res, {}, 'User not found');
+          }
 
-      const accounts = await prisma.account.findMany({
-        where: { userId: user.id },
-        orderBy: { id: 'asc' },
-        select: {
-          id: true,
-          name: true,
-          avatar: true,
-        },
-      });
-      if (!accounts) return Send.notFound(res, {}, 'Accounts not found');
+          const accounts = await prisma.account.findMany({
+            where: { userId: user.id },
+            orderBy: { id: 'asc' },
+            select: {
+              id: true,
+              name: true,
+              avatar: true,
+            },
+          });
+          if (!accounts) return Send.notFound(res, {}, 'Accounts not found');
 
-      const data = {
-        user: {
-          id: user.id,
-          email: user.email,
-          twoFactorEnabled: user.twoFactorEnabled,
-          hasPassword: !!user.password,
-          isPro: user.isPro,
+          return {
+            user: {
+              id: user.id,
+              email: user.email,
+              twoFactorEnabled: user.twoFactorEnabled,
+              hasPassword: !!user.password,
+              isPro: user.isPro,
+            },
+            accounts,
+          };
         },
-        accounts,
-      };
+      );
 
       return Send.success(res, data);
     } catch (error) {
@@ -65,6 +71,9 @@ export default class UserController {
       await prisma.user.delete({
         where: { id: userId },
       });
+
+      // Invalidate user cache since user is deleted
+      await RedisUtil.deleteCache(`user-${userId}*`);
 
       return Send.success(res, {}, 'User deleted successfully');
     } catch (error) {

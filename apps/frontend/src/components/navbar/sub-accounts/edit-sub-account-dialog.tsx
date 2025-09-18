@@ -106,6 +106,7 @@ export default function EditSubAccountDialog(props: {
         return;
       }
       await deleteAccount(props.account.id);
+      setLoading(false);
       setFormData(resetFormData());
       setOpen(false);
     } catch (error: unknown) {
@@ -141,7 +142,12 @@ export default function EditSubAccountDialog(props: {
         <DialogContent
           className="sm:max-w-[425px]"
           deleteDialog={
-            editType && <DeleteAccountDialog handleDelete={handleDelete} />
+            editType && (
+              <DeleteAccountDialog
+                handleDelete={handleDelete}
+                loading={loading}
+              />
+            )
           }
         >
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -188,6 +194,7 @@ export default function EditSubAccountDialog(props: {
                   type="button"
                   variant="outline"
                   onClick={() => setOpen(false)}
+                  disabled={loading}
                 >
                   Cancel
                 </Button>

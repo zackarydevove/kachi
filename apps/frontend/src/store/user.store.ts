@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { useAccountStore } from "./account.store";
 import { useAssetStore } from "./asset.store";
 import { UserApi } from "@/api/user.api";
-import { toastUtil } from "@/utils/toast.util";
+import { toast } from "sonner";
 
 interface UserState {
   user: User | null;
@@ -27,7 +27,7 @@ export const useUserStore = create<UserState>((set) => ({
     set((state) => ({
       user: state.user ? { ...state.user, hasPassword: true } : null,
     }));
-    toastUtil.success("Password has been successfully updated!");
+    toast.success("Password has been successfully updated!");
   },
   deleteUser: async () => {
     const userApi = new UserApi();

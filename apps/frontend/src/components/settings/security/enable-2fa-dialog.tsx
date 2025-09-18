@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,9 +14,9 @@ import {
 import { InputOTP } from "@/components/ui/input-otp";
 import { TwoFactorApi } from "@/api/two-factor.api";
 import { useUserStore } from "@/store/user.store";
-import { toastUtil } from "@/utils/toast.util";
 import { Loader2Icon } from "lucide-react";
 import Image from "next/image";
+import { toast } from "sonner";
 
 type DialogStep = "qr-code" | "otp-input";
 
@@ -73,7 +73,7 @@ export default function Enable2FADialog() {
       updateTwoFactorStatus(true);
 
       // Show success message
-      toastUtil.success("2FA has been successfully enabled!");
+      toast.success("2FA has been successfully enabled!");
 
       // Close dialog and reset state
       handleClose();

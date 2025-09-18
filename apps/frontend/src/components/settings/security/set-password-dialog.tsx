@@ -146,7 +146,9 @@ export default function SetPasswordDialog() {
             <DialogFooter className="flex">
               <div className="flex gap-2">
                 <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
+                  <Button variant="outline" disabled={loading}>
+                    Cancel
+                  </Button>
                 </DialogClose>
                 <Button type="submit" disabled={loading}>
                   {loading ? (

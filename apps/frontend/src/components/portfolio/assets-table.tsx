@@ -42,6 +42,7 @@ export default function AssetsTable() {
   const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const toggleGroup = (groupName: string) => {
     setOpenGroups((prev) => ({
@@ -76,9 +77,18 @@ export default function AssetsTable() {
     }
   };
 
-  const handleDeleteConfirm = () => {
-    if (selectedAsset) deleteAsset(selectedAsset.id);
-    closeDeleteDialog();
+  const handleDeleteConfirm = async () => {
+    try {
+      if (selectedAsset) {
+        setLoading(true);
+        await deleteAsset(selectedAsset.id);
+      }
+    } catch (error) {
+      console.error("Failed to delete asset:", error);
+    } finally {
+      setLoading(false);
+      closeDeleteDialog();
+    }
   };
 
   // Count split[type].assets.length and if total is 0 return the div
@@ -250,6 +260,7 @@ export default function AssetsTable() {
         setDeleteDialogOpen={setDeleteDialogOpen}
         onDelete={handleDeleteConfirm}
         onCancel={closeDeleteDialog}
+        loading={loading}
       />
     </div>
   );

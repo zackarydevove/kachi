@@ -32,7 +32,7 @@ export default function PortfolioGraph({
 }: {
   isLargeScreen?: boolean;
 }) {
-  const { snapshots, getAllAssets } = useAssetStore();
+  const { snapshots } = useAssetStore();
   const [timeframe, setTimeframe] = useState(30); // Default to 30 days
 
   // in the format Aug 18, 2025

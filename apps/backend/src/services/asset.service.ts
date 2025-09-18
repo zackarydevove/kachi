@@ -58,7 +58,6 @@ export default class AssetService {
     assetId: number,
     transaction: Prisma.TransactionClient,
   ) {
-    // TODO IN SAME TRANSACTION
     const existingSnapshot = await transaction.assetSnapshot.findFirst({
       where: {
         assetId,

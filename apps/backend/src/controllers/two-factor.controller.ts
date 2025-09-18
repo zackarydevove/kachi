@@ -63,8 +63,6 @@ export default class TwoFactorController {
 
       return Send.success(res, {
         qrCode: qrCodeDataUrl,
-        // TODO: I don't think we need this
-        // secret: secret, // Return plain secret for QR code generation (will be encrypted in DB)
       });
     } catch (error) {
       console.error('Error generating 2FA:', error);

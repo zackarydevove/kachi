@@ -12,7 +12,6 @@ import EmailService from 'services/email.service';
 import GoogleOAuthService from 'services/google-oauth.service';
 import { DecodedToken } from '@middlewares/auth.middleware';
 
-// TODO: Create response schema for each
 export default class AuthController {
   public static async login(req: Request, res: Response) {
     const { email, password } = req.body as z.infer<typeof authSchema.login>;
@@ -84,7 +83,6 @@ export default class AuthController {
     }
   }
 
-  // TODO: Use transaction to avoid creating user if account fail
   public static async register(req: Request, res: Response) {
     const { email, name, password, confirmPassword } = req.body as z.infer<
       typeof authSchema.signup
