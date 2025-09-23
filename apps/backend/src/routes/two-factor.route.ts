@@ -1,8 +1,8 @@
-import BaseRouter, { RouteConfig } from './router';
-import ValidationMiddleware from '../middlewares/validation.middleware';
-import AuthMiddleware from '../middlewares/auth.middleware';
-import TwoFactorController from '../controllers/two-factor.controller';
-import twoFactorSchema from '../schema/two-factor.schema';
+import BaseRouter, { RouteConfig } from '@routes/router';
+import ValidationMiddleware from '@middlewares/validation.middleware';
+import AuthMiddleware from '@middlewares/auth.middleware';
+import TwoFactorController from '@controllers/two-factor.controller';
+import twoFactorSchema from '@schema/two-factor.schema';
 
 class TwoFactorRouter extends BaseRouter {
   protected routes(): RouteConfig[] {

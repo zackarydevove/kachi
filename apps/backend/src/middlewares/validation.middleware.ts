@@ -7,34 +7,26 @@ class ValidationMiddleware {
   static validateBody(schema: ZodType) {
     return (req: Request, res: Response, next: NextFunction) => {
       try {
-        const x = schema.safeParse(req.body);
-        next();
-      } catch (error) {
-        if (error instanceof ZodError) {
+        const result = schema.safeParse(req.body);
+
+        if (!result.success) {
           // Format errors like { email: ['error1', 'error2'], password: ['error1'] }
           const formattedErrors: Record<string, string[]> = {};
 
-          const result = schema.safeParse(error);
-
-          // TODO : For each error, fulfill formatted Errors here
-
-          // if (!result.success) {
-          //   const parsed = JSON.parse(result.error.message);
-          //   const message = parsed?.[0]?.message || "Invalid email or password";
-          //   const path = parsed?.[0]?.path?.[0];
-          // }
-
-          //   z.flattenError(error);.forEach((err) => {
-          //     const field = err.path.join('.'); // Get the field name
-          //     if (!formattedErrors[field]) {
-          //       formattedErrors[field] = [];
-          //     }
-          //     formattedErrors[field].push(err.message); // Add validation message
-          //   });
+          result.error.issues.forEach((err) => {
+            const field = err.path.join('.'); // Get the field name
+            if (!formattedErrors[field]) {
+              formattedErrors[field] = [];
+            }
+            formattedErrors[field].push(err.message); // Add validation message
+          });
 
           return Send.validationErrors(res, formattedErrors);
         }
 
+        // Validation passed, continue to next middleware
+        next();
+      } catch (error) {
         // If it's another type of error, send a generic error response
         return Send.error(res, 'Invalid request data');
       }

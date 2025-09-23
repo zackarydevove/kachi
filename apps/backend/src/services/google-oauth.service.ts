@@ -1,8 +1,8 @@
 import { OAuth2Client } from 'google-auth-library';
-import { prisma } from '../db';
-import AuthService from './auth.service';
+import { prisma } from 'db';
+import AuthService from '@services/auth.service';
 import { Response } from 'express';
-import SnapshotService from './snapshot.service';
+import SnapshotService from '@services/snapshot.service';
 
 interface GoogleUserInfo {
   id: string;

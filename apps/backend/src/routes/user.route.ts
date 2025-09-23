@@ -1,7 +1,7 @@
 import AuthMiddleware from '@middlewares/auth.middleware';
 import UserController from '@controllers/user.controller';
-import BaseRouter, { RouteConfig } from './router';
-import userSchema from 'schema/user.schema';
+import BaseRouter, { RouteConfig } from '@routes/router';
+import userSchema from '@schema/user.schema';
 import ValidationMiddleware from '@middlewares/validation.middleware';
 
 class UserRoutes extends BaseRouter {

@@ -1,5 +1,5 @@
 import AuthMiddleware from '@middlewares/auth.middleware';
-import BaseRouter, { RouteConfig } from './router';
+import BaseRouter, { RouteConfig } from '@routes/router';
 import PlaidController from '@controllers/plaid.controller';
 import ValidationMiddleware from '@middlewares/validation.middleware';
 import z from 'zod';

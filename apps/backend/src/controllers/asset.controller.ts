@@ -29,6 +29,10 @@ export default class AssetController {
     try {
       const { accountId, ...formData } = req.body;
 
+      console.log('accountId', accountId);
+      console.log('userId', userId);
+      console.log('formData', formData);
+
       await prisma.$transaction(async (tx) => {
         await AssetService.createAsset(Number(accountId), formData, tx);
       });

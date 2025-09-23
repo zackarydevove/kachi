@@ -1,7 +1,7 @@
 import { prisma } from 'db';
-import { AssetTypeEnum, Prisma } from '../../generated/prisma';
+import { AssetTypeEnum, Prisma } from '@generated/prisma';
 import { Asset } from 'types/asset.type';
-import PlaidService from './plaid.service';
+import PlaidService from '@services/plaid.service';
 
 export default class SnapshotService {
   public static today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format

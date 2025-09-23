@@ -1,6 +1,6 @@
 import { AssetFormData } from 'types/asset.type';
-import SnapshotService from './snapshot.service';
-import { Prisma } from '../../generated/prisma';
+import SnapshotService from '@services/snapshot.service';
+import { Prisma } from '@generated/prisma';
 
 export default class AssetService {
   // Create asset

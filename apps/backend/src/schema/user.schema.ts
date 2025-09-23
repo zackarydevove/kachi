@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { passwordSchema } from './auth.schema';
+import { passwordSchema } from '@schema/auth.schema';
 
 const updatePassword = z.object({
   currentPassword: z.string().optional(),

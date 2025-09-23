@@ -1,5 +1,5 @@
 import AuthMiddleware from '@middlewares/auth.middleware';
-import BaseRouter, { RouteConfig } from './router';
+import BaseRouter, { RouteConfig } from '@routes/router';
 import AssetController from '@controllers/asset.controller';
 import ValidationMiddleware from '@middlewares/validation.middleware';
 import { assetRequestSchema } from 'schema/asset.schema';

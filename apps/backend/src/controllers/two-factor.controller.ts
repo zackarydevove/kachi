@@ -1,10 +1,8 @@
 import { Request, Response } from 'express';
-import authConfig from '../config/auth.config';
-import Send from '../utils/response.util';
-import { prisma } from '../db';
-import * as jwt from 'jsonwebtoken';
-import TwoFactorService from '../services/two-factor.service';
-import AuthService from 'services/auth.service';
+import Send from '@utils/response.util';
+import { prisma } from 'db';
+import TwoFactorService from '@services/two-factor.service';
+import AuthService from '@services/auth.service';
 
 export default class TwoFactorController {
   private static twoFactorService = new TwoFactorService();

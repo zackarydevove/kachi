@@ -7,8 +7,8 @@ import {
   Products,
 } from 'plaid';
 import { AssetFormData } from 'types/asset.type';
-import AssetService from './asset.service';
-import { AssetTypeEnum, Prisma } from '../../generated/prisma';
+import AssetService from '@services/asset.service';
+import { AssetTypeEnum, Prisma } from '@generated/prisma';
 
 const configuration = new Configuration(plaidConfig.configuration);
 const plaidClient = new PlaidApi(configuration);

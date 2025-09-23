@@ -113,10 +113,16 @@
     "baseUrl": "./src",
     "paths": {
       "@config/*": ["config/*"],
-      "@middlewares/*": ["middlewares/*"],
       "@controllers/*": ["controllers/*"],
+      "@middlewares/*": ["middlewares/*"],
       "@routes/*": ["routes/*"],
-      "@utils/*": ["utils/*"]
+      "@schema/*": ["schema/*"],
+      "@services/*": ["services/*"],
+      "@types/*": ["types/*"],
+      "@utils/*": ["utils/*"],
+      "@workers/*": ["workers/*"],
+      "@db/*": ["db/*"],
+      "@generated/*": ["../generated/*"]
     }
   }
 }

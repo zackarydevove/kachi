@@ -1,7 +1,7 @@
 import * as speakeasy from 'speakeasy';
 import * as QRCode from 'qrcode';
 import * as crypto from 'crypto';
-import twoFactorConfig from '../config/two-factor.config';
+import twoFactorConfig from '@config/two-factor.config';
 
 export default class TwoFactorService {
   public encryptTwoFactorSecret(secret: string): string {

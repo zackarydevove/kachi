@@ -1,5 +1,5 @@
 import StripeController from '@controllers/stripe.controller';
-import BaseRouter, { RouteConfig } from './router';
+import BaseRouter, { RouteConfig } from '@routes/router';
 import AuthMiddleware from '@middlewares/auth.middleware';
 
 class StripeRoutes extends BaseRouter {

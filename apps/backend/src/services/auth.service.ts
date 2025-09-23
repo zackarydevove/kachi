@@ -1,9 +1,9 @@
 import Send from '@utils/response.util';
-import { prisma } from '../db';
+import { prisma } from 'db';
 import jwt from 'jsonwebtoken';
 import authConfig from '@config/auth.config';
 import { Response } from 'express';
-import EmailService from './email.service';
+import EmailService from '@services/email.service';
 
 export default class AuthService {
   public static async generateTokens(

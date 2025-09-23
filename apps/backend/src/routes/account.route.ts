@@ -1,5 +1,5 @@
 import ValidationMiddleware from '@middlewares/validation.middleware';
-import BaseRouter, { RouteConfig } from './router';
+import BaseRouter, { RouteConfig } from '@routes/router';
 import AccountController from '@controllers/account.controller';
 import { accountFormSchema } from 'schema/account.schema';
 import AuthMiddleware from '@middlewares/auth.middleware';
