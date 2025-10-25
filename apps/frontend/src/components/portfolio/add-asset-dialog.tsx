@@ -77,7 +77,7 @@ export default function AddAssetDialog() {
           <DialogDescription>Add details for your new asset.</DialogDescription>
         </DialogHeader>
 
-        <div className="flex justify-between items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           {/* Type */}
           <Select
             value={formData.type || ""}
@@ -94,7 +94,7 @@ export default function AddAssetDialog() {
               ))}
             </SelectContent>
           </Select>
-          <p>Or</p>
+          <p className="hidden sm:block">Or</p>
           <div className="flex-1">
             <ConnectPlaidButton />
           </div>

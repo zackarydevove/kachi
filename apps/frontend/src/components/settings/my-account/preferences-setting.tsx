@@ -15,13 +15,13 @@ export default function PreferencesSetting() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <div className="flex flex-col gap-7">
-      <span className="text-2xl">Preferences</span>
+    <div className="flex flex-col gap-6 md:gap-7">
+      <span className="text-xl md:text-2xl">Preferences</span>
       <form className="flex flex-col gap-4">
         <span className="flex flex-col gap-2">
-          <p>Theme</p>
+          <p className="text-sm md:text-base">Theme</p>
           <Select value={theme} onValueChange={(value) => setTheme(value)}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full max-w-[180px]">
               <SelectValue placeholder="Select a theme" />
             </SelectTrigger>
             <SelectContent>

@@ -36,8 +36,8 @@ export default function DeleteAccount() {
   };
 
   return (
-    <div className="flex flex-col gap-7">
-      <span className="text-2xl">Delete account</span>
+    <div className="flex flex-col gap-6 md:gap-7">
+      <span className="text-xl md:text-2xl">Delete account</span>
       <div className="flex flex-col gap-6">
         <p className="text-sm text-muted-foreground">
           Deleting your account will permanently remove all your data and cannot
@@ -46,7 +46,11 @@ export default function DeleteAccount() {
         <div>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" disabled={loading}>
+              <Button
+                variant="destructive"
+                disabled={loading}
+                className="w-full sm:w-auto"
+              >
                 {loading ? (
                   <Loader2Icon className="animate-spin" />
                 ) : (
@@ -54,7 +58,7 @@ export default function DeleteAccount() {
                 )}
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent>
+            <AlertDialogContent className="mx-4 sm:mx-0">
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>
@@ -62,9 +66,18 @@ export default function DeleteAccount() {
                   your account and remove its data from our servers.
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDelete} disabled={loading}>
+              <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                <AlertDialogCancel
+                  disabled={loading}
+                  className="w-full sm:w-auto"
+                >
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  disabled={loading}
+                  className="w-full sm:w-auto"
+                >
                   {loading ? (
                     <Loader2Icon className="animate-spin" />
                   ) : (

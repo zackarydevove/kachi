@@ -1,4 +1,6 @@
+import RedisUtil from '@utils/redis.util';
 import { prisma } from 'db';
+import UserService from './user.service';
 
 export default class StripeService {
   // Utility function to format Stripe timestamp to readable date
@@ -41,12 +43,24 @@ export default class StripeService {
     // Grant access to pro
     const updatedUser = await prisma.user.update({
       where: { id: user?.id },
+      select: {
+        id: true,
+        email: true,
+        twoFactorEnabled: true,
+        password: true,
+        isPro: true,
+      },
       data: {
         priceId,
         customerId,
         isPro: true,
       },
     });
+
+    console.log('updatedUser ici');
+
+    // Update the user in the cache
+    await UserService.setUserAndAccountsCache(user.id);
 
     // TODO: send successful email with link to dashboard
     // EmailService.sendProAccessEmail(updatedUser.email);
@@ -74,6 +88,9 @@ export default class StripeService {
         priceId: null,
       },
     });
+
+    // Update the user in the cache
+    await UserService.setUserAndAccountsCache(user.id);
 
     // TODO: send email to form why he revoke the subscription
     // EmailService.sendProRevokeEmail(updatedUser.email);

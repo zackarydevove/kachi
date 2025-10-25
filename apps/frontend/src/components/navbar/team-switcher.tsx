@@ -35,6 +35,8 @@ export function AccountSwitcher() {
     return null;
   }
 
+  console.log("user ici: ", user);
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>

@@ -122,27 +122,151 @@ export default function AssetsTable() {
         <p className="text-lg font-semibold">Assets</p>
         <AddAssetDialog />
       </div>
-      <table className="border-separate border-spacing-y-2">
-        <thead className="text-sm text-muted-foreground">
-          <tr className="grid grid-cols-4 pr-6 py-2">
-            <th className="cursor-pointer text-xs text-left">Name</th>
-            <th className="cursor-pointer text-xs text-right">Split</th>
-            <th className="cursor-pointer text-xs text-right">Value</th>
-            <th className="cursor-pointer text-xs text-right">1Y P&L</th>
-          </tr>
-        </thead>
+      {/* Desktop Table */}
+      <div className="hidden md:block">
+        <table className="border-separate border-spacing-y-2 w-full">
+          <thead className="text-sm text-muted-foreground">
+            <tr className="grid grid-cols-4 pr-6 py-2">
+              <th className="cursor-pointer text-xs text-left">Name</th>
+              <th className="cursor-pointer text-xs text-right">Split</th>
+              <th className="cursor-pointer text-xs text-right">Value</th>
+              <th className="cursor-pointer text-xs text-right">1Y P&L</th>
+            </tr>
+          </thead>
+          {Object.keys(split).map((t) => {
+            const type = t as AssetType;
+            if (type === "networth" || split[type].assets.length === 0) return;
+            return (
+              <tbody key={type} className="rounded-md">
+                <tr
+                  className={cn(
+                    "grid grid-cols-4 items-center px-6 py-3 bg-secondary rounded-t-md",
+                    openGroups[type] ? "rounded-t-md" : "rounded-md"
+                  )}
+                >
+                  <th className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-6"
+                      onClick={() =>
+                        split[type].assets.length > 0 && toggleGroup(type)
+                      }
+                    >
+                      {openGroups[type] ? (
+                        <ChevronDown size={16} />
+                      ) : split[type].assets.length > 0 ? (
+                        <ChevronRight size={16} />
+                      ) : null}
+                    </Button>
+                    <span
+                      className="w-2 h-2 rounded-full"
+                      style={{ backgroundColor: assetTypeColor[type] }}
+                    />
+                    <span className="font-medium ml-1">
+                      {assetTypeLabels[type]}
+                    </span>
+                  </th>
+                  <th className="text-right">
+                    {split[type].split.toFixed(0)}%
+                  </th>
+                  <th className="text-right">
+                    ${split[type].value.toLocaleString()}
+                  </th>
+                  <th
+                    className={cn(
+                      "text-right",
+                      formatPnL(split[type].pnl).className
+                    )}
+                  >
+                    {formatPnL(split[type].pnl).display}
+                  </th>
+                </tr>
+                {openGroups[type] &&
+                  split[type].assets?.map((asset) => (
+                    <tr
+                      key={asset.id}
+                      className={cn(
+                        "grid grid-cols-4 items-center px-6 py-3 bg-secondary",
+                        split[type].assets[0] === asset &&
+                          "border-t border-border",
+                        split[type].assets[split[type].assets.length - 1] ===
+                          asset && "rounded-b-md"
+                      )}
+                    >
+                      <td className="flex items-center gap-2">
+                        <span className="bg-black w-8 h-8 rounded-full" />
+                        <span className="text-sm">{asset.name}</span>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-4 p-4 rounded-full hover:bg-secondary-hover"
+                            >
+                              <Ellipsis />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start">
+                            <DropdownMenuGroup>
+                              <DropdownMenuItem
+                                onSelect={(e) => {
+                                  e.preventDefault();
+                                  handleEditClick(asset);
+                                }}
+                              >
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                onSelect={(e) => {
+                                  e.preventDefault();
+                                  handleDeleteClick(asset);
+                                }}
+                                className="text-destructive"
+                              >
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuGroup>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                      <td className="text-right text-sm">
+                        {asset.split.toFixed(0)}%
+                      </td>
+                      <td className="text-right text-sm">
+                        ${asset.value.toLocaleString()}
+                      </td>
+                      <td
+                        className={cn(
+                          "text-right text-sm",
+                          formatPnL(asset.pnl).className
+                        )}
+                      >
+                        {formatPnL(asset.pnl).display}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            );
+          })}
+        </table>
+      </div>
+
+      {/* Mobile Cards */}
+      <div className="md:hidden space-y-3">
         {Object.keys(split).map((t) => {
           const type = t as AssetType;
           if (type === "networth" || split[type].assets.length === 0) return;
           return (
-            <tbody key={type} className="rounded-md">
-              <tr
+            <div key={type} className="space-y-2">
+              {/* Category Header */}
+              <div
                 className={cn(
-                  "grid grid-cols-4 items-center px-6 py-3 bg-secondary rounded-t-md",
-                  openGroups[type] ? "rounded-t-md" : "rounded-md"
+                  "flex items-center justify-between p-4 bg-secondary rounded-lg",
+                  openGroups[type] && "rounded-b-none"
                 )}
               >
-                <th className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -161,44 +285,48 @@ export default function AssetsTable() {
                     className="w-2 h-2 rounded-full"
                     style={{ backgroundColor: assetTypeColor[type] }}
                   />
-                  <span className="font-medium ml-1">
-                    {assetTypeLabels[type]}
+                  <span className="font-medium">{assetTypeLabels[type]}</span>
+                </div>
+                <div className="flex items-center gap-4 text-sm">
+                  <span className="text-muted-foreground">
+                    {split[type].split.toFixed(0)}%
                   </span>
-                </th>
-                <th className="text-right">{split[type].split.toFixed(0)}%</th>
-                <th className="text-right">
-                  ${split[type].value.toLocaleString()}
-                </th>
-                <th
-                  className={cn(
-                    "text-right",
-                    formatPnL(split[type].pnl).className
-                  )}
-                >
-                  {formatPnL(split[type].pnl).display}
-                </th>
-              </tr>
-              {openGroups[type] &&
-                split[type].assets?.map((asset) => (
-                  <tr
-                    key={asset.id}
+                  <span className="font-medium">
+                    ${split[type].value.toLocaleString()}
+                  </span>
+                  <span
                     className={cn(
-                      "grid grid-cols-4 items-center px-6 py-3 bg-secondary",
-                      split[type].assets[0] === asset &&
-                        "border-t border-border",
-                      split[type].assets[split[type].assets.length - 1] ===
-                        asset && "rounded-b-md"
+                      "text-sm",
+                      formatPnL(split[type].pnl).className
                     )}
                   >
-                    <td className="flex items-center gap-2">
-                      <span className="bg-black w-8 h-8 rounded-full" />
-                      <span className="text-sm">{asset.name}</span>
+                    {formatPnL(split[type].pnl).display}
+                  </span>
+                </div>
+              </div>
+
+              {/* Individual Assets */}
+              {openGroups[type] &&
+                split[type].assets?.map((asset, index) => (
+                  <div
+                    key={asset.id}
+                    className={cn(
+                      "flex items-center justify-between p-4 bg-secondary",
+                      index === 0 && "rounded-t-lg",
+                      index === split[type].assets.length - 1 && "rounded-b-lg"
+                    )}
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <span className="bg-black w-8 h-8 rounded-full flex-shrink-0" />
+                      <span className="text-sm font-medium truncate">
+                        {asset.name}
+                      </span>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="size-4 p-4 rounded-full hover:bg-secondary-hover"
+                            className="size-4 p-4 rounded-full hover:bg-secondary-hover flex-shrink-0"
                           >
                             <Ellipsis />
                           </Button>
@@ -225,27 +353,29 @@ export default function AssetsTable() {
                           </DropdownMenuGroup>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </td>
-                    <td className="text-right text-sm">
-                      {asset.split.toFixed(0)}%
-                    </td>
-                    <td className="text-right text-sm">
-                      ${asset.value.toLocaleString()}
-                    </td>
-                    <td
-                      className={cn(
-                        "text-right text-sm",
-                        formatPnL(asset.pnl).className
-                      )}
-                    >
-                      {formatPnL(asset.pnl).display}
-                    </td>
-                  </tr>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm ml-3">
+                      <span className="text-muted-foreground min-w-0">
+                        {asset.split.toFixed(0)}%
+                      </span>
+                      <span className="font-medium min-w-0">
+                        ${asset.value.toLocaleString()}
+                      </span>
+                      <span
+                        className={cn(
+                          "text-sm min-w-0",
+                          formatPnL(asset.pnl).className
+                        )}
+                      >
+                        {formatPnL(asset.pnl).display}
+                      </span>
+                    </div>
+                  </div>
                 ))}
-            </tbody>
+            </div>
           );
         })}
-      </table>
+      </div>
       {/* Edit Dialog */}
       {editDialogOpen && selectedAsset && (
         <EditAssetDialog

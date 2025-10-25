@@ -35,6 +35,7 @@ export default class StripeController {
           // User has cancelled their subscription -- Revoke access to pro
           case 'customer.subscription.deleted':
             StripeService.handleCustomerSubscriptionDeleted(event, stripe);
+            console.log('Customer subscription deleted');
             break;
           default:
             console.log(`Unhandled event type ${event.type}`);

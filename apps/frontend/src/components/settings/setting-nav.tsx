@@ -19,18 +19,18 @@ export default function SettingNav() {
   }
 
   return (
-    <div className="min-w-68 py-6 pl-10 pr-2">
+    <div className="w-full md:min-w-68 md:w-auto py-6 md:pl-10 md:pr-2">
       <section className="flex flex-col gap-3">
-        <span className="text-xs pl-4">Manage my account</span>
-        <ul className="flex flex-col gap-1">
+        <span className="text-xs pl-4 hidden md:block">Manage my account</span>
+        <ul className="flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0">
           {links.map(({ href, label }) => {
             const isActive = pathname === href;
 
             return (
-              <li key={href}>
+              <li key={href} className="flex-shrink-0 md:flex-shrink">
                 {isActive ? (
                   <div
-                    className="block text-sm rounded-sm px-4 py-3 w-full cursor-default bg-card-hover transition-colors duration-200"
+                    className="block text-sm rounded-sm px-4 py-3 w-full cursor-default bg-card-hover transition-colors duration-200 whitespace-nowrap"
                     aria-current="page"
                   >
                     <span>{label}</span>
@@ -38,7 +38,7 @@ export default function SettingNav() {
                 ) : (
                   <Link
                     href={href}
-                    className="block text-sm rounded-sm px-4 py-3 w-full hover:cursor-pointer hover:bg-card-hover transition-colors duration-200"
+                    className="block text-sm rounded-sm px-4 py-3 w-full hover:cursor-pointer hover:bg-card-hover transition-colors duration-200 whitespace-nowrap"
                   >
                     <span>{label}</span>
                   </Link>
