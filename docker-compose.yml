@@ -1,0 +1,74 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    env_file:
+      - ./apps/backend/.env.db
+    volumes:
+      - pgdata:/var/lib/postgresql
+    networks:
+      - node-postgres
+
+  # Redis Cache
+  redis:
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - node-redis
+
+  # Backend Node.js
+  backend:
+    build:
+      context: .
+      dockerfile: docker/node/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - ./apps/backend/.env
+    volumes:
+      - ./apps/backend:/app
+      - /app/node_modules
+    networks:
+      - node-postgres
+      - node-redis
+      - next-node
+
+  # Frontend Next.js
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/next/Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - backend
+    env_file:
+      - ./apps/frontend/.env
+    volumes:
+      - ./apps/frontend:/app
+      - /app/node_modules
+    networks:
+      - next-node
+
+volumes:
+  pgdata:
+  redis_data:
+
+networks:
+  next-node:
+    driver: bridge
+  node-postgres:
+    driver: bridge
+  node-redis:
+    driver: bridge

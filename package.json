@@ -1,0 +1,23 @@
+{
+  "name": "kachi",
+  "version": "1.0.0",
+  "description": "..",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "docker-compose up -d --build",
+    "stop": "docker-compose down",
+    "restart": "docker-compose down && docker-compose up -d --build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zackarydevove/kachi.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zackarydevove/kachi/issues"
+  },
+  "homepage": "https://github.com/zackarydevove/kachi#readme"
+}
