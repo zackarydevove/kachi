@@ -7,7 +7,7 @@
     "test:setup": "ts-node scripts/setup-test-db.ts",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:migrate": "TEST_DATABASE_URL=DATABASE_URL prisma migrate deploy",
+    "test:migrate": "DATABASE_URL=TEST_DATABASE_URL prisma migrate deploy",
     "build": "tsc",
     "start": "node dist/server.js",
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
