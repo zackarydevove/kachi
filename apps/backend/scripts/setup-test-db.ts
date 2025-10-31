@@ -35,7 +35,7 @@ try {
   // Prisma will create the database if it does not exist when migrate deploy runs
   console.log('🔄 Running prisma migrate deploy...');
   execSync('npx prisma migrate deploy --schema=./prisma/schema.prisma', {
-    env: { DATABASE_URL: databaseUrl.toString() },
+    env: { ...process.env, DATABASE_URL: databaseUrl.toString() },
     stdio: 'inherit',
     cwd: backendRoot,
   });
