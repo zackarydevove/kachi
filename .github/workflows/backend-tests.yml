@@ -51,7 +51,7 @@ jobs:
       - name: Load backend .env
         uses: xom9ikk/dotenv@v2
         with:
-          path: apps/backend
+          path: ./..
 
       - name: Install PostgreSQL client
         run: |
