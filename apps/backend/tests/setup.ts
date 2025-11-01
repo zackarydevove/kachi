@@ -2,6 +2,7 @@ import SnapshotService from '@services/snapshot.service';
 import bcrypt from 'bcryptjs';
 import App from 'app';
 import { prisma } from 'db';
+import redisClient from '@config/redis.config';
 
 // Load test environment variables
 jest.mock('@middlewares/auth.middleware', () => {
@@ -41,6 +42,9 @@ afterAll(async () => {
   await prisma.account.deleteMany();
   await prisma.user.deleteMany();
   await prisma.$disconnect();
+  if (redisClient.isOpen) {
+    await redisClient.quit();
+  }
 });
 
 // Helper function to create a test user
