@@ -39,13 +39,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-    env:
-      DATABASE_URL: postgresql://postgres:admin@localhost:5432/kachi?schema=public
-      TEST_DATABASE_URL: postgresql://postgres:admin@localhost:5432/kachitest?schema=public
-      REDIS_URL: redis://localhost:6379
-      TEST_REDIS_URL: redis://localhost:6379
-      NODE_ENV: test
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -54,6 +47,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+
+      - name: Load backend .env
+        uses: xom9ikk/dotenv@v2
+        with:
+          path: apps/backend/.env
 
       - name: Install PostgreSQL client
         run: |
