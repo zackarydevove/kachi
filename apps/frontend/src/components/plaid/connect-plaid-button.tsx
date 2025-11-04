@@ -6,6 +6,7 @@ import { Loader2Icon, Sparkles } from "lucide-react";
 import { useUserStore } from "@/store/user.store";
 import { useAccountStore } from "@/store/account.store";
 import { useRouter } from "next/navigation";
+import { useAssetStore } from "@/store/asset.store";
 
 export default function ConnectPlaidButton() {
   const [linkToken, setLinkToken] = useState("");
@@ -13,6 +14,7 @@ export default function ConnectPlaidButton() {
   const user = useUserStore((state) => state.user);
   const activeAccount = useAccountStore((state) => state.activeAccount);
   const plaidApi = new PlaidApi();
+  const getAllAssets = useAssetStore((state) => state.getAllAssets);
 
   useEffect(() => {
     const getLinkToken = async (accountId: number) => {
@@ -40,6 +42,8 @@ export default function ConnectPlaidButton() {
             publicToken,
             activeAccount.id
           );
+          // if success, refresh the assets
+          await getAllAssets();
         } catch (error) {
           // show error
           console.error("Error exchanging public token: ", error);

@@ -1,5 +1,5 @@
 import { AccountForm } from "@/types/account.type";
-import { CameraIcon, CrossIcon, TrashIcon, XIcon } from "lucide-react";
+import { CameraIcon, XIcon } from "lucide-react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
@@ -15,7 +15,10 @@ export default function EditAvatar(props: {
       {/* Current avatar preview */}
       <div className="relative">
         <Avatar className="h-16 w-16 border-2 border-border">
-          <AvatarImage src={formData.avatar} alt="Avatar preview" />
+          <AvatarImage
+            src={formData.avatar || undefined}
+            alt="Avatar preview"
+          />
         </Avatar>
 
         {/* Upload button overlay */}

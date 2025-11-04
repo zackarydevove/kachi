@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AuthApi } from "@/api/auth.api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Loader2Icon } from "lucide-react";
 
 export default function GoogleCallbackPage() {
   const [isProcessing, setIsProcessing] = useState(true);
@@ -47,7 +48,7 @@ export default function GoogleCallbackPage() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+              <Loader2Icon className="animate-spin" />
             </div>
             <p className="text-center mt-4 text-gray-600">
               Please wait while we complete your authentication...

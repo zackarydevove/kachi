@@ -77,24 +77,26 @@ export default function AddAssetDialog() {
           <DialogDescription>Add details for your new asset.</DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
           {/* Type */}
-          <Select
-            value={formData.type || ""}
-            onValueChange={(value) => handleFormDataChange("type", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select an asset type" />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.keys(assetTypeLabels).map((type) => (
-                <SelectItem key={type} value={type}>
-                  {type}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <p className="hidden sm:block">Or</p>
+          <div className="flex-1">
+            <Select
+              value={formData.type || ""}
+              onValueChange={(value) => handleFormDataChange("type", value)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select an asset type" />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.keys(assetTypeLabels).map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <p className="hidden sm:block shrink-0">Or</p>
           <div className="flex-1">
             <ConnectPlaidButton />
           </div>

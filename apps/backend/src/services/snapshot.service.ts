@@ -341,9 +341,10 @@ export default class SnapshotService {
       });
 
       // For each accounts, if they connected to Plaid, fetch the holdings and create or update the snapshots
-      for (const accountId of accountIds) {
-        await PlaidService.createOrUpdatePlaidAssets(accountId, transaction);
-      }
+      // TODO: Check if the account is connected to Plaid and token is valid to fetch the holdings
+      // for (const accountId of accountIds) {
+      //   await PlaidService.createOrUpdatePlaidAssets(accountId, transaction);
+      // }
     });
   }
 

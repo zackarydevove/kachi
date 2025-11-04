@@ -39,7 +39,7 @@ export default class AccountController {
 
       const newAccount = await prisma.$transaction(async (tx) => {
         const newAccount = await tx.account.create({
-          data: { name, avatar, userId },
+          data: { name, avatar: avatar || null, userId },
           select: {
             id: true,
             name: true,
@@ -110,7 +110,7 @@ export default class AccountController {
 
       const updatedAccount = await prisma.account.update({
         where: { id: accountId },
-        data: { name, avatar },
+        data: { name, avatar: avatar || null },
         select: {
           id: true,
           name: true,

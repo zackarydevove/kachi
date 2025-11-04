@@ -9,6 +9,8 @@ import {
 import { AssetFormData } from 'types/asset.type';
 import AssetService from '@services/asset.service';
 import { AssetTypeEnum, Prisma } from '@generated/prisma';
+import RedisUtil from '@utils/redis.util';
+import SnapshotService from './snapshot.service';
 
 const configuration = new Configuration(plaidConfig.configuration);
 const plaidClient = new PlaidApi(configuration);
@@ -94,6 +96,7 @@ export default class PlaidService {
 
   public static async createOrUpdatePlaidAssets(
     accountId: number,
+    userId: number,
     transaction: Prisma.TransactionClient,
   ) {
     // Fetch the plaid assets
@@ -136,5 +139,7 @@ export default class PlaidService {
         );
       }
     }
+    // Note: Cache update is handled in the controller after transaction commits
+    // to ensure we read the committed data
   }
 }

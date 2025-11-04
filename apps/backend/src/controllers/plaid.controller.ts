@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import Send from '@utils/response.util';
 import PlaidService from 'services/plaid.service';
 import { prisma } from 'db';
+import RedisUtil from '@utils/redis.util';
+import SnapshotService from 'services/snapshot.service';
 
 export default class PlaidController {
   static generateLinkToken = async (req: Request, res: Response) => {
@@ -17,15 +19,22 @@ export default class PlaidController {
 
   static exchangePublicToken = async (req: Request, res: Response) => {
     const { publicTokenFromClient, accountId } = req.body;
+    const userId = (req as any).userId;
     try {
-      prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx) => {
         await PlaidService.exchangePublicToken(
           accountId,
           publicTokenFromClient,
           tx,
         );
-        await PlaidService.createOrUpdatePlaidAssets(accountId, tx);
+        await PlaidService.createOrUpdatePlaidAssets(accountId, userId, tx);
       });
+
+      // Update cache after transaction commits to ensure we read committed data
+      await RedisUtil.setCache(`user-${userId}-assets-${accountId}`, () => {
+        return SnapshotService.getSplitAndSnapshots(Number(accountId));
+      });
+
       return Send.success(res, null, 'Public token exchanged');
     } catch (error) {
       console.error(error);

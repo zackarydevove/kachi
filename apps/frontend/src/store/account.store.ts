@@ -38,6 +38,10 @@ export const useAccountStore = create<AccountState>((set) => ({
         accounts: state.accounts.map((account) =>
           account.id === accountId ? updatedAccount : account
         ),
+        activeAccount:
+          state.activeAccount?.id === accountId
+            ? updatedAccount
+            : state.activeAccount,
       }));
       toast.success("Account updated successfully");
     } catch (error) {

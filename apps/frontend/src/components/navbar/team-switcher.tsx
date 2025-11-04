@@ -35,8 +35,6 @@ export function AccountSwitcher() {
     return null;
   }
 
-  console.log("user ici: ", user);
-
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -48,7 +46,7 @@ export function AccountSwitcher() {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
-                  src={activeAccount?.avatar}
+                  src={activeAccount?.avatar || undefined}
                   alt={activeAccount?.name}
                 />
                 <AvatarFallback className="rounded-lg">
@@ -81,7 +79,10 @@ export function AccountSwitcher() {
               >
                 <div className="flex gap-2 flex-1 items-center">
                   <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src={account?.avatar} alt={account?.name} />
+                    <AvatarImage
+                      src={account?.avatar || undefined}
+                      alt={account?.name}
+                    />
                     <AvatarFallback className="rounded-lg">
                       {avatarFallbackUtil(account?.name)}
                     </AvatarFallback>

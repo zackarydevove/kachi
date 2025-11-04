@@ -57,8 +57,6 @@ export default class StripeService {
       },
     });
 
-    console.log('updatedUser ici');
-
     // Update the user in the cache
     await UserService.setUserAndAccountsCache(user.id);
 
