@@ -142,12 +142,14 @@ export default function Enable2FADialog() {
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4">
-              <InputOTP
-                value={otp}
-                onChange={setOtp}
-                length={6}
-                disabled={loading}
-              />
+              <div className="flex justify-center items-center">
+                <InputOTP
+                  value={otp}
+                  onChange={setOtp}
+                  length={6}
+                  disabled={loading}
+                />
+              </div>
               {error && (
                 <p className="text-sm text-destructive mt-1">{error}</p>
               )}

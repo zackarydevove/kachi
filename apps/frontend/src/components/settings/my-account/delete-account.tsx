@@ -58,7 +58,7 @@ export default function DeleteAccount() {
                 )}
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent className="mx-4 sm:mx-0">
+            <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                 <AlertDialogDescription>

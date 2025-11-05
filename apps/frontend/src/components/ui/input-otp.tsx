@@ -78,7 +78,7 @@ export function InputOTP({
           onKeyDown={(e) => handleKeyDown(index, e)}
           onPaste={handlePaste}
           disabled={disabled}
-          className="w-12 h-12 text-center text-lg font-mono"
+          className="w-10 h-10 sm:w-12 sm:h-12 text-center text-lg font-mono"
           autoComplete="one-time-code"
         />
       ))}

@@ -3,7 +3,7 @@ import { z } from "zod";
 export const accountSchema = z.object({
   id: z.number(),
   name: z.string(),
-  avatar: z.string().optional(),
+  avatar: z.string().nullable().optional(),
 });
 
 export const accountFormSchema = z.object({
@@ -11,5 +11,5 @@ export const accountFormSchema = z.object({
     .string()
     .min(1, "Name is required")
     .regex(/^[a-zA-Z0-9 ]+$/, "Only letters, numbers, and spaces are allowed."),
-  avatar: z.string().optional(),
+  avatar: z.string().nullable().optional(),
 });
