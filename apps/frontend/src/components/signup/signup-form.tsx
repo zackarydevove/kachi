@@ -64,6 +64,7 @@ export function SignupForm({
       setLoading(true);
       await authApi.signup(payload);
       router.push("/verify-email");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       const { status, message } = parseApiError(err);
 

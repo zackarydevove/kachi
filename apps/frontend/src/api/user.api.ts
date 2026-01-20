@@ -1,10 +1,5 @@
-import {
-  GetUserResponse,
-  UpdatePasswordRequest,
-  User,
-} from "@/types/user.type";
+import { GetUserResponse, UpdatePasswordRequest } from "@/types/user.type";
 import { ApiBase } from "@/api/api.base";
-import { userSchema } from "@/schemas/user.schema";
 
 export class UserApi extends ApiBase<null, null, GetUserResponse> {
   constructor() {
