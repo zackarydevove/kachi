@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { GalleryVerticalEnd } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,7 @@ import { Loader2Icon, CheckCircle, Mail, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { parseApiError } from "@/utils/error.util";
 
-export default function VerifyEmailPage() {
+function VerifyEmailHandler() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -173,5 +173,19 @@ export default function VerifyEmailPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2Icon className="animate-spin" />
+        </div>
+      }
+    >
+      <VerifyEmailHandler />
+    </Suspense>
   );
 }

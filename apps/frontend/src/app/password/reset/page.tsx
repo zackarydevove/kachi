@@ -11,12 +11,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2Icon } from "lucide-react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { AuthApi } from "@/api/auth.api";
 import { passwordSchema } from "@/schemas/auth.schema";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function ResetPasswordPage() {
+function ResetPasswordHandler() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -142,5 +142,19 @@ export default function ResetPasswordPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2Icon className="animate-spin" />
+        </div>
+      }
+    >
+      <ResetPasswordHandler />
+    </Suspense>
   );
 }
