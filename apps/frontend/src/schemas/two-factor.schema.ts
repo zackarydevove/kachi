@@ -1,5 +1,4 @@
 import z from "zod";
-import { userSchema } from "./user.schema";
 
 const generateResponse = z.object({
   qrCode: z.string(),
