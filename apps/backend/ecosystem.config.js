@@ -4,9 +4,7 @@ module.exports = {
       name: 'kachi',
       script: 'npm',
       args: 'run start',
-      env: {
-        NODE_ENV: 'development',
-      },
+      env_file: '.env',
     },
   ],
 };
