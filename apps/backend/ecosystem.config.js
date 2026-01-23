@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'kachi',
       script: 'npm',
-      args: 'run dev',
+      args: 'run start',
       env: {
         NODE_ENV: 'development',
       },
