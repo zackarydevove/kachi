@@ -33,10 +33,7 @@ export default class App {
     this.app.use(cookieParser());
     this.app.use(
       cors({
-        origin: [
-          'http://localhost:3000',
-          // 'https://mywebsite.com',
-        ],
+        origin: [appConfig.frontendUrl],
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true, // to get the httpOnly cookies
       }),
@@ -44,6 +41,9 @@ export default class App {
   }
 
   private initRoutes() {
+    this.app.get('/health', (req, res) => {
+      res.status(200).send('OK - Backend is running');
+    });
     this.app.use('/api/auth', authRoutes);
     this.app.use('/api/user', userRoutes);
     this.app.use('/api/account', accountRoutes);
