@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import stripeConfig from '@config/stripe.config';
 import Send from '@utils/response.util';
-import StripeService from 'services/stripe.service';
+import StripeService from '@services/stripe.service';
 
 const stripe = require('stripe')(stripeConfig.secret);
 

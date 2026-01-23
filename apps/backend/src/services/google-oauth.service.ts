@@ -1,5 +1,5 @@
 import { OAuth2Client } from 'google-auth-library';
-import { prisma } from 'db';
+import { prisma } from '@db';
 import AuthService from '@services/auth.service';
 import { Response } from 'express';
 import SnapshotService from '@services/snapshot.service';
@@ -66,7 +66,7 @@ export default class GoogleOAuthService {
         }
       } else {
         // New user - create with Google info
-        const data = await prisma.$transaction(async (tx) => {
+        const data = await prisma.$transaction(async (tx: any) => {
           const newUser = await tx.user.create({
             data: {
               email: userInfo.email,

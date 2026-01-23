@@ -1,9 +1,9 @@
 import RedisUtil from '@utils/redis.util';
 import Send from '@utils/response.util';
-import { prisma } from 'db';
+import { prisma } from '@db';
 import { Request, Response } from 'express';
-import AssetService from 'services/asset.service';
-import SnapshotService from 'services/snapshot.service';
+import AssetService from '@services/asset.service';
+import SnapshotService from '@services/snapshot.service';
 
 export default class AssetController {
   static getAllAssets = async (req: Request, res: Response) => {
@@ -29,7 +29,7 @@ export default class AssetController {
     try {
       const { accountId, ...formData } = req.body;
 
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: any) => {
         await AssetService.createAsset(Number(accountId), formData, tx);
       });
 
@@ -54,7 +54,7 @@ export default class AssetController {
       const assetId = Number(req.params.assetId);
       const { accountId, ...formData } = req.body;
 
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: any) => {
         await AssetService.editAsset(accountId, assetId, formData, tx);
       });
 
@@ -79,7 +79,7 @@ export default class AssetController {
       const assetId = Number(req.params.assetId);
       const { accountId } = req.body;
 
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: any) => {
         await AssetService.deleteAsset(accountId, assetId, tx);
       });
 

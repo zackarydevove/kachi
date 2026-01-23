@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Send from '@utils/response.util';
-import { prisma } from 'db';
+import { prisma } from '@db';
 import TwoFactorService from '@services/two-factor.service';
 import AuthService from '@services/auth.service';
 

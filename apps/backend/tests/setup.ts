@@ -1,7 +1,7 @@
 import SnapshotService from '@services/snapshot.service';
 import bcrypt from 'bcryptjs';
 import App from 'app';
-import { prisma } from 'db';
+import { prisma } from '@db';
 import redisClient from '@config/redis.config';
 
 // Load test environment variables
@@ -57,7 +57,7 @@ export async function createTestUser(
 ) {
   const hashedPassword = await bcrypt.hash(userData.password, 10);
 
-  const data = await prisma.$transaction(async (tx) => {
+  const data = await prisma.$transaction(async (tx: any) => {
     const newUser = await tx.user.create({
       data: {
         email: userData.email,

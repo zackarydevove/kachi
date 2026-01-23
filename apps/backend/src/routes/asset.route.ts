@@ -2,7 +2,7 @@ import AuthMiddleware from '@middlewares/auth.middleware';
 import BaseRouter, { RouteConfig } from '@routes/router';
 import AssetController from '@controllers/asset.controller';
 import ValidationMiddleware from '@middlewares/validation.middleware';
-import { assetRequestSchema } from 'schema/asset.schema';
+import { assetRequestSchema } from '@schema/asset.schema';
 import { z } from 'zod';
 import AssetMiddleware from '@middlewares/asset.middleware';
 

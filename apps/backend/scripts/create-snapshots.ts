@@ -1,6 +1,6 @@
 #!/usr/bin/env ts-node
 
-import SnapshotService from 'services/snapshot.service';
+import SnapshotService from '@services/snapshot.service';
 
 async function createSnapshots() {
   // Get date from command line arguments

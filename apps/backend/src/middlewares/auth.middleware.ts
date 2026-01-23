@@ -1,6 +1,6 @@
 import authConfig from '@config/auth.config';
 import Send from '@utils/response.util';
-import { prisma } from 'db';
+import { prisma } from '@db';
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 

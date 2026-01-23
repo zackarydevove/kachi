@@ -9,6 +9,7 @@ import assetRoutes from '@routes/asset.route';
 import twoFactorRoutes from '@routes/two-factor.route';
 import stripeRoutes from '@routes/stripe.route';
 import plaidRoutes from '@routes/plaid.route';
+
 export default class App {
   public app: Express;
 

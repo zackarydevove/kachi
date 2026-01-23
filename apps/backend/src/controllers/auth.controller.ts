@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
 import Send from '@utils/response.util';
-import { prisma } from 'db';
-import authSchema from 'schema/auth.schema';
+import { prisma } from '@db';
+import authSchema from '@schema/auth.schema';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import jwt from 'jsonwebtoken';
 import authConfig from '@config/auth.config';
-import SnapshotService from 'services/snapshot.service';
-import AuthService from 'services/auth.service';
-import EmailService from 'services/email.service';
-import GoogleOAuthService from 'services/google-oauth.service';
+import SnapshotService from '@services/snapshot.service';
+import AuthService from '@services/auth.service';
+import EmailService from '@services/email.service';
+import GoogleOAuthService from '@services/google-oauth.service';
 import { DecodedToken } from '@middlewares/auth.middleware';
 
 export default class AuthController {
@@ -108,7 +108,7 @@ export default class AuthController {
       }
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      const data = await prisma.$transaction(async (tx) => {
+      const data = await prisma.$transaction(async (tx: any) => {
         const newUser = await tx.user.create({
           data: {
             email,

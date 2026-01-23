@@ -7,8 +7,6 @@ export default defineConfig({
     path: 'prisma/migrations',
   },
   datasource: {
-    // Dummy to bypass error during build as app runner doesn't have env yet
-    url:
-      env('DATABASE_URL') || 'postgresql://dummy:password@localhost:5432/dummy',
+    url: env('DATABASE_URL'),
   },
 });

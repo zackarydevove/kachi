@@ -1,7 +1,7 @@
 import request from 'supertest';
 import { createTestUser, appTest } from './setup';
-import { AssetTypeEnum } from '@generated/prisma';
 import { Asset } from 'types/asset.type';
+import { AssetTypeEnum } from '@generated/prisma/enums';
 
 describe('Asset Endpoints', () => {
   const app = appTest.app;

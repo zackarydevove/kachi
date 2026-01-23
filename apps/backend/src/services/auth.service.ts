@@ -1,5 +1,5 @@
 import Send from '@utils/response.util';
-import { prisma } from 'db';
+import { prisma } from '@db';
 import jwt from 'jsonwebtoken';
 import authConfig from '@config/auth.config';
 import { Response } from 'express';

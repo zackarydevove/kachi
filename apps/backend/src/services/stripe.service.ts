@@ -1,5 +1,5 @@
 import RedisUtil from '@utils/redis.util';
-import { prisma } from 'db';
+import { prisma } from '@db';
 import UserService from './user.service';
 
 export default class StripeService {

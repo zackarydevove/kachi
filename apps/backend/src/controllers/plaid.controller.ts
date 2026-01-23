@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import Send from '@utils/response.util';
-import PlaidService from 'services/plaid.service';
-import { prisma } from 'db';
+import PlaidService from '@services/plaid.service';
+import { prisma } from '@db';
 import RedisUtil from '@utils/redis.util';
-import SnapshotService from 'services/snapshot.service';
+import SnapshotService from '@services/snapshot.service';
 
 export default class PlaidController {
   static generateLinkToken = async (req: Request, res: Response) => {
@@ -21,7 +21,7 @@ export default class PlaidController {
     const { publicTokenFromClient, accountId } = req.body;
     const userId = (req as any).userId;
     try {
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: any) => {
         await PlaidService.exchangePublicToken(
           accountId,
           publicTokenFromClient,

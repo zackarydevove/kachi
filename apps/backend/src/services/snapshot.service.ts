@@ -1,5 +1,6 @@
-import { prisma } from 'db';
-import { AssetTypeEnum, Prisma } from '@generated/prisma';
+import { Prisma } from '@generated/prisma/client';
+import { AssetTypeEnum } from '@generated/prisma/enums';
+import { prisma } from '@db';
 import { Asset } from 'types/asset.type';
 
 export default class SnapshotService {

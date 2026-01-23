@@ -8,9 +8,8 @@ import {
 } from 'plaid';
 import { AssetFormData } from 'types/asset.type';
 import AssetService from '@services/asset.service';
-import { AssetTypeEnum, Prisma } from '@generated/prisma';
-import RedisUtil from '@utils/redis.util';
-import SnapshotService from './snapshot.service';
+import { AssetTypeEnum } from '@generated/prisma/enums';
+import { Prisma } from '@generated/prisma/client';
 
 const configuration = new Configuration(plaidConfig.configuration);
 const plaidClient = new PlaidApi(configuration);

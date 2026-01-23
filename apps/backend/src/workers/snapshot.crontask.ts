@@ -1,5 +1,5 @@
 import cron from 'node-cron';
-import SnapshotService from 'services/snapshot.service';
+import SnapshotService from '@services/snapshot.service';
 
 // Every day at 1am
 cron.schedule('0 1 * * *', async () => {

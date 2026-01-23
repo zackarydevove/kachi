@@ -1,5 +1,5 @@
 import Send from '@utils/response.util';
-import { prisma } from 'db';
+import { prisma } from '@db';
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import RedisUtil from '@utils/redis.util';

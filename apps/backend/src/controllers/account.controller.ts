@@ -1,7 +1,7 @@
 import Send from '@utils/response.util';
-import { prisma } from 'db';
+import { prisma } from '@db';
 import { Request, Response } from 'express';
-import SnapshotService from 'services/snapshot.service';
+import SnapshotService from '@services/snapshot.service';
 import RedisUtil from '@utils/redis.util';
 
 export default class AccountController {
@@ -37,7 +37,7 @@ export default class AccountController {
         );
       }
 
-      const newAccount = await prisma.$transaction(async (tx) => {
+      const newAccount = await prisma.$transaction(async (tx: any) => {
         const newAccount = await tx.account.create({
           data: { name, avatar: avatar || null, userId },
           select: {

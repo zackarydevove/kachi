@@ -12,11 +12,11 @@ RUN npm ci
 # Copy source code
 COPY apps/backend/ .
 
-# # Generate Prisma client
-# RUN npx prisma generate
+# Generate prisma client and compile typescript
+RUN npm run build
 
 # Expose port
 EXPOSE 8080
 
 # Start the application
-CMD ["sh", "-c", "npm run prisma:deploy && npm run dev"]
+CMD ["sh", "-c", "npm run start"]

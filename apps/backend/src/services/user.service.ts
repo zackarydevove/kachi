@@ -1,5 +1,5 @@
 import RedisUtil from '@utils/redis.util';
-import { prisma } from 'db';
+import { prisma } from '@db';
 
 export default class UserService {
   static async getUserAndAccounts(userId: number) {
