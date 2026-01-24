@@ -268,17 +268,17 @@ export default class AuthController {
       // Send the new access token in the response
       res.cookie('accessToken', newAccessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: true,
         maxAge: 15 * 60 * 1000, // 15 minutes
-        sameSite: 'strict',
+        sameSite: 'none',
       });
 
       // Idem new refresh token to reset inactive period
       res.cookie('refreshToken', newRefreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: true,
         maxAge: 24 * 60 * 60 * 1000,
-        sameSite: 'strict',
+        sameSite: 'none',
       });
 
       return Send.success(res, {
