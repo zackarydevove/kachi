@@ -88,11 +88,13 @@ export default function AddAssetDialog() {
                 <SelectValue placeholder="Select an asset type" />
               </SelectTrigger>
               <SelectContent>
-                {Object.keys(assetTypeLabels).map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
+                {Object.entries(assetTypeLabels)
+                  .filter(([key]) => key != "networth")
+                  .map(([key, value]) => (
+                    <SelectItem key={key} value={key}>
+                      {value}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>

@@ -32,7 +32,7 @@ export const assetTypeLabels: Record<AssetType, string> = {
   realEstate: "Real Estate",
   stock: "Stocks",
   cash: "Cash",
-  exotic: "Exotic Assets",
+  exotic: "Exotic",
 };
 
 export const assetTypeColor: Record<AssetType, string> = {
