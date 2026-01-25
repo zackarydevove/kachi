@@ -1,14 +1,31 @@
-import { useCallback, useEffect, useState } from "react";
-import { PlaidLinkOptions, usePlaidLink } from "react-plaid-link";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
+import {
+  PlaidLinkOnEventMetadata,
+  PlaidLinkOptions,
+  PlaidLinkStableEvent,
+  usePlaidLink,
+} from "react-plaid-link";
 import { Button } from "../ui/button";
 import { PlaidApi } from "@/api/plaid.api";
-import { Loader2Icon, Sparkles } from "lucide-react";
+import { Loader2Icon } from "lucide-react";
 import { useUserStore } from "@/store/user.store";
 import { useAccountStore } from "@/store/account.store";
 import { useRouter } from "next/navigation";
 import { useAssetStore } from "@/store/asset.store";
 
-export default function ConnectPlaidButton() {
+interface ConnectPlaidButtonProps {
+  loading: boolean;
+  setLoading: Dispatch<SetStateAction<boolean>>;
+  closeDialog: () => void;
+}
+
+export default function ConnectPlaidButton(props: ConnectPlaidButtonProps) {
   const [linkToken, setLinkToken] = useState("");
   const router = useRouter();
   const user = useUserStore((state) => state.user);
@@ -32,8 +49,25 @@ export default function ConnectPlaidButton() {
 
   const config: PlaidLinkOptions = {
     token: linkToken,
+    onExit: (err, metadata) => {
+      props.setLoading(false);
+    },
+    onEvent: (
+      eventName: PlaidLinkStableEvent | string,
+      metadata: PlaidLinkOnEventMetadata
+    ) => {
+      switch (eventName) {
+        case PlaidLinkStableEvent.OPEN:
+          props.setLoading(true);
+          break;
+        case PlaidLinkStableEvent.EXIT:
+          props.setLoading(false);
+          break;
+      }
+    },
     onSuccess: useCallback(
       async (publicToken: string) => {
+        props.setLoading(true);
         try {
           if (!activeAccount?.id) {
             throw new Error("Account ID is required");
@@ -48,6 +82,9 @@ export default function ConnectPlaidButton() {
           // show error
           console.error("Error exchanging public token: ", error);
           return;
+        } finally {
+          props.setLoading(false);
+          props.closeDialog();
         }
       },
       [user]
@@ -65,8 +102,15 @@ export default function ConnectPlaidButton() {
   }
 
   return (
-    <Button type="button" onClick={() => open()} disabled={!ready}>
-      {!ready ? (
+    <Button
+      type="button"
+      onClick={() => {
+        props.setLoading(true);
+        open();
+      }}
+      disabled={!ready}
+    >
+      {!ready || props.loading ? (
         <Loader2Icon className="animate-spin" />
       ) : (
         "Connect Investment Account"

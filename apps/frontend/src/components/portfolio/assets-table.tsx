@@ -195,7 +195,6 @@ export default function AssetsTable() {
                       )}
                     >
                       <td className="flex items-center gap-2">
-                        <span className="bg-black w-8 h-8 rounded-full" />
                         <span className="text-sm">{asset.name}</span>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -317,7 +316,6 @@ export default function AssetsTable() {
                     )}
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <span className="bg-black w-8 h-8 rounded-full flex-shrink-0" />
                       <span className="text-sm font-medium truncate">
                         {asset.name}
                       </span>

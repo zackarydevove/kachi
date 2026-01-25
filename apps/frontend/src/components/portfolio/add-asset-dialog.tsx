@@ -100,7 +100,11 @@ export default function AddAssetDialog() {
           </div>
           <p className="hidden sm:block shrink-0">Or</p>
           <div className="flex-1">
-            <ConnectPlaidButton />
+            <ConnectPlaidButton
+              loading={loading}
+              setLoading={setLoading}
+              closeDialog={() => handleOpenChange(false)}
+            />
           </div>
         </div>
 
