@@ -29,8 +29,10 @@ const currencyFormatter = (value: number) =>
 
 export default function PortfolioGraph({
   isLargeScreen = true,
+  filterType,
 }: {
   isLargeScreen?: boolean;
+  filterType?: AssetType;
 }) {
   const { snapshots } = useAssetStore();
   const [timeframe, setTimeframe] = useState(30); // Default to 30 days
@@ -83,7 +85,9 @@ export default function PortfolioGraph({
           <p className="text-xs text-muted-foreground">{today}</p>
           <p className="text-3xl font-bold">
             {currencyFormatter(
-              filteredSnapshots[filteredSnapshots.length - 1]?.networth
+              filterType
+                ? filteredSnapshots[filteredSnapshots.length - 1]?.[filterType]
+                : filteredSnapshots[filteredSnapshots.length - 1]?.networth
             )}
           </p>
         </div>
@@ -143,10 +147,12 @@ export default function PortfolioGraph({
                 });
               }}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip filterType={filterType} />} />
             {Object.keys(filteredSnapshots[0] ?? {}).map((key) => {
               if (key === "date") return;
               const type = key as AssetType;
+              // If filterType is provided, only show that type
+              if (filterType && type !== filterType) return null;
               return (
                 <Area
                   key={type}
@@ -168,6 +174,7 @@ const CustomTooltip = ({
   active,
   payload,
   label,
+  filterType,
 }: {
   active?: boolean;
   payload?: Array<{
@@ -178,9 +185,12 @@ const CustomTooltip = ({
     label?: string;
   }>;
   label?: Date | string;
+  filterType?: AssetType;
 }) => {
   if (active && payload && payload.length) {
-    const networth = payload.find((item) => item.dataKey === "networth");
+    const mainItem = filterType
+      ? payload.find((item) => item.dataKey === filterType)
+      : payload.find((item) => item.dataKey === "networth");
 
     // Format the date label properly
     const formatDate = (date: Date | string | undefined) => {
@@ -194,12 +204,26 @@ const CustomTooltip = ({
       return String(date || "");
     };
 
+    // If filtering by type, show only that type
+    if (filterType) {
+      return (
+        <div className="py-3 rounded-md shadow bg-background/60 backdrop-blur-sm text-xs space-y-2 min-w-52">
+          <div className="flex justify-between p-3 pt-0 border-b border-border-strong">
+            <span className="text-muted-foreground">{formatDate(label)}</span>
+            <span className="font-bold" style={{ color: mainItem?.color }}>
+              {currencyFormatter(mainItem?.value ?? 0)}
+            </span>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="py-3 rounded-md shadow bg-background/60 backdrop-blur-sm text-xs space-y-2 min-w-52">
         <div className="flex justify-between p-3 pt-0 border-b border-border-strong">
           <span className="text-muted-foreground">{formatDate(label)}</span>
-          <span className="font-bold" style={{ color: networth?.color }}>
-            {currencyFormatter(networth?.value ?? 0)}
+          <span className="font-bold" style={{ color: mainItem?.color }}>
+            {currencyFormatter(mainItem?.value ?? 0)}
           </span>
         </div>
         <div className="flex flex-col gap-3 px-3 pt-1 pb-0">

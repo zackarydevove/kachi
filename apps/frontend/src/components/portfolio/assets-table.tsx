@@ -21,6 +21,7 @@ import {
 import { useAssetStore } from "@/store/asset.store";
 import EditAssetDialog from "./edit-asset-dialog";
 import AddAssetDialog from "./add-asset-dialog";
+import { useRouter } from "next/navigation";
 
 // Utility function to format PnL values with proper colors and formatting
 const formatPnL = (pnl: number) => {
@@ -34,9 +35,10 @@ const formatPnL = (pnl: number) => {
   };
 };
 
-export default function AssetsTable() {
+export default function AssetsTable({ filterType }: { filterType?: AssetType }) {
   const split = useAssetStore((state) => state.split);
   const deleteAsset = useAssetStore((state) => state.deleteAsset);
+  const router = useRouter();
 
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
   const [editDialogOpen, setEditDialogOpen] = useState<boolean>(false);
@@ -91,8 +93,13 @@ export default function AssetsTable() {
     }
   };
 
+  // Filter split by type if filterType is provided
+  const filteredSplit = filterType
+    ? { [filterType]: split[filterType] }
+    : split;
+
   // Count split[type].assets.length and if total is 0 return the div
-  const totalAssets = Object.values(split).reduce(
+  const totalAssets = Object.values(filteredSplit).reduce(
     (acc, type) => acc + type.assets.length,
     0
   );
@@ -133,9 +140,9 @@ export default function AssetsTable() {
               <th className="cursor-pointer text-xs text-right">1Y P&L</th>
             </tr>
           </thead>
-          {Object.keys(split).map((t) => {
+          {Object.keys(filteredSplit).map((t) => {
             const type = t as AssetType;
-            if (type === "networth" || split[type].assets.length === 0) return;
+            if (type === "networth" || filteredSplit[type].assets.length === 0) return;
             return (
               <tbody key={type} className="rounded-md">
                 <tr
@@ -150,12 +157,12 @@ export default function AssetsTable() {
                       size="icon"
                       className="size-6"
                       onClick={() =>
-                        split[type].assets.length > 0 && toggleGroup(type)
+                        filteredSplit[type].assets.length > 0 && toggleGroup(type)
                       }
                     >
                       {openGroups[type] ? (
                         <ChevronDown size={16} />
-                      ) : split[type].assets.length > 0 ? (
+                      ) : filteredSplit[type].assets.length > 0 ? (
                         <ChevronRight size={16} />
                       ) : null}
                     </Button>
@@ -163,34 +170,40 @@ export default function AssetsTable() {
                       className="w-2 h-2 rounded-full"
                       style={{ backgroundColor: assetTypeColor[type] }}
                     />
-                    <span className="font-medium ml-1">
+                    <span 
+                      className={cn(
+                        "font-medium ml-1",
+                        !filterType && "hover:underline cursor-pointer"
+                      )}
+                      onClick={() => !filterType && router.push(`/portfolio/${type}`)}
+                    >
                       {assetTypeLabels[type]}
                     </span>
                   </th>
                   <th className="text-right">
-                    {split[type].split.toFixed(0)}%
+                    {filteredSplit[type].split.toFixed(0)}%
                   </th>
                   <th className="text-right">
-                    ${split[type].value.toLocaleString()}
+                    ${filteredSplit[type].value.toLocaleString()}
                   </th>
                   <th
                     className={cn(
                       "text-right",
-                      formatPnL(split[type].pnl).className
+                      formatPnL(filteredSplit[type].pnl).className
                     )}
                   >
-                    {formatPnL(split[type].pnl).display}
+                    {formatPnL(filteredSplit[type].pnl).display}
                   </th>
                 </tr>
                 {openGroups[type] &&
-                  split[type].assets?.map((asset) => (
+                  filteredSplit[type].assets?.map((asset) => (
                     <tr
                       key={asset.id}
                       className={cn(
                         "grid grid-cols-4 items-center px-6 py-3 bg-secondary",
-                        split[type].assets[0] === asset &&
+                        filteredSplit[type].assets[0] === asset &&
                           "border-t border-border",
-                        split[type].assets[split[type].assets.length - 1] ===
+                        filteredSplit[type].assets[filteredSplit[type].assets.length - 1] ===
                           asset && "rounded-b-md"
                       )}
                     >
@@ -253,9 +266,9 @@ export default function AssetsTable() {
 
       {/* Mobile Cards */}
       <div className="md:hidden space-y-3">
-        {Object.keys(split).map((t) => {
+        {Object.keys(filteredSplit).map((t) => {
           const type = t as AssetType;
-          if (type === "networth" || split[type].assets.length === 0) return;
+          if (type === "networth" || filteredSplit[type].assets.length === 0) return;
           return (
             <div key={type} className="space-y-2">
               {/* Category Header */}
@@ -271,12 +284,12 @@ export default function AssetsTable() {
                     size="icon"
                     className="size-6"
                     onClick={() =>
-                      split[type].assets.length > 0 && toggleGroup(type)
+                      filteredSplit[type].assets.length > 0 && toggleGroup(type)
                     }
                   >
                     {openGroups[type] ? (
                       <ChevronDown size={16} />
-                    ) : split[type].assets.length > 0 ? (
+                    ) : filteredSplit[type].assets.length > 0 ? (
                       <ChevronRight size={16} />
                     ) : null}
                   </Button>
@@ -284,35 +297,43 @@ export default function AssetsTable() {
                     className="w-2 h-2 rounded-full"
                     style={{ backgroundColor: assetTypeColor[type] }}
                   />
-                  <span className="font-medium">{assetTypeLabels[type]}</span>
+                  <span 
+                    className={cn(
+                      "font-medium",
+                      !filterType && "hover:underline cursor-pointer"
+                    )}
+                    onClick={() => !filterType && router.push(`/portfolio/${type}`)}
+                  >
+                    {assetTypeLabels[type]}
+                  </span>
                 </div>
                 <div className="flex items-center gap-4 text-sm">
                   <span className="text-muted-foreground">
-                    {split[type].split.toFixed(0)}%
+                    {filteredSplit[type].split.toFixed(0)}%
                   </span>
                   <span className="font-medium">
-                    ${split[type].value.toLocaleString()}
+                    ${filteredSplit[type].value.toLocaleString()}
                   </span>
                   <span
                     className={cn(
                       "text-sm",
-                      formatPnL(split[type].pnl).className
+                      formatPnL(filteredSplit[type].pnl).className
                     )}
                   >
-                    {formatPnL(split[type].pnl).display}
+                    {formatPnL(filteredSplit[type].pnl).display}
                   </span>
                 </div>
               </div>
 
               {/* Individual Assets */}
               {openGroups[type] &&
-                split[type].assets?.map((asset, index) => (
+                filteredSplit[type].assets?.map((asset, index) => (
                   <div
                     key={asset.id}
                     className={cn(
                       "flex items-center justify-between p-4 bg-secondary",
                       index === 0 && "rounded-t-lg",
-                      index === split[type].assets.length - 1 && "rounded-b-lg"
+                      index === filteredSplit[type].assets.length - 1 && "rounded-b-lg"
                     )}
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -324,7 +345,7 @@ export default function AssetsTable() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="size-4 p-4 rounded-full hover:bg-secondary-hover flex-shrink-0"
+                            className="size-4 p-4 rounded-full hover:bg-secondary-hover shrink-0"
                           >
                             <Ellipsis />
                           </Button>
