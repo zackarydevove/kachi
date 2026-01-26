@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { ChartColumnIncreasing } from "lucide-react";
+import { ChartColumnIncreasing, Calculator } from "lucide-react";
 
 import { NavMain } from "@/components/navbar/nav-main";
 import { NavUser } from "@/components/navbar/nav-user";
@@ -20,6 +20,12 @@ const navItems = [
     title: "Portfolio",
     url: "/portfolio",
     icon: ChartColumnIncreasing,
+    isActive: false,
+  },
+  {
+    title: "Investment Calculator",
+    url: "/investment-calculator",
+    icon: Calculator,
     isActive: false,
   },
 ];
