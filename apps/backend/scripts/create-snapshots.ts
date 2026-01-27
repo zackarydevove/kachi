@@ -1,5 +1,8 @@
 #!/usr/bin/env ts-node
 
+// Register module aliases for runtime resolution
+import 'module-alias/register';
+
 import SnapshotService from '@services/snapshot.service';
 
 async function createSnapshots() {

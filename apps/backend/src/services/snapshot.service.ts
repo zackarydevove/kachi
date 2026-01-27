@@ -238,7 +238,7 @@ export default class SnapshotService {
             })
           ).map((account) => account.id);
 
-    prisma.$transaction(async (transaction) => {
+    await prisma.$transaction(async (transaction) => {
       // Get most recent snapshot of each assetId without type and type without assetId
       // First, get all assets for all accounts
       const allAssets = await transaction.asset.findMany({

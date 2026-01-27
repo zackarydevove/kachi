@@ -12,7 +12,7 @@
     "start": "npx prisma migrate deploy && node dist/src/index.js",
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
     "lint": "eslint 'src/**/*.ts'",
-    "create-snapshots": "node scripts/create-snapshots.ts",
+    "create-snapshots": "node dist/scripts/create-snapshots.js",
     "prisma:deploy": "npx prisma migrate deploy && npx prisma generate",
     "prisma:generate": "npx prisma generate",
     "prisma:migrate": "npx prisma migrate dev",
