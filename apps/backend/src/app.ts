@@ -9,6 +9,7 @@ import assetRoutes from '@routes/asset.route';
 import twoFactorRoutes from '@routes/two-factor.route';
 import stripeRoutes from '@routes/stripe.route';
 import plaidRoutes from '@routes/plaid.route';
+import s3Routes from '@routes/s3.route';
 
 export default class App {
   public app: Express;
@@ -52,6 +53,7 @@ export default class App {
     this.app.use('/api/2fa', twoFactorRoutes);
     this.app.use('/api/stripe', stripeRoutes);
     this.app.use('/api/plaid', plaidRoutes);
+    this.app.use('/api/s3', s3Routes);
   }
 
   public start() {

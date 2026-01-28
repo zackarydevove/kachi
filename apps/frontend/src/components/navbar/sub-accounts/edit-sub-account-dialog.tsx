@@ -20,6 +20,7 @@ import { parseSchemaError } from "@/utils/parse-schema.util";
 import { accountFormSchema } from "@/schemas/account.schema";
 import DeleteAccountDialog from "./delete-account-dialog";
 import EditAvatar from "./edit-avatar";
+import { S3Api } from "@/api/s3.api";
 
 export default function EditSubAccountDialog(props: {
   type: "edit" | "create";
@@ -33,13 +34,15 @@ export default function EditSubAccountDialog(props: {
   });
 
   const [formData, setFormData] = useState<AccountForm>(resetFormData());
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<{ message: string; path: string } | null>(
-    null
+    null,
   );
   const [open, setOpen] = useState(false);
 
   const { createAccount, editAccount, deleteAccount } = useAccountStore();
+  const s3Api = new S3Api();
 
   // Update form data when account prop changes
   useEffect(() => {
@@ -58,17 +61,46 @@ export default function EditSubAccountDialog(props: {
     setError(null);
 
     try {
+      // To avoid modifying the formData.avatar in prod as it is used for the preview
+      let finalFormData = { ...formData };
+
+      // If prod, upload to S3
+      if (avatarFile && process.env.NODE_ENV === "production") {
+        try {
+          // Get pre-signed URL
+          const { preSignedUrl, key } = await s3Api.getSignedUrl(
+            avatarFile.type,
+            avatarFile.size,
+          );
+
+          // Upload to S3
+          await s3Api.uploadToS3(preSignedUrl, avatarFile);
+
+          // Replace avatar with the S3 key
+          finalFormData.avatar = key;
+        } catch (uploadError) {
+          console.error("Failed to upload avatar to S3:", uploadError);
+          setError({
+            message: "Failed to upload avatar. Please try again.",
+            path: "avatar",
+          });
+          setLoading(false);
+          return;
+        }
+      }
+
       if (editType && props.account) {
-        await editAccount(props.account.id, formData);
+        await editAccount(props.account.id, finalFormData);
       } else {
-        await createAccount(formData);
+        await createAccount(finalFormData);
       }
       setFormData(resetFormData());
+      setAvatarFile(null);
       setOpen(false); // Close dialog only on success
     } catch (error: unknown) {
       console.error(
         `Error ${editType ? "updating" : "creating"} account:`,
-        error
+        error,
       );
       setError(
         // If error is 409, show error message
@@ -82,7 +114,7 @@ export default function EditSubAccountDialog(props: {
                 editType ? "update" : "create"
               } account. Please try again.`,
               path: "avatar", // general error
-            }
+            },
       );
     } finally {
       setLoading(false);
@@ -182,6 +214,7 @@ export default function EditSubAccountDialog(props: {
                   setError={setError}
                   editType={editType}
                   handleFormChange={handleFormChange}
+                  setAvatarFile={setAvatarFile}
                 />
                 {error?.path === "avatar" && (
                   <p className="text-sm text-destructive">{error?.message}</p>

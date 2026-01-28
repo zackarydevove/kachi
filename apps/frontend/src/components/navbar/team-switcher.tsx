@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { avatarFallbackUtil } from "@/utils/avatar-fallback.util";
 import { useUserStore } from "@/store/user.store";
 import { useRouter } from "next/navigation";
+import { getAvatarUrl } from "@/utils/avatar.util";
 
 export function AccountSwitcher() {
   const router = useRouter();
@@ -46,7 +47,7 @@ export function AccountSwitcher() {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage
-                  src={activeAccount?.avatar || undefined}
+                  src={getAvatarUrl(activeAccount?.avatar)}
                   alt={activeAccount?.name}
                 />
                 <AvatarFallback className="rounded-lg">
@@ -80,7 +81,7 @@ export function AccountSwitcher() {
                 <div className="flex gap-2 flex-1 items-center">
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarImage
-                      src={account?.avatar || undefined}
+                      src={getAvatarUrl(activeAccount?.avatar)}
                       alt={account?.name}
                     />
                     <AvatarFallback className="rounded-lg">

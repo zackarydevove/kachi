@@ -8,8 +8,54 @@ export default function EditAvatar(props: {
   setError: (error: { message: string; path: string } | null) => void;
   editType: boolean;
   handleFormChange: (key: string, value: string) => void;
+  setAvatarFile: (file: File | null) => void;
 }) {
-  const { formData, setError, editType, handleFormChange } = props;
+  const { formData, setError, editType, handleFormChange, setAvatarFile } =
+    props;
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Check file size is <5MB
+      if (file.size > 5 * 1024 * 1024) {
+        setError({
+          message: "File size must be less than 5MB",
+          path: "avatar",
+        });
+        return;
+      }
+
+      // Check file type is image
+      if (!file.type.startsWith("image/")) {
+        setError({
+          message: "Please select a valid image file",
+          path: "avatar",
+        });
+        return;
+      }
+
+      // Clear any previous errors
+      setError(null);
+
+      // Store the file for later upload
+      setAvatarFile(file);
+
+      // Convert file to data URL for preview
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const result = event.target?.result as string;
+        handleFormChange("avatar", result);
+      };
+      reader.onerror = () => {
+        setError({
+          message: "Failed to read file. Please try again.",
+          path: "avatar",
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="flex items-center gap-4">
       {/* Current avatar preview */}
@@ -51,45 +97,7 @@ export default function EditAvatar(props: {
         type="file"
         accept="image/*"
         className="hidden"
-        onChange={(e) => {
-          const file = e.target.files?.[0];
-          if (file) {
-            // Check file size (5MB limit)
-            if (file.size > 5 * 1024 * 1024) {
-              setError({
-                message: "File size must be less than 5MB",
-                path: "avatar",
-              });
-              return;
-            }
-
-            // Check file type
-            if (!file.type.startsWith("image/")) {
-              setError({
-                message: "Please select a valid image file",
-                path: "avatar",
-              });
-              return;
-            }
-
-            // Clear any previous errors
-            setError(null);
-
-            // Convert file to data URL for preview
-            const reader = new FileReader();
-            reader.onload = (event) => {
-              const result = event.target?.result as string;
-              handleFormChange("avatar", result);
-            };
-            reader.onerror = () => {
-              setError({
-                message: "Failed to read file. Please try again.",
-                path: "avatar",
-              });
-            };
-            reader.readAsDataURL(file);
-          }
-        }}
+        onChange={handleFileInputChange}
       />
 
       {/* Upload info */}

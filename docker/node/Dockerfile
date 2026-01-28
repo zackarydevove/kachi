@@ -12,8 +12,8 @@ RUN npm ci
 # Copy source code
 COPY apps/backend/ .
 
-# Generate prisma client and compile typescript
-RUN npx prisma generate
+# Compile typescript and Generate prisma client and compile typescript
+RUN npm run build
 
 # Expose port
 EXPOSE 8080
