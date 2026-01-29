@@ -72,9 +72,10 @@ export default function PortfolioPieChart({ filterType }: { filterType?: AssetTy
         <div className="absolute inset-0 flex flex-col justify-center items-center pointer-events-none">
           <p className="text-2xl font-bold">
             $
-            {activeIndex === -1
+            {(activeIndex === -1
               ? totalValue
-              : splitData?.[activeIndex]?.value}
+              : splitData?.[activeIndex]?.value
+            )?.toLocaleString('en-US', { maximumFractionDigits: 0 })}
           </p>
           <p className="text-xs text-muted-foreground">
             {activeIndex === -1

@@ -38,10 +38,10 @@ export default function LandingPage() {
             <span className="text-primary">Precision</span>
           </h1>
           <p className="mt-6 text-lg leading-8 text-muted-foreground">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.
+            Take control of your financial future with comprehensive portfolio
+            tracking, automated bank integrations, and powerful analytics.
+            Visualize your wealth growth, track multiple accounts, and make
+            informed investment decisions—all in one beautiful dashboard.
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <Button asChild size="lg">
@@ -61,8 +61,8 @@ export default function LandingPage() {
             Everything you need to manage your wealth
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            Powerful features designed to give you complete visibility and
+            control over your financial portfolio.
           </p>
         </div>
         <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -70,17 +70,17 @@ export default function LandingPage() {
             {
               title: "Real-time Tracking",
               description:
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.",
+                "Monitor your net worth across all accounts with daily snapshots and interactive charts. See exactly how your wealth grows over time with detailed performance analytics.",
             },
             {
               title: "Secure & Private",
               description:
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.",
+                "Bank-level encryption protects your data. Your financial information is never shared with third parties. Two-factor authentication keeps your account secure.",
             },
             {
               title: "Bank Integration",
               description:
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.",
+                "Connect your bank accounts seamlessly with Plaid integration. Automatic syncing keeps your portfolio up-to-date without manual entry. Support for thousands of financial institutions.",
             },
           ].map((feature, index) => (
             <Card key={index} className="text-center">
@@ -207,8 +207,8 @@ export default function LandingPage() {
           </h2>
           <p className="mt-4 text-lg text-muted-foreground">
             Join thousands of users who are already tracking their net worth
-            with Kachi. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            with Kachi. Start for free with up to 5 assets, or upgrade to Pro
+            for unlimited assets, bank integration, and advanced analytics.
           </p>
           <div className="mt-8">
             <Button size="lg" asChild>

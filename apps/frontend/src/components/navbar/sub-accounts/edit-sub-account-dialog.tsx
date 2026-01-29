@@ -200,6 +200,7 @@ export default function EditSubAccountDialog(props: {
                   id="name-1"
                   name="name"
                   value={formData.name}
+                  disabled={loading}
                   onChange={(e) => handleFormChange("name", e.target.value)}
                 />
                 {error?.path === "name" && (
@@ -213,6 +214,7 @@ export default function EditSubAccountDialog(props: {
                   formData={formData}
                   setError={setError}
                   editType={editType}
+                  loading={loading}
                   handleFormChange={handleFormChange}
                   setAvatarFile={setAvatarFile}
                 />

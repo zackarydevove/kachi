@@ -54,7 +54,7 @@ export default function ConnectPlaidButton(props: ConnectPlaidButtonProps) {
     },
     onEvent: (
       eventName: PlaidLinkStableEvent | string,
-      metadata: PlaidLinkOnEventMetadata
+      metadata: PlaidLinkOnEventMetadata,
     ) => {
       switch (eventName) {
         case PlaidLinkStableEvent.OPEN:
@@ -74,7 +74,7 @@ export default function ConnectPlaidButton(props: ConnectPlaidButtonProps) {
           }
           const data = await plaidApi.exchangePublicToken(
             publicToken,
-            activeAccount.id
+            activeAccount.id,
           );
           // if success, refresh the assets
           await getAllAssets();
@@ -87,7 +87,7 @@ export default function ConnectPlaidButton(props: ConnectPlaidButtonProps) {
           props.closeDialog();
         }
       },
-      [user]
+      [user],
     ),
   };
 
@@ -108,7 +108,7 @@ export default function ConnectPlaidButton(props: ConnectPlaidButtonProps) {
         props.setLoading(true);
         open();
       }}
-      disabled={!ready}
+      disabled={!ready || props.loading}
     >
       {!ready || props.loading ? (
         <Loader2Icon className="animate-spin" />

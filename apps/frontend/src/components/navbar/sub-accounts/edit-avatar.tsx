@@ -2,16 +2,25 @@ import { AccountForm } from "@/types/account.type";
 import { CameraIcon, XIcon } from "lucide-react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { getAvatarUrl } from "@/utils/avatar.util";
+import { cn } from "@/lib/utils";
 
 export default function EditAvatar(props: {
   formData: AccountForm;
   setError: (error: { message: string; path: string } | null) => void;
   editType: boolean;
+  loading: boolean;
   handleFormChange: (key: string, value: string) => void;
   setAvatarFile: (file: File | null) => void;
 }) {
-  const { formData, setError, editType, handleFormChange, setAvatarFile } =
-    props;
+  const {
+    formData,
+    setError,
+    editType,
+    loading,
+    handleFormChange,
+    setAvatarFile,
+  } = props;
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -62,7 +71,7 @@ export default function EditAvatar(props: {
       <div className="relative">
         <Avatar className="h-16 w-16 border-2 border-border">
           <AvatarImage
-            src={formData.avatar || undefined}
+            src={formData.avatar || getAvatarUrl(formData.avatar) || undefined}
             alt="Avatar preview"
           />
         </Avatar>
@@ -70,9 +79,21 @@ export default function EditAvatar(props: {
         {/* Upload button overlay */}
         <label
           htmlFor="avatar-upload"
-          className="absolute inset-0 flex items-center justify-center rounded-full bg-black/20 hover:bg-black/40 transition-colors cursor-pointer group"
+          className={cn(
+            "absolute inset-0 flex items-center justify-center rounded-full bg-black/20  group",
+            loading
+              ? "cursor-not-pointer"
+              : "hover:bg-black/40 transition-colors cursor-pointer",
+          )}
         >
-          <div className="h-8 w-8 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors">
+          <div
+            className={cn(
+              "h-8 w-8 rounded-full bg-black/60 flex items-center justify-center text-white",
+              loading
+                ? "cursor-not-pointer"
+                : "cursor-pointer hover:bg-black/80 transition-colors",
+            )}
+          >
             <CameraIcon className="size-4" />
           </div>
         </label>
@@ -83,6 +104,7 @@ export default function EditAvatar(props: {
             variant="destructive"
             size="icon"
             type="button"
+            disabled={loading}
             onClick={() => handleFormChange("avatar", "")}
             className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full opacity-90 hover:opacity-100 flex items-center justify-center text-white text-xs transition-colors"
           >
@@ -98,6 +120,7 @@ export default function EditAvatar(props: {
         accept="image/*"
         className="hidden"
         onChange={handleFileInputChange}
+        disabled={loading}
       />
 
       {/* Upload info */}

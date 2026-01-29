@@ -86,10 +86,6 @@ export default function ProPage() {
                     Historical performance
                   </span>
                 </div>
-                <div className="flex items-center space-x-3">
-                  <Check className="h-5 w-5 flex-shrink-0 text-constructive" />
-                  <span className="text-foreground">Mobile responsive</span>
-                </div>
               </div>
 
               <div className="space-y-4 pt-4 border-t border-border">
@@ -102,13 +98,7 @@ export default function ProPage() {
                 <div className="flex items-center space-x-3">
                   <X className="h-5 w-5 flex-shrink-0 text-destructive" />
                   <span className="text-muted-foreground">
-                    No Plaid integration
-                  </span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <X className="h-5 w-5 flex-shrink-0 text-destructive" />
-                  <span className="text-muted-foreground">
-                    No real-time updates (crypto/stock API)
+                    Cannot connect bank accounts
                   </span>
                 </div>
                 <div className="flex items-center space-x-3">
@@ -181,8 +171,7 @@ export default function ProPage() {
                 <div className="flex items-center space-x-3">
                   <Check className="h-5 w-5 flex-shrink-0 text-constructive" />
                   <span className="text-foreground">
-                    Can invite members (family, partners, accountants) to an
-                    account
+                    Early access to advanced features
                   </span>
                 </div>
                 <div className="flex items-center space-x-3">

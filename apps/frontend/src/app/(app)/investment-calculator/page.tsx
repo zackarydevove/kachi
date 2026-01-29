@@ -97,65 +97,67 @@ export default function InvestmentCalculatorPage() {
   return (
     <main>
       <div className="flex flex-col gap-6 p-4 pt-0">
-        <div className="flex flex-col lg:flex-row gap-6">
+        <div className="flex flex-col lg:flex-row gap-6 lg:h-[635px]">
           {/* Left Side - Input Form */}
-          <div className="bg-component rounded-md p-6 flex flex-col gap-6 lg:w-1/3">
+          <div className="bg-component rounded-md p-6 flex flex-col gap-6 lg:w-1/3 lg:h-full">
             <h2 className="text-xl font-semibold">Investment Parameters</h2>
 
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="starting-amount">Starting Amount (USD)</Label>
-                <Input
-                  id="starting-amount"
-                  type="number"
-                  min="0"
-                  step="100"
-                  value={startingAmount}
-                  onChange={(e) => setStartingAmount(e.target.value)}
-                  placeholder="10000"
-                />
-              </div>
+            <div className="flex flex-col justify-between h-full">
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="starting-amount">Starting Amount (USD)</Label>
+                  <Input
+                    id="starting-amount"
+                    type="number"
+                    min="0"
+                    step="100"
+                    value={startingAmount}
+                    onChange={(e) => setStartingAmount(e.target.value)}
+                    placeholder="10000"
+                  />
+                </div>
 
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="years">After (Years)</Label>
-                <Input
-                  id="years"
-                  type="number"
-                  min="1"
-                  max="100"
-                  value={years}
-                  onChange={(e) => setYears(e.target.value)}
-                  placeholder="10"
-                />
-              </div>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="years">After (Years)</Label>
+                  <Input
+                    id="years"
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={years}
+                    onChange={(e) => setYears(e.target.value)}
+                    placeholder="10"
+                  />
+                </div>
 
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="return-rate">Return Rate Per Year (%)</Label>
-                <Input
-                  id="return-rate"
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.1"
-                  value={returnRate}
-                  onChange={(e) => setReturnRate(e.target.value)}
-                  placeholder="7"
-                />
-              </div>
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="return-rate">Return Rate Per Year (%)</Label>
+                  <Input
+                    id="return-rate"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={returnRate}
+                    onChange={(e) => setReturnRate(e.target.value)}
+                    placeholder="7"
+                  />
+                </div>
 
-              <div className="flex flex-col gap-2">
-                <Label htmlFor="additional-contribution">
-                  Additional Contribution Per Year (USD)
-                </Label>
-                <Input
-                  id="additional-contribution"
-                  type="number"
-                  min="0"
-                  step="100"
-                  value={additionalContribution}
-                  onChange={(e) => setAdditionalContribution(e.target.value)}
-                  placeholder="5000"
-                />
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="additional-contribution">
+                    Additional Contribution Per Year (USD)
+                  </Label>
+                  <Input
+                    id="additional-contribution"
+                    type="number"
+                    min="0"
+                    step="100"
+                    value={additionalContribution}
+                    onChange={(e) => setAdditionalContribution(e.target.value)}
+                    placeholder="5000"
+                  />
+                </div>
               </div>
 
               <Button
@@ -201,11 +203,11 @@ export default function InvestmentCalculatorPage() {
                 </div>
 
                 {/* Graph */}
-                <div className="bg-component rounded-md p-6 flex flex-col gap-6">
+                <div className="bg-component rounded-md p-6 flex flex-col gap-6 h-full">
                   <h3 className="text-lg font-semibold">
                     Investment Growth Over Time
                   </h3>
-                  <div className="h-[400px] w-full">
+                  <div className="h-[400px] lg:h-full w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={results.yearlyData}>
                         <defs>

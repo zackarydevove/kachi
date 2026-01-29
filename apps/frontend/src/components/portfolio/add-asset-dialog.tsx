@@ -67,7 +67,7 @@ export default function AddAssetDialog() {
 
   // Add mode - show with trigger
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange} modal={false}>
       <DialogTrigger asChild>
         <Button>Add Asset</Button>
       </DialogTrigger>
@@ -83,6 +83,7 @@ export default function AddAssetDialog() {
             <Select
               value={formData.type || ""}
               onValueChange={(value) => handleFormDataChange("type", value)}
+              disabled={loading}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select an asset type" />
@@ -115,6 +116,7 @@ export default function AddAssetDialog() {
             id="name"
             type="text"
             placeholder="My Asset Name"
+            disabled={loading}
             value={formData.name}
             onChange={(e) => handleFormDataChange("name", e.target.value)}
             required
@@ -128,6 +130,7 @@ export default function AddAssetDialog() {
             id="value"
             type="number"
             placeholder="My Asset Value"
+            disabled={loading}
             value={formData.value}
             onChange={(e) =>
               handleFormDataChange("value", Number(e.target.value))

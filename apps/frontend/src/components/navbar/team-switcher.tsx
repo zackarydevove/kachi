@@ -1,6 +1,6 @@
 "use client";
 
-import { BadgeCheckIcon, ChevronsUpDown, Plus, Sparkles } from "lucide-react";
+import { BadgeCheckIcon, ChevronsUpDown, Sparkles } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -23,6 +23,7 @@ import { avatarFallbackUtil } from "@/utils/avatar-fallback.util";
 import { useUserStore } from "@/store/user.store";
 import { useRouter } from "next/navigation";
 import { getAvatarUrl } from "@/utils/avatar.util";
+import { Badge } from "../ui/badge";
 
 export function AccountSwitcher() {
   const router = useRouter();
@@ -55,9 +56,19 @@ export function AccountSwitcher() {
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">
-                  {activeAccount.name}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="truncate font-medium">
+                    {activeAccount.name}
+                  </span>
+                  {user?.isPro && (
+                    <Badge
+                      variant="default"
+                      className="text-[10px] px-1 py-0.5"
+                    >
+                      Pro
+                    </Badge>
+                  )}
+                </div>
                 {/* <span className="truncate text-xs">{activeAccount.plan}</span> */}
               </div>
               <ChevronsUpDown className="ml-auto" />
@@ -81,7 +92,7 @@ export function AccountSwitcher() {
                 <div className="flex gap-2 flex-1 items-center">
                   <Avatar className="h-8 w-8 rounded-lg">
                     <AvatarImage
-                      src={getAvatarUrl(activeAccount?.avatar)}
+                      src={getAvatarUrl(account?.avatar)}
                       alt={account?.name}
                     />
                     <AvatarFallback className="rounded-lg">

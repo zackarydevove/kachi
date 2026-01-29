@@ -14,7 +14,7 @@ export default function LoginPage() {
           <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
             <GalleryVerticalEnd className="size-4" />
           </div>
-          Kachi Networth.
+          Kachi.
         </Link>
         <LoginForm />
       </div>

@@ -82,6 +82,7 @@ export default function EditAssetDialog(props: {
         <Select
           value={formData.type || ""}
           onValueChange={(value) => handleFormDataChange("type", value)}
+          disabled={loading}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select an asset type" />
@@ -104,6 +105,7 @@ export default function EditAssetDialog(props: {
             id="name"
             type="text"
             placeholder="My Asset Name"
+            disabled={loading}
             value={formData.name}
             onChange={(e) => handleFormDataChange("name", e.target.value)}
             required
@@ -117,6 +119,7 @@ export default function EditAssetDialog(props: {
             id="value"
             type="number"
             placeholder="My Asset Value"
+            disabled={loading}
             value={formData.value}
             onChange={(e) =>
               handleFormDataChange("value", Number(e.target.value))
