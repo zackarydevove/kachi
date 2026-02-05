@@ -1,7 +1,10 @@
-# 💰 Kachi - Net Worth Tracker
+# 💰 Kachi - Wealth Management Platform
 
-Full-stack Net Worth Tracker application designed for secure personal financial management, featuring automated asset aggregation via Plaid API and high-fidelity historical data tracking. It is engineered with a focus on security (JWT, 2FA), performance (Redis caching), and scalability using a Dockerized architecture ready for AWS deployment.
+Full-stack Wealth Management Platform application designed for secure personal financial management, featuring automated asset aggregation via Plaid API and high-fidelity historical data tracking. It is engineered with a focus on security (JWT, 2FA), performance (Redis caching), and scalability using a Dockerized architecture ready for AWS deployment.
 
+## 🚀 Demo
+
+The project is deployed and available at http://kachifrontend.vercel.app/
 
 ## 🛠️ Technology Stack
 
@@ -20,7 +23,7 @@ Full-stack Net Worth Tracker application designed for secure personal financial 
 ### DevOps & Infrastructure
 * **Docker / Docker-Compose**
 * **GitHub Actions CI/CD**
-* **AWS Services** (EC2, RDS, S3, ElastiCache)
+* **AWS** (EC2, RDS, API Gateway, S3, ElastiCache, VPC, IAM)
 
 ### Testing
 * **Jest**
@@ -30,7 +33,7 @@ Full-stack Net Worth Tracker application designed for secure personal financial 
 
 ## 🚀 Getting Started
 
-To set up and run this project locally, ensure you have **Node.js**, **Docker**, and **Docker-Compose** installed.
+To set up and run this project locally, ensure you have **Docker**, and **Docker-Compose** installed.
 
 ### 1. Clone the Repository
 
@@ -41,15 +44,11 @@ cd networth-tracker
 
 ### 2. Configure Environment Variables
 
-* Create a .env file in the root directory and configure the necessary variables for PostgreSQL, Redis, and the Plaid API keys following the .env.example file.
+* Create a .env file in the root, frontend, and backend directory and configure the necessary variables following the .env.example file.
 
 ### 3. Run with Docker-Compose
 
-* Install the packages running the following command
-```bash
-npm install
-```
-* Then build the containers using the Docker-Compose script, it will automaticly build the containeres and populate the database with sample data
+* Build the containers using the Docker-Compose, make sure your local postgres and redis are down and the ports you specified in the .env are available
 ```bash
 npm run start
 ```
