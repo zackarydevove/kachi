@@ -4,7 +4,7 @@ Full-stack Wealth Management Platform application designed for secure personal f
 
 ## 🚀 Demo
 
-The project is deployed and available at http://kachifrontend.vercel.app/
+The project is deployed and available at https://kachifrontend.vercel.app/
 
 ## 🛠️ Technology Stack
 
