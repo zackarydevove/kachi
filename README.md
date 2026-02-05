@@ -1,6 +1,6 @@
 # 💰 Kachi - Wealth Management Platform
 
-Full-stack Wealth Management Platform application designed for secure personal financial management, featuring automated asset aggregation via Plaid API and high-fidelity historical data tracking. It is engineered with a focus on security (JWT, 2FA), performance (Redis caching), and scalability using a Dockerized architecture ready for AWS deployment.
+Full-stack Wealth Management Platform application designed for secure personal financial management, featuring instant portfolio rebalancing and PnL calculation, automated asset aggregation via Plaid API and high-fidelity historical data tracking. Dockerized and fully deployed using AWS services.
 
 ## 🚀 Demo
 
