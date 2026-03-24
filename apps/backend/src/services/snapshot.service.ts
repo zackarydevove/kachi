@@ -4,7 +4,9 @@ import { prisma } from '@db';
 import { Asset } from 'types/asset.type';
 
 export default class SnapshotService {
-  public static today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  public static get today() {
+    return new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+  }
 
   private static async getSplit(accountId: number) {
     // Get all assets of accountId
